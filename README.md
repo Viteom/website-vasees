@@ -1,23 +1,78 @@
-# Vasees — concepto de sitio web
+# Vasees — Más años. Más futuro.
 
-React + TypeScript + Vite, with Tailwind CSS v4, Framer Motion and Lucide icons.
+Home e internas editoriales responsive para comunicación, cultura, tecnología y longevidad. React 19, TypeScript y Vite. Tipografía Pathway Extreme alojada localmente, licencia OFL en `public/fonts/OFL.txt`.
 
-## Development
+## Desarrollo
 
-Use Node.js 22.12+ (validated with Node.js 24).
+Node.js 24 y npm (validados en este entorno).
 
 ```sh
-npm ci
-npm run dev
+cd /workspace/website-vasees
+npm ci --cache /workspace/.npm --no-audit --no-fund
+npm run dev -- --port 5173 --strictPort
 ```
 
 ```sh
 npm run build
-npm run preview
+npm run preview -- --port 4173 --strictPort
+npm run smoke
+node scripts/export-preview.mjs
+npm run smoke:pages
 ```
 
-Components live in `src/components/ui`, imported through `@/components/ui`. This is the UI directory configured in `components.json` for shadcn; the `@` alias maps to `src`. Global styles and Tailwind theme tokens are in `src/styles.css`. Utilities are in `src/lib/utils.ts`.
+El smoke test de la home abre Chromium y levanta su propio servidor temporal en el puerto 5174. Comprueba navegación entre home y páginas, lectura del Observatorio, servicios, FAQ, diagnóstico, newsletter, preparación del correo, diseño a 1440/768/390 px y movimiento reducido. Guarda capturas en `.qa/` (ignoradas en Git). Usa `/usr/bin/chromium`; puedes indicar otra instalación mediante `CHROMIUM_PATH`. No necesita descargar un navegador. No detiene el servidor de desarrollo.
 
-`src/components/ui/prisma-hero.tsx` integrates the supplied component. Navigation links lead to introductory sections. The video has a playback control and a CSS background fallback. The supplied video is hosted by a third party and requires access to `d8j0ntlcm91z4.cloudfront.net` in the viewing browser.
+Cada tarea del entorno ya está aislada: utiliza este checkout; no crees un worktree salvo petición expresa. Los procesos deben iniciarse de nuevo después de restaurar el entorno. No hacen falta secretos ni backend para este alcance.
 
-The brand name is Vasees and the website copy is in Spanish. Workshop/program notices and contact placeholder remain concept content, pending launch details. No forms, backend or registration service are connected.
+## Edición
+
+- `src/content/home.ts`: servicios, capacidades, estados, iniciativas, clientes, preguntas, investigación y contacto. `enabled` controla qué servicios se muestran; `status` identifica Tech como línea en desarrollo.
+- `src/main.tsx`: recorrido de la home, navegación, fichas en diálogo, formulario de correo y ejercicio de diagnóstico.
+- `src/styles.css`: tokens de marca, home, tamaños responsive, tarjetas superpuestas y movimiento reducido.
+- `src/inner-pages.tsx` y `src/inner-pages.css`: composición y contenido de las internas.
+- `src/content/pages.ts`: metadatos, organizaciones, temas de Consulting y propuestas de la Escuela.
+- `src/navigation.tsx`: enlaces, historial y navegación con hash en la vista descargable.
+- `public/images/`: fotografías conceptuales generadas con IA y versión raster del logo sin slogan, preparada a partir del adjunto. Sustituir por el vector oficial antes del lanzamiento.
+
+## Internas y salida estática
+
+| Ruta | Recorrido |
+|---|---|
+| `/studio` | Marca, capacidades, proceso, experiencia relacionada, FAQ y contacto |
+| `/consulting` | Conversaciones expandibles, diseño de experiencias, cuidado y FAQ |
+| `/tech` | Enfoque en construcción y acceso a Kánna |
+| `/ecosistema` | Red con filtros por categoría e iniciativas propias |
+| `/observatorio` | Portada editorial, líneas de exploración, lecturas y fuentes |
+| `/observatorio/vivir-mas` | Lectura completa con índice y fuentes |
+| `/escuela` | Presentación pública, propuestas de aprendizaje y temas; sin inscripciones |
+| `/ecosistema/kanna` | Presentación de la iniciativa de talento senior en desarrollo |
+| `/la-chispa` | Proyecto editorial y acceso informativo al newsletter |
+
+`npm run build` genera HTML prerenderizado para la home y cada interna mediante `scripts/prerender.mjs`. Cada documento tiene su H1 y metadatos sin depender de JavaScript para leer su contenido. Las rutas se pueden servir desde sus directorios en cualquier alojamiento estático; también se genera `dist/404.html`.
+
+Después de compilar, `node scripts/export-preview.mjs` crea `.qa/Vasees-vista-previa.html`: un único archivo con imágenes y fuente incluidas. Utiliza rutas hash para navegar, volver atrás y recargar sin servidor. `npm run smoke:pages` requiere esta exportación y el build recientes; prueba las nueve internas, sus documentos HTML, tres anchos, filtros, temas, navegación y el archivo autocontenido.
+
+La Escuela es una presentación pública en preparación. No hay cuentas, aula, administración, matrículas, vacantes ni integraciones de newsletter simuladas.
+
+## Contenido e interacciones
+
+- Los clientes aparecen mediante sus nombres, sin inventar sus identidades gráficas. La franja se puede pausar y se detiene con movimiento reducido.
+- El manifiesto revela «Futuro. Longevidad. Humanidad.» de desenfoque a nitidez según el scroll. Con movimiento reducido queda nítido y estático.
+- El Observatorio tiene una exploración editorial completa de muestra. No se presenta como una investigación propia finalizada ni ofrece un PDF inexistente. Las dos cifras son proyecciones mundiales 60+ con fuente OMS enlazada.
+- El newsletter se llama **El Futuro tiene Canas**. Su acceso y suscripción están pendientes; la ficha ofrece una consulta por correo, sin confirmar altas ficticias.
+- Contacto prepara un `mailto:info@vasees.co` con los datos introducidos. El visitante revisa y envía en su aplicación de correo. No se simula envío ni se guardan datos.
+- El diagnóstico es un ejercicio orientativo de tres preguntas, no una evaluación validada. Las respuestas viven solo en memoria mientras el diálogo está abierto. Su acción final prepara un correo con el resumen.
+- Escuela y Kánna están identificadas en preparación/desarrollo. No hay inscripciones ni reproducción de videos ficticia.
+
+## Revisión y lanzamiento
+
+Esta versión incluye `noindex, nofollow` y una nota de revisión. No está desplegada a producción. Revisar antes de lanzar:
+
+1. Archivos y permisos de logos de clientes y logo vectorial oficial sin slogan.
+2. Fotografías autorizadas para sustituir las imágenes conceptuales, si se desean personas/proyectos reales.
+3. Investigación publicada, autoría, fecha y PDF real.
+4. URL del newsletter y proveedor de suscripción, consentimiento y política de privacidad si se activa captura de datos.
+5. Disponibilidad comercial de Tech y estado de cada iniciativa.
+6. Decisión de indexación y revisión editorial final.
+
+El usuario gestiona la publicación del entorno desde Codex. Este trabajo prepara su contenido y configuración; no realiza la publicación de una versión ni un despliegue web público.
