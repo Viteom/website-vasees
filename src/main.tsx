@@ -4,6 +4,7 @@ import { InnerPage } from './inner-pages';
 import { DemoProvider, isPortalPath, useDemo } from './portal/demo-store';
 import { Portal } from './portal';
 import { FlowerMotion } from './flower-motion';
+import { InitiativeCards } from './initiative-cards';
 import { SiteLink, usePath, navigate } from './navigation';
 import { pageMeta } from './content/pages';
 import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, List, X, Pause, Play, ArrowLeft, Sparkle, Check, GlobeHemisphereWest } from '@phosphor-icons/react';
@@ -12,6 +13,7 @@ import './styles.css';
 import './inner-pages.css';
 import './school.css';
 import './portal/portal.css';
+import './brand-pages.css';
 
 type ModalContent = { eyebrow: string; title: string; body: React.ReactNode; image?: string; subject?: string };
 const mail = (subject: string, body = '') => `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -143,7 +145,7 @@ function SiteApp({ initialPath }: { initialPath?: string }) {
       <section className="ecosystem section-wrap" id="ecosistema">
         <div className="section-label"><span className="status-dot" /> Ecosistema Vasees <span className="section-index">04 / 07</span></div>
         <div className="section-heading"><h2>El futuro se<br />construye en red.</h2><p>Ideas que se encuentran.<br />Experiencias que se comparten.<br />Una mirada que sigue creciendo.</p></div>
-        <div className="ecosystem-grid">{initiatives.map((item, index) => <article className={`initiative ${item.className}`} key={item.name}><div className="initiative-top"><span className="eyebrow">{item.label}</span>{index === 1 ? <Sparkle size={30} weight="light" /> : <ArrowUpRight size={28} />}</div><h3>{item.name}</h3><h4>{item.title}</h4><p>{item.text}</p><SiteLink className="initiative-action" href={['/ecosistema/kanna', '/la-chispa', '/escuela'][index]}><span>{item.status}</span><span className="small-round"><IconArrow /></span></SiteLink></article>)}</div>
+        <InitiativeCards />
       </section>
 
       <section className="diagnostic section-wrap" id="diagnostico"><div><p className="eyebrow"><GlobeHemisphereWest size={17} /> Un punto de partida</p><h2>¿Qué tan preparado<br />está tu presente<br />para el futuro?</h2></div><div className="diagnostic-right"><span className="tag">Diagnóstico de futuro</span><p>Tus públicos cambian.<br />Tus equipos también.<br />¿Y tu organización?</p><button className="button button-dark" onClick={() => setDiagnostic(true)}>Abre la conversación <IconArrow /></button><span className="fine-print">3 preguntas para explorar tu reto. Sin registro.</span></div></section>

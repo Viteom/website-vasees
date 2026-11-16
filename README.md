@@ -84,7 +84,7 @@ Home con hero floral, clientes por sus nombres, manifiesto que se revela de dese
 | `/observatorio` | Líneas de exploración, lecturas y fuentes |
 | `/observatorio/vivir-mas` | Lectura editorial de muestra con índice y contexto |
 | `/ecosistema/kanna` | Iniciativa de talento senior en desarrollo |
-| `/la-chispa` | Proyecto editorial sobre vida, vejez, cultura y arte |
+| `/la-chispa` | Medio editorial de Vasees: podcast, revista y campaña Cartografía de Pieles |
 
 El contacto público prepara un `mailto:info@vasees.co` para revisar en la aplicación de correo; el sitio no lo envía. El diagnóstico es un ejercicio orientativo, con respuestas temporales. El newsletter público ofrece información, sin activar suscripciones. Se respetan movimiento reducido, navegación por teclado y foco en los diálogos. La web conserva `noindex, nofollow` durante esta etapa de revisión.
 
@@ -101,6 +101,16 @@ El contacto público prepara un `mailto:info@vasees.co` para revisar en la aplic
 - `scripts/prerender.mjs`: documentos estáticos; `scripts/export-preview.mjs`: exportación autocontenida de revisión.
 
 El repositorio está vinculado al proyecto Vercel `website-vasees`. Los cambios enviados a su rama de producción pueden iniciar un despliegue; el estado **Ready** se comprueba en Vercel. Publicar una versión del entorno de Codex es una acción separada de la interfaz de Codex.
+
+## Identidades del ecosistema y La Chispa
+
+Las tarjetas de la home y de `/ecosistema` comparten el componente `src/initiative-cards.tsx`: Kánna con su logo original, crema, cobalto y tipografías del brandbook; La Chispa con sus trazados originales y naranja editorial; Escuela en azul fuerte. Los estilos están en `src/brand-pages.css`.
+
+`src/chispa.tsx` presenta el medio editorial de Vasees y la campaña Cartografía de Pieles, con cinco fotografías ampliables, contexto de la investigación-creación de Melissa Usme Botero y secciones de podcast y revista. El reproductor de YouTube se activa por acción del visitante y usa el video/lista facilitado por el usuario; también ofrece un enlace directo. La revista lleva a la campaña de esta web mientras no se disponga de un enlace independiente.
+
+De `Cartografia_de_Pieles_Vasees (1).pdf` se utilizaron **solo fotografías**, sin textos ni portada gráfica. La procedencia, las páginas de origen, las identidades y las licencias de fuentes se documentan en [docs/brand-sources.md](docs/brand-sources.md). La exportación autocontenida incluye los nuevos logos, fotografías, textura y fuentes; el reproductor externo necesita conexión.
+
+`npm run smoke:brands` comprueba las tarjetas en ambas páginas, tamaños de pantalla, galería, foco, enlaces del podcast, activación y configuración del reproductor, accesibilidad y navegación sin servidor. La prueba del reproductor utiliza una respuesta simulada de YouTube; no certifica la reproducción remota.
 
 
 ## Avances públicos de cursos

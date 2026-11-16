@@ -54,9 +54,9 @@ export const services: Service[] = [
 export const clients = ['Fundación Provida Colombia', 'Rödea Care', 'Precisión Logística', 'Comfama'];
 
 export const initiatives = [
-  { name: 'Kánna', label: 'Talento senior', title: 'La experiencia sigue\nabriendo caminos.', text: 'Exploramos cómo conectar trayectorias con nuevas oportunidades. Una plataforma propia para reconocer el talento senior.', status: 'En desarrollo', className: 'kanna' },
-  { name: 'La Chispa', label: 'Conversaciones que conectan', title: 'Historias para mirar\nde otra manera.', text: 'Vida, vejez, cultura y arte. Un proyecto editorial para cuestionar prejuicios y ampliar lo que imaginamos posible.', status: 'Proyecto editorial', className: 'chispa' },
-  { name: 'Escuela de Hijos y Nietos', label: 'Aprender a vivir más', title: 'Más generaciones.\nMás aprendizajes.', text: 'Un espacio en preparación para aprender sobre envejecimiento, cuidado, propósito y relaciones entre generaciones.', status: 'En preparación', className: 'escuela' },
+  { name: 'Kánna', label: 'Talento con trayectoria', title: 'Experiencia que abre\nposibilidades.', text: 'Una plataforma en desarrollo para conectar trayectorias, conocimientos y habilidades con nuevos retos.', status: 'En desarrollo', className: 'kanna' },
+  { name: 'La Chispa', label: 'Medio editorial de Vasees', title: 'Podcast. Revista.\nHistorias que conectan.', text: 'Vida, vejez, cultura y arte. Nuestra última campaña: Cartografía de Pieles.', status: 'Explorar La Chispa', className: 'chispa' },
+  { name: 'Escuela de Hijos y Nietos', label: 'Aprender a vivir más', title: 'Más generaciones.\nMás aprendizajes.', text: 'Un espacio para explorar el envejecimiento, el cuidado, el propósito y las relaciones entre generaciones.', status: 'Explora la Escuela', className: 'escuela' },
 ];
 
 export const research = [

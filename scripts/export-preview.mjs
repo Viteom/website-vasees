@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { schoolCourses } from '../src/content/school.ts';
 
@@ -18,6 +18,18 @@ for (const name of ['hero.webp', 'hero-flower.png', 'editorial.webp', 'studio.we
   const mime = name.endsWith('.png') ? 'image/png' : 'image/webp';
   assets[key] = `data:${mime};base64,${(await readFile(path.join(dist, key))).toString('base64')}`;
   js = js.replaceAll(JSON.stringify(key), `window.__VASEES_ASSETS[${JSON.stringify(key)}]`);
+}
+for (const name of await readdir(path.join(dist, 'images/brands'))) {
+  if (!/\.(png|webp|svg)$/.test(name)) continue;
+  const key = `/images/brands/${name}`;
+  const mime = name.endsWith('.svg') ? 'image/svg+xml' : name.endsWith('.png') ? 'image/png' : 'image/webp';
+  assets[key] = `data:${mime};base64,${(await readFile(path.join(dist, key))).toString('base64')}`;
+  js = js.replaceAll(JSON.stringify(key), `window.__VASEES_ASSETS[${JSON.stringify(key)}]`);
+  css = css.replaceAll(key, assets[key]);
+}
+for (const name of ['bricolage-grotesque.ttf', 'atkinson-regular.ttf']) {
+  const key = `/fonts/brands/${name}`;
+  css = css.replaceAll(key, `data:font/ttf;base64,${(await readFile(path.join(dist, key))).toString('base64')}`);
 }
 for (const course of schoolCourses) {
   for (const [key, mime] of [[course.trailer, 'video/mp4'], [course.trailerCaptions, 'text/vtt']]) {

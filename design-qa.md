@@ -167,3 +167,23 @@ Verificación: render de inicio/cierre con diferencia máxima y media de píxele
 Evidencias: `.qa/flower-home-1440.png`, `.qa/flower-home-390.png`, `.qa/flower-pose-a.png`, `.qa/flower-pose-b.png` y `.qa/flower-test-results.json`.
 
 final result: passed
+
+## Iteración: identidades del ecosistema y La Chispa
+
+Petición: aplicar el brandbook de cada iniciativa a sus tarjetas, usar azul fuerte en Escuela y desarrollar La Chispa como medio editorial de Vasees, con podcast, revista y su última campaña Cartografía de Pieles. La respuesta posterior del usuario aportó el enlace del podcast en YouTube.
+
+Resultado: tarjetas compartidas entre home y Ecosistema, con logo original de Kánna sobre crema y cobalto, logo y destello originales de La Chispa sobre naranja, y Escuela en azul fuerte. Se incorporaron Bricolage Grotesque y Atkinson Hyperlegible con licencias OFL para Kánna. La interna de La Chispa combina papel cálido, tinta, naranja, amarillo y fotografía, manteniendo la cabecera de Vasees.
+
+La campaña incluye contexto de la investigación-creación de Melissa Usme Botero, una selección fotográfica y un visor con anterior/siguiente, cierre por Escape y restitución del foco. Del documento `Cartografia_de_Pieles_Vasees (1).pdf` se utilizan únicamente cinco fotografías, de las páginas 2, 4, 6, 8 y 10. No se usan su texto ni la portada gráfica. La redacción procede de los otros dos documentos de investigación/podcast y de la instrucción del usuario. No se regeneraron los rostros. Fuentes, colores, licencias y alcance editorial: `docs/brand-sources.md`.
+
+El podcast enlaza al video y lista de YouTube facilitados por el usuario. El reproductor se monta tras pulsar Reproducir y conserva un acceso directo externo. La revista tiene sección propia y conecta con la campaña; no se inventa una publicación descargable. Se conserva la landing pública de Escuela antes del acceso, así como sus avances y los prototipos de estudiante y administración.
+
+Revisión visual: tarjetas en escritorio y móvil, portada de La Chispa, sección del podcast y visor móvil. Se ajustó el encuadre superior de la fotografía de portada para conservar la mirada del retrato. Se revisaron colores, logotipos, jerarquía editorial, imágenes y controles. Las diferencias de tipografía de La Chispa son intencionales: logo original en trazados y Georgia como alternativa editorial, sin distribuir las fuentes propietarias del brochure.
+
+Validación: compilación y prerender de 32 rutas correctos; 58 comprobaciones específicas de marcas aprobadas, incluidas 8 ejecuciones de axe sin infracciones WCAG A/AA automatizadas; 29 comprobaciones de home y 103 de internas/exportación aprobadas. Sin desbordamiento a 1440, 768 y 390 px, con imágenes cargadas y sin excepciones de JavaScript. La exportación autocontenida conserva los nuevos activos y la navegación por anclas. La activación y URL del iframe se comprobaron con una respuesta simulada; la reproducción remota de YouTube no se certifica desde este entorno.
+
+Evidencias: `.qa/brands/cards-{1440,768,390}.png`, `.qa/brands/chispa-{1440,768,390}.png` y sus capturas completas, `.qa/brands/gallery-{1440,390}.png`, `.qa/brands/podcast-1440.png`. Resultados: `.qa/brands-test-results.json` y `.qa/pages-test-results.json`.
+
+No quedan hallazgos P0/P1/P2 en el alcance revisado. El estado Ready del despliegue corresponde a Vercel y no se deduce del envío del commit.
+
+final result: passed

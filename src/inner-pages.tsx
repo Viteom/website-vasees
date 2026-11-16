@@ -4,6 +4,8 @@ import { services, initiatives, research, site } from './content/home';
 import { collaborationTopics, connections, learningTopics } from './content/pages';
 import { SiteLink } from './navigation';
 import { SchoolPage } from './school';
+import { InitiativeCards } from './initiative-cards';
+import { ChispaPage } from './chispa';
 
 const Arrow = () => <ArrowUpRight size={21} aria-hidden="true" />;
 const email = (subject: string) => `mailto:${site.email}?subject=${encodeURIComponent(subject)}`;
@@ -83,9 +85,6 @@ function Tech() {
   </>;
 }
 
-function InitiativeCards() {
-  return <div className="ecosystem-grid">{initiatives.map((item, i) => <article className={`initiative ${item.className}`} key={item.name}><div className="initiative-top"><span className="eyebrow">{item.label}</span><Arrow /></div><h3>{item.name}</h3><h4>{item.title}</h4><p>{item.text}</p><SiteLink className="initiative-action" href={['/ecosistema/kanna', '/la-chispa', '/escuela'][i]}><span>{item.status}</span><span className="small-round"><Arrow /></span></SiteLink></article>)}</div>;
-}
 
 function Ecosystem() {
   const [filter, setFilter] = useState('Todas');
@@ -117,27 +116,19 @@ function ResearchArticle() {
 
 function Kanna() {
   return <>
-    <Hero category="Ecosistema · Kánna" title={'La experiencia sigue\nabriendo caminos.'} description="Las trayectorias guardan conocimiento, capacidad y nuevas preguntas. Kánna explora cómo reconocer el talento senior y conectarlo con oportunidades." image="/images/editorial.webp" alt="Retrato conceptual de una mujer de cabello plateado" cta="Conversemos sobre Kánna" subject="Kánna · Talento senior" tone="kanna-hero" status="Producto propio en desarrollo" />
+    <Hero category="Ecosistema · Kánna" title={'Experiencia que abre\nposibilidades.'} description="Las trayectorias guardan conocimiento, capacidad y nuevas preguntas. Kánna explora cómo reconocer el talento senior y conectarlo con oportunidades." image="/images/editorial.webp" alt="Retrato conceptual de una mujer de cabello plateado" cta="Conversemos sobre Kánna" subject="Kánna · Talento senior" tone="kanna-hero" status="Producto propio en desarrollo" />
     <section className="inner-intro section-wrap"><Chapter label="Una iniciativa de Vasees" /><div><h2>El talento no tiene<br />una sola<br /><em>etapa de vida.</em></h2><div><p className="lead">Queremos explorar lo que sigue siendo posible.</p><p>Kánna es una plataforma propia en desarrollo para talento senior. Partimos de la escucha y de las trayectorias de las personas para pensar cómo conectar experiencia y nuevas oportunidades.</p><p>Esta página presenta la iniciativa. No hay registro de perfiles, vacantes ni procesos de selección habilitados.</p><SiteLink href="/tech" className="text-link">Conoce el enfoque de Vasees Tech<Arrow /></SiteLink></div></div></section>
     <Closing title={'¿Qué puede aportar\nuna nueva mirada?'} text="Si te interesa explorar talento senior desde tu organización o compartir una experiencia, conversemos." cta="Conectar con Vasees" subject="Kánna · Una nueva mirada al talento" />
   </>;
 }
 
-function Chispa() {
-  return <>
-    <Hero category="La Chispa" title={'Las historias también\ncambian el futuro.'} description="Conversaciones sobre vida, vejez, cultura y arte. Un proyecto editorial para cuestionar prejuicios y mirar de otra manera las posibilidades de una vida más larga." image="/images/editorial.webp" alt="Imagen conceptual de una mujer de cabello plateado entre flores y luz natural" cta="Conversemos sobre La Chispa" subject="La Chispa · Historias y conversaciones" tone="chispa-hero" status="Proyecto editorial" />
-    <section className="inner-intro section-wrap"><Chapter label="Conversaciones que conectan" /><div><h2>Una historia puede<br />cambiar<br /><em>una pregunta.</em></h2><div><p className="lead">No hay una sola forma de vivir, crear o envejecer.</p><p>La Chispa reúne la mirada editorial de Vasees sobre las historias y conversaciones que amplían lo que imaginamos posible.</p><p>Los videos, entrevistas y canales se incorporarán cuando estén confirmados. Mientras tanto, puedes compartir una historia que te gustaría poner en conversación.</p></div></div></section>
-    <section className="chispa-newsletter section-wrap"><div><Sparkle size={30} weight="light" /><p className="eyebrow">Insights · El newsletter de Vasees</p><h2>El Futuro<br />tiene Canas.</h2><p>Ideas sobre longevidad, cultura y las posibilidades de una vida más larga. Una conversación para seguir mirando lo que viene.</p><a className="button button-dark" href={email('Quiero leer El Futuro tiene Canas')}>Consultar el newsletter<Arrow /></a><span className="source-note">Acceso en preparación. La consulta abre tu correo; no registra una suscripción.</span></div><img src="/images/editorial.webp" alt="Retrato conceptual de una mujer mirando hacia la luz" loading="lazy" /></section>
-    <Closing title={'¿Qué historia merece\nseguir conversándose?'} text="Una experiencia, una idea o una pregunta puede ser el comienzo." cta="Comparte tu mirada" subject="Una historia para La Chispa" />
-  </>;
-}
 
 export function InnerPage({ path }: { path: string }) {
   const pages: Record<string, () => ReactNode> = {
     '/studio': Studio, '/consulting': Consulting, '/tech': Tech,
     '/ecosistema': Ecosystem, '/observatorio': Observatory,
     '/observatorio/vivir-mas': ResearchArticle, '/escuela': SchoolPage,
-    '/ecosistema/kanna': Kanna, '/la-chispa': Chispa,
+    '/ecosistema/kanna': Kanna, '/la-chispa': ChispaPage,
   };
   const Page = pages[path];
   return <main id="contenido" className={`inner-page page-${path.split('/').filter(Boolean).join('-')}`} key={path}>{Page ? <Page /> : <section className="not-found section-wrap"><p className="eyebrow">404 · Una nueva dirección</p><h1 tabIndex={-1}>Este camino<br />todavía no existe.</h1><p>Podemos volver al inicio y encontrar otra forma de seguir explorando.</p><SiteLink className="button button-dark" href="/">Volver a Vasees<ArrowRight size={18} /></SiteLink></section>}</main>;
