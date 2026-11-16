@@ -38,7 +38,13 @@ export function LoginPage({ path }: { path: string }) {
             email: store.authEmail || "laura@ejemplo.com",
           },
     );
-    navigate(role === "admin" ? "/admin" : "/escuela");
+    const destination = role === "admin" ? "/admin" : store.authDestination;
+    const course = store.courses.find(item => item.id === store.selectedCourse);
+    if (role === "student" && destination === "/escuela/aula" && course?.price === 0) {
+      store.setEnrolled(old => [...new Set([...old, course.id])]);
+    }
+    store.setAuthDestination("/escuela/inicio");
+    navigate(destination);
   }
   function submit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -93,9 +99,9 @@ export function LoginPage({ path }: { path: string }) {
       <section className="vp-auth-art">
         <div className="vp-auth-art-top">
           <SiteLink
-            href="/"
+            href="/escuela"
             className="vp-auth-back"
-            aria-label="Volver a Vasees"
+            aria-label="Volver a la Escuela"
           >
             <ArrowLeft size={21} />
           </SiteLink>
@@ -339,7 +345,7 @@ export function LoginPage({ path }: { path: string }) {
           )}
         </div>
         <div className="vp-auth-footer">
-          <SiteLink href="/">Volver a Vasees</SiteLink>
+          <SiteLink href="/escuela">Volver a la Escuela</SiteLink>
           <span>Más años. Más futuro.</span>
         </div>
       </section>

@@ -39,7 +39,7 @@ export function Portal({ path }: { path: string }) {
     return <LoginPage key={path} path={path} />;
   if (admin && store.session.role !== "admin") return <AccessPreview />;
   const routes: Record<string, React.ReactNode> = {
-    "/escuela": <StudentDashboard />,
+    "/escuela/inicio": <StudentDashboard />,
     "/escuela/explorar": <StudentCatalog key={path} />,
     "/escuela/mis-cursos": <StudentCatalog key={path} mine />,
     "/escuela/aula": <Classroom key={store.selectedCourse} />,
@@ -66,7 +66,7 @@ export function Portal({ path }: { path: string }) {
           action={
             <SiteLink
               className="vp-btn vp-btn-primary"
-              href={admin ? "/admin" : "/escuela"}
+              href={admin ? "/admin" : "/escuela/inicio"}
             >
               Volver al inicio
             </SiteLink>

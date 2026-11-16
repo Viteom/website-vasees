@@ -1,5 +1,6 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
+import { schoolCourses } from '../src/content/school.ts';
 
 // Export the built home as one offline file, including all fonts and images.
 const root = process.cwd();
@@ -17,6 +18,13 @@ for (const name of ['hero.webp', 'hero-flower.png', 'editorial.webp', 'studio.we
   const mime = name.endsWith('.png') ? 'image/png' : 'image/webp';
   assets[key] = `data:${mime};base64,${(await readFile(path.join(dist, key))).toString('base64')}`;
   js = js.replaceAll(JSON.stringify(key), `window.__VASEES_ASSETS[${JSON.stringify(key)}]`);
+}
+for (const course of schoolCourses) {
+  for (const [key, mime] of [[course.trailer, 'video/mp4'], [course.trailerCaptions, 'text/vtt']]) {
+    if (!key) continue;
+    assets[key] = `data:${mime};base64,${(await readFile(path.join(dist, key))).toString('base64')}`;
+    js = js.replaceAll(JSON.stringify(key), `window.__VASEES_ASSETS[${JSON.stringify(key)}]`);
+  }
 }
 const font = `data:font/ttf;base64,${(await readFile(path.join(dist, 'fonts/pathway-extreme.ttf'))).toString('base64')}`;
 css = css.replace(/url\((?:"|')?\/fonts\/pathway-extreme\.ttf(?:"|')?\)/g, `url("${font}")`);

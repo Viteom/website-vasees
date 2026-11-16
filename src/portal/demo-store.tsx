@@ -66,7 +66,7 @@ export const money = (value: number) =>
         maximumFractionDigits: 0,
       }).format(value);
 export const portalPaths = [
-  "/escuela",
+  "/escuela/inicio",
   "/escuela/ingresar",
   "/escuela/registro",
   "/escuela/verificar",
@@ -90,7 +90,7 @@ export const portalPaths = [
   "/admin/ajustes",
 ];
 export const isPortalPath = (path: string) =>
-  path.startsWith("/escuela") || path.startsWith("/admin");
+  path.startsWith("/escuela/") || path === "/admin" || path.startsWith("/admin/");
 
 const initialCourses: ManagedCourse[] = schoolCourses.map((course, index) => ({
   ...course,
@@ -169,6 +169,8 @@ type DemoStore = {
   setSettings: React.Dispatch<React.SetStateAction<DemoStore["settings"]>>;
   notice: string;
   setNotice: (value: string) => void;
+  authDestination: string;
+  setAuthDestination: (value: string) => void;
   authEmail: string;
   setAuthEmail: (value: string) => void;
   authName: string;
@@ -329,6 +331,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     ],
   });
   const [notice, setNotice] = useState("");
+  const [authDestination, setAuthDestination] = useState("/escuela/inicio");
   const [authEmail, setAuthEmail] = useState("laura@ejemplo.com");
   const [authName, setAuthName] = useState("Laura Gómez");
   const [authIntent, setAuthIntent] = useState<"login" | "register" | "reset">(
@@ -373,6 +376,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         setSettings,
         notice,
         setNotice,
+        authDestination,
+        setAuthDestination,
         authEmail,
         setAuthEmail,
         authName,

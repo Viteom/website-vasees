@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { InnerPage } from './inner-pages';
-import { DemoProvider, isPortalPath } from './portal/demo-store';
+import { DemoProvider, isPortalPath, useDemo } from './portal/demo-store';
 import { Portal } from './portal';
 import { SiteLink, usePath, navigate } from './navigation';
 import { pageMeta } from './content/pages';
@@ -22,6 +22,7 @@ export function App({ initialPath }: { initialPath?: string } = {}) {
 
 function SiteApp({ initialPath }: { initialPath?: string }) {
   const route = usePath(initialPath);
+  const schoolDemo = useDemo();
   const [menu, setMenu] = useState(false);
   const [paused, setPaused] = useState(false);
   const [modal, setModal] = useState<ModalContent | null>(null);
@@ -94,7 +95,7 @@ function SiteApp({ initialPath }: { initialPath?: string }) {
         </div>
         <button className="menu-toggle" aria-expanded={menu} aria-controls="mobile-navigation" aria-label={menu ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setMenu(!menu)}>{menu ? <X size={24} /> : <List size={24} />}</button>
       </nav>
-      <SiteLink className="header-cta" href="/#contacto"><span>Diseña tu futuro</span><span className="cta-icon"><IconArrow /></span></SiteLink>
+      <SiteLink className="header-cta" href={route === "/escuela" ? schoolDemo.session ? "/escuela/inicio" : "/escuela/ingresar" : "/#contacto"} onClick={() => { if (route === "/escuela") schoolDemo.setAuthDestination("/escuela/inicio"); }}><span>{route === "/escuela" ? schoolDemo.session ? "Mi Escuela" : "Ingresar" : "Diseña tu futuro"}</span><span className="cta-icon"><IconArrow /></span></SiteLink>
       {menu && <nav id="mobile-navigation" className="mobile-menu" aria-label="Navegación móvil">{[['Soluciones', '/#soluciones'], ['Observatorio', '/observatorio'], ['Ecosistema', '/ecosistema'], ['Escuela', '/escuela'], ['Conversemos', '/#contacto']].map(([label, href]) => <SiteLink key={href} href={href} onClick={() => setMenu(false)}>{label}<IconArrow /></SiteLink>)}</nav>}
     </header>
 

@@ -80,12 +80,12 @@ try {
   }
   const html = await (await fetch(`${base}/escuela/`)).text();
   ok(
-    html.includes("vp-auth-form") &&
+    html.includes("school-landing-hero") &&
       html.includes("school-mateo-melissa.webp") &&
       !html.includes("vp-student-welcome"),
-    "Direct School document renders an access gate",
+    "Direct School document renders its public landing",
   );
-  for (const route of ['/escuela', '/admin', '/escuela/perfil', '/admin/contenido']) {
+  for (const route of ['/escuela/inicio', '/admin', '/escuela/perfil', '/admin/contenido']) {
     const source = await (await fetch(`${base}${route}`)).text();
     ok(source.includes('vp-auth-art') && !source.includes('class="hero"'), `${route}: direct clean URL serves its own access document`);
   }
@@ -102,9 +102,29 @@ try {
     .getByRole("link", { name: "Escuela", exact: true })
     .click();
   ok(
-    await page.locator(".vp-auth").isVisible(),
-    "School navigation opens login",
+    await page.locator(".school-landing-hero").isVisible(),
+    "School navigation opens the public landing",
   );
+  ok(await page.locator('.site-header').isVisible(), 'Public School keeps the website header');
+  ok(await page.locator('.school-catalog-grid article').count() === 4, 'Public School shows published courses only');
+  await page.locator('.school-categories').getByRole('button', { name: 'Tecnología', exact: true }).click();
+  ok(await page.locator('.school-catalog-grid article').count() === 1, 'Public course category filter works');
+  await page.locator('.school-categories').getByRole('button', { name: 'Todos', exact: true }).click();
+  await page.getByRole('searchbox', { name: 'Buscar cursos', exact: true }).fill('tecnologia');
+  ok(await page.locator('.school-catalog-grid article').count() === 1, 'Public course search ignores accents');
+  await page.getByRole('button', { name: 'Limpiar búsqueda' }).click();
+  const publicPreview = page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Cuidar sin dejar de vivir', exact: true });
+  await publicPreview.click();
+  const video = page.locator('.school-course-dialog video');
+  await video.evaluate(element => element.play());
+  await page.waitForFunction(() => document.querySelector('.school-course-dialog video').currentTime > 0.2);
+  ok(await video.evaluate(element => element.duration > 9 && element.duration < 11), 'Public trailer is a playable ten-second demo');
+  await video.evaluate(element => element.pause());
+  ok(await page.locator('.school-course-dialog').getByRole('button', { name: 'Marcar como completada' }).count() === 0, 'Public preview does not expose classroom progress controls');
+  await page.keyboard.press('Escape');
+  ok(await publicPreview.evaluate(element => element === document.activeElement), 'Closing public preview restores focus');
+  await page.locator('.header-cta').click();
+  ok(await page.locator('.vp-auth-form').isVisible(), 'School header login opens the account access');
   await label("Contraseña de muestra").fill("demo-1234");
   await button("Mostrar contraseña").click();
   ok(
@@ -525,7 +545,7 @@ try {
   ];
   for (const width of [1440, 768, 390]) {
     await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
-    await page.goto(`${base}/escuela`, { waitUntil: "networkidle" });
+    await page.goto(`${base}/escuela/ingresar`, { waitUntil: "networkidle" });
     await shot(`login-${width}`);
     await audit("Login", width);
     ok(
@@ -635,6 +655,30 @@ try {
     if (width !== 768) await audit("Pago de muestra", width);
     await button("Cerrar sesión de demostración").click();
   }
+  for (const width of [1440, 768, 390]) {
+    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+    await page.goto(`${base}/escuela/`, { waitUntil: 'networkidle' });
+    await page.addStyleTag({ content: 'html{scroll-behavior:auto!important}' });
+    for (const image of await page.locator('main img').all()) { await image.scrollIntoViewIfNeeded(); await image.evaluate(element => element.decode()); }
+    await page.evaluate(() => scrollTo(0, 0));
+    await shot(`public-school-${width}`);
+    ok(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), `Public landing ${width}: no document overflow`);
+    await audit('Landing pública de Escuela', width);
+    await page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Tecnología que nos acerca', exact: true }).click();
+    if (width !== 768) { await shot(`public-trailer-${width}`); await audit('Tráiler público', width); }
+    await page.keyboard.press('Escape');
+  }
+  await page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Tecnología que nos acerca', exact: true }).click();
+  await button('Ingresar para continuar').click();
+  await label('Contraseña de muestra').fill('demo-1234');
+  await button('Entrar a mi Escuela').click();
+  await label('Código de 6 dígitos').fill('123456');
+  await button('Confirmar y continuar').click();
+  ok(page.url().endsWith('/escuela/pago') && (await page.locator('.vp-order-summary').innerText()).includes('Tecnología que nos acerca'), 'Login continues to the selected public course');
+  await page.evaluate(() => { history.pushState({}, '', '/escuela'); dispatchEvent(new PopStateEvent('popstate')); });
+  ok(await page.locator('.school-landing-hero').isVisible(), 'Landing stays public for signed-in demo visitors');
+  await page.locator('.header-cta').click();
+  ok(page.url().endsWith('/escuela/inicio') && await page.locator('.vp-student-welcome').isVisible(), 'My School links to its own student dashboard');
   await writeFile(
     ".qa/portal-accessibility.json",
     JSON.stringify(audits, null, 2),

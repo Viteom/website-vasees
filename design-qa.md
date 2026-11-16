@@ -135,3 +135,20 @@ Evidencias visuales: `.qa/portal-login-{1440,768,390}.png`, `.qa/portal-student-
 No quedan hallazgos P0/P1/P2 en el alcance visual revisado. No se presenta esta maqueta como autenticación, CMS persistente, cobro o servicio de envío real. La verificación del despliegue Ready corresponde a Vercel; enviar un commit no demuestra que haya terminado. La publicación del entorno de Codex sigue siendo una acción separada de su interfaz.
 
 final result: passed
+
+
+## Ajuste: landing pública antes del ingreso a Escuela
+
+La usuaria aclaró que Escuela debe conservar su landing con header, hero y avances antes de mostrar el acceso. `/escuela` vuelve a presentar la página pública; `/escuela/ingresar` abre el login y `/escuela/inicio` aloja el inicio del estudiante. Se conservan el backoffice, el aula, el perfil y el pago de muestra. Las personas con sesión también pueden recorrer la landing; su acción de cabecera es Mi Escuela.
+
+El catálogo público usa los cursos publicados del estado compartido con el panel. Las fichas presentan descripción, índice, valor y un avance visual sin exponer controles de progreso del aula. Al continuar, el acceso conserva el curso y dirige al aula o al pago según corresponda. Se actualizaron las preguntas frecuentes y los enlaces del área privada para explicar este recorrido.
+
+Se crearon seis clips locales MP4 de 10 segundos con imágenes conceptuales y títulos de los recorridos; los cuatro publicados se pueden reproducir desde la landing. Están rotulados como avances de demostración, sin audio, y disponen de VTT y equivalente textual en la ficha. No se activa reproducción automática. Los cursos nuevos sin clip muestran un estado de avance en preparación. La exportación sin servidor incluye MP4 y VTT. El hero público conserva la composición actualizada de Mateo y Melissa y el degradado azul/cian.
+
+Validación: 169 comprobaciones de Escuela/CMS aprobadas, incluyendo reproducción y duración del avance, cierre y restitución de foco, catálogo público, acceso posterior, continuidad del curso y entrada a Mi Escuela. Las 44 revisiones automatizadas de accesibilidad no detectan infracciones WCAG A/AA en las vistas revisadas. Las internas/exportación conservan 103 comprobaciones aprobadas. Se verificaron 1440, 768 y 390 px y se inspeccionaron capturas de la landing de escritorio y reproducción del avance en escritorio y móvil.
+
+Evidencias: `.qa/portal-public-school-{1440,768,390}.png`, `.qa/portal-public-trailer-{1440,390}.png`, `.qa/school-public-review-1440.png`, `.qa/school-public-trailer-playing.png` y `.qa/school-public-trailer-mobile.png`. Resultados: `.qa/school-test-results.json`, `.qa/portal-accessibility.json` y `.qa/pages-test-results.json`.
+
+No quedan hallazgos P0/P1/P2 en el alcance de este ajuste. El acceso sigue siendo una demostración temporal y las integraciones técnicas continúan pendientes.
+
+final result: passed

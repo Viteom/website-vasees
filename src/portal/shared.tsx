@@ -135,7 +135,7 @@ export function Modal({
 }
 
 const studentMenu = [
-  { path: "/escuela", label: "Mi inicio", icon: House },
+  { path: "/escuela/inicio", label: "Mi inicio", icon: House },
   { path: "/escuela/explorar", label: "Explorar cursos", icon: SquaresFour },
   { path: "/escuela/mis-cursos", label: "Mis cursos", icon: BookOpen },
   { path: "/escuela/perfil", label: "Mi perfil", icon: UserCircle },
@@ -198,7 +198,7 @@ export function PortalShell({
         ? { role: "student", name: "Laura Gómez", email: "laura@ejemplo.com" }
         : { role: "admin", name: "Equipo Vasees", email: "admin@example.com" },
     );
-    navigate(admin ? "/escuela" : "/admin");
+    navigate(admin ? "/escuela/inicio" : "/admin");
   }
   const sidebar = (
     <>
@@ -340,7 +340,7 @@ export function AccessPreview() {
         su diseño.
       </p>
       <div>
-        <SiteLink className="vp-btn vp-btn-secondary" href="/escuela">
+        <SiteLink className="vp-btn vp-btn-secondary" href="/escuela/inicio">
           Volver a mi Escuela
         </SiteLink>
         <button

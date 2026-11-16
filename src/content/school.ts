@@ -1,9 +1,9 @@
 export type Lesson = { title: string; text: string; reflection: string };
-export type SchoolCourse = { id: string; category: string; title: string; description: string; image: string; imageAlt: string; lessons: Lesson[] };
+export type SchoolCourse = { id: string; category: string; title: string; description: string; image: string; imageAlt: string; trailer?: string; trailerCaptions?: string; lessons: Lesson[] };
 
 export const schoolCourses: SchoolCourse[] = [
   {
-    id: 'cuidar-sin-dejar-de-vivir', category: 'Cuidado', title: 'Cuidar sin dejar de vivir',
+    id: 'cuidar-sin-dejar-de-vivir', trailer: '/videos/cuidar-sin-dejar-de-vivir.mp4', trailerCaptions: '/videos/cuidar-sin-dejar-de-vivir.vtt', category: 'Cuidado', title: 'Cuidar sin dejar de vivir',
     description: 'Acompañar a otra persona también implica hacer espacio para tu propia vida.',
     image: '/images/school-care.webp', imageAlt: 'Escena conceptual de dos generaciones compartiendo un momento alrededor de la mesa',
     lessons: [
@@ -13,7 +13,7 @@ export const schoolCourses: SchoolCourse[] = [
     ],
   },
   {
-    id: 'generaciones-que-se-encuentran', category: 'Generaciones', title: 'Generaciones que se encuentran',
+    id: 'generaciones-que-se-encuentran', trailer: '/videos/generaciones-que-se-encuentran.mp4', trailerCaptions: '/videos/generaciones-que-se-encuentran.vtt', category: 'Generaciones', title: 'Generaciones que se encuentran',
     description: 'Escuchar otras experiencias y descubrir lo que podemos aprender juntos.',
     image: '/images/school-generations.webp', imageAlt: 'Fotografía conceptual de una conversación entre dos adultos de distintas edades',
     lessons: [
@@ -23,7 +23,7 @@ export const schoolCourses: SchoolCourse[] = [
     ],
   },
   {
-    id: 'proposito-que-sigue-creciendo', category: 'Proyecto de vida', title: 'Un propósito que sigue creciendo',
+    id: 'proposito-que-sigue-creciendo', trailer: '/videos/proposito-que-sigue-creciendo.mp4', trailerCaptions: '/videos/proposito-que-sigue-creciendo.vtt', category: 'Proyecto de vida', title: 'Un propósito que sigue creciendo',
     description: 'Volver a preguntarnos qué queremos aprender, hacer y compartir en cada etapa.',
     image: '/images/studio.webp', imageAlt: 'Composición editorial conceptual de un libro abierto y materiales creativos',
     lessons: [
@@ -33,7 +33,7 @@ export const schoolCourses: SchoolCourse[] = [
     ],
   },
   {
-    id: 'tecnologia-que-nos-acerca', category: 'Tecnología', title: 'Tecnología que nos acerca',
+    id: 'tecnologia-que-nos-acerca', trailer: '/videos/tecnologia-que-nos-acerca.mp4', trailerCaptions: '/videos/tecnologia-que-nos-acerca.vtt', category: 'Tecnología', title: 'Tecnología que nos acerca',
     description: 'Herramientas y conversaciones para una vida digital con más autonomía.',
     image: '/images/hero-flower.png', imageAlt: 'Flor translúcida como imagen conceptual de la relación entre tecnología y vida',
     lessons: [
@@ -43,7 +43,7 @@ export const schoolCourses: SchoolCourse[] = [
     ],
   },
   {
-    id: 'acuerdos-para-cuidarnos', category: 'Cuidado', title: 'Pequeños acuerdos para cuidarnos',
+    id: 'acuerdos-para-cuidarnos', trailer: '/videos/acuerdos-para-cuidarnos.mp4', trailerCaptions: '/videos/acuerdos-para-cuidarnos.vtt', category: 'Cuidado', title: 'Pequeños acuerdos para cuidarnos',
     description: 'Hablar de responsabilidades, apoyos y decisiones antes de que todo sea urgente.',
     image: '/images/school-care.webp', imageAlt: 'Imagen conceptual de un encuentro cotidiano entre generaciones',
     lessons: [
@@ -53,7 +53,7 @@ export const schoolCourses: SchoolCourse[] = [
     ],
   },
   {
-    id: 'historias-que-nos-conectan', category: 'Generaciones', title: 'Historias que nos conectan',
+    id: 'historias-que-nos-conectan', trailer: '/videos/historias-que-nos-conectan.mp4', trailerCaptions: '/videos/historias-que-nos-conectan.vtt', category: 'Generaciones', title: 'Historias que nos conectan',
     description: 'La memoria y las experiencias como un puente entre distintas formas de vivir.',
     image: '/images/school-generations.webp', imageAlt: 'Imagen conceptual de un intercambio de experiencias entre generaciones',
     lessons: [

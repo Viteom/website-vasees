@@ -19,23 +19,25 @@ npm run smoke:pages
 npm run smoke:school
 ```
 
-La compilación valida TypeScript y genera 31 rutas estáticas y un 404. Las rutas de Escuela y administración generan el acceso de muestra: no se prerenderiza un perfil autenticado. Las pruebas levantan y cierran sus propios servidores en 5174, 5176 y 5177; usan Chromium del sistema (`CHROMIUM_PATH` permite cambiarlo). Las capturas y resultados quedan en `.qa/`, ignorada en Git. `smoke:pages` necesita la exportación reciente; `smoke:school` utiliza axe-core para comprobaciones automatizadas WCAG A/AA.
+La compilación valida TypeScript y genera 32 rutas estáticas y un 404. Las rutas de Escuela y administración generan el acceso de muestra: no se prerenderiza un perfil autenticado. Las pruebas levantan y cierran sus propios servidores en 5174, 5176 y 5177; usan Chromium del sistema (`CHROMIUM_PATH` permite cambiarlo). Las capturas y resultados quedan en `.qa/`, ignorada en Git. `smoke:pages` necesita la exportación reciente; `smoke:school` utiliza axe-core para comprobaciones automatizadas WCAG A/AA.
 
 ## Recorrer la Escuela y el backoffice
 
-- `/escuela` abre el acceso con Mateo y Melissa y el degradado azul de Vasees.
+- `/escuela` es la landing pública: header, hero con Mateo y Melissa, degradado azul, catálogo, avances en video, enfoque y preguntas.
+- **Ingresar** abre `/escuela/ingresar`. El área de estudiante tiene su propia ruta `/escuela/inicio`.
+- Puedes explorar los cursos y sus avances sin cuenta. Al continuar al aula o una inscripción se muestra el ingreso y se conserva el curso elegido.
 - Los botones **Vista estudiante** y **Vista administrador** permiten recorrer ambos perfiles de demostración.
 - El formulario de estudiante pasa por la vista de código: utiliza **123456**. El código es fijo y no se envía por correo.
 - Registro, recuperación y nueva contraseña son recorridos visuales. Usar datos ficticios.
 - `/admin` abre el acceso al backoffice; desde la Escuela se requiere un cambio explícito de vista demo.
 
-Todo el estado vive en memoria: se conserva al navegar en la misma pestaña y se reinicia al recargar. No se crean cuentas, no se validan identidades, no se guardan contraseñas, no hay permisos de servidor, transacciones, suscripciones ni envíos reales. El selector de rol es una herramienta para revisar la maqueta, no una implementación de seguridad.
+Todo el estado vive en memoria: se conserva al navegar en la misma pestaña y se reinicia al recargar. No se crean cuentas, no se validan identidades, no se guardan contraseñas, no hay permisos de servidor, transacciones, suscripciones ni envíos reales. El selector de rol es una herramienta para revisar la maqueta, no una implementación de seguridad. La landing pública permanece accesible también al iniciar la sesión demo; su botón cambia a Mi Escuela.
 
 ### Estudiante
 
 | Ruta | Experiencia |
 |---|---|
-| `/escuela` | Inicio, cursos en biblioteca, progreso y recomendaciones |
+| `/escuela/inicio` | Inicio privado de muestra, cursos en biblioteca, progreso y recomendaciones |
 | `/escuela/explorar` | Catálogo publicado, búsqueda sin acentos, categorías y ficha de curso |
 | `/escuela/mis-cursos` | Biblioteca de muestra con progreso |
 | `/escuela/aula` | Lectura de lecciones, reflexión, recursos y notas temporales |
@@ -60,7 +62,7 @@ Hay seis cursos iniciales con tres lecciones cada uno: cuatro publicados y dos b
 | `/admin/mensajes` | Plantillas para códigos, bienvenida, recuperación y resumen; vista de correo |
 | `/admin/ajustes` | Identidad, navegación de muestra, roles propuestos e integraciones pendientes |
 
-Publicar un curso en el panel actualiza el catálogo del estudiante en la misma sesión. Editar páginas y navegación actualiza su previsualización del CMS; no reescribe los archivos del sitio público ni despliega Vercel. Las imágenes locales se pueden elegir como portada durante esa sesión. Los recursos PDF/MP4 muestran sus metadatos; no hay reproducción, descarga o almacenamiento de esos recursos en un servidor.
+Publicar un curso en el panel actualiza el catálogo del estudiante en la misma sesión. Editar páginas y navegación actualiza su previsualización del CMS; no reescribe los archivos del sitio público ni despliega Vercel. Las imágenes locales se pueden elegir como portada durante esa sesión. Los recursos PDF/MP4 que se eligen en el editor muestran sus metadatos; no se almacenan en un servidor. Los avances de la landing son archivos de muestra locales independientes de esos recursos.
 
 ## Fase técnica pendiente
 
@@ -93,8 +95,15 @@ El contacto público prepara un `mailto:info@vasees.co` para revisar en la aplic
 - `src/portal/demo-store.tsx`: datos ficticios y estado temporal compartido.
 - `src/portal/index.tsx`, `shared.tsx`, `student.tsx`, `admin.tsx`, `portal.css`: acceso, layouts, estudiante, CMS y estilos.
 - `src/navigation.tsx`: navegación interna e historial; rutas hash para la exportación sin servidor.
-- `src/school.tsx`, `src/school.css`: primera composición de Escuela, conservada como referencia; el acceso actual está en `src/portal/`.
+- `src/school.tsx`, `src/school.css`: landing pública de Escuela y fichas con avances; el área de estudiante está en `src/portal/`.
 - `public/images/`: logo, fotografía conceptual y composición de Mateo y Melissa. La composición se corrigió usando el nuevo retrato de Melissa como referencia y se convirtió a WebP.
 - `scripts/prerender.mjs`: documentos estáticos; `scripts/export-preview.mjs`: exportación autocontenida de revisión.
 
 El repositorio está vinculado al proyecto Vercel `website-vasees`. Los cambios enviados a su rama de producción pueden iniciar un despliegue; el estado **Ready** se comprueba en Vercel. Publicar una versión del entorno de Codex es una acción separada de la interfaz de Codex.
+
+
+## Avances públicos de cursos
+
+Los seis cursos iniciales disponen de un clip MP4 de 10 segundos, silencioso e identificado como avance visual de demostración. La landing muestra los cuatro cursos publicados; los otros dos conservan sus clips preparados para una publicación de muestra desde el panel. Cada avance presenta el tema y el recorrido. Se incluye un archivo VTT en español y el índice textual de las lecciones junto al video. La reproducción es una acción del visitante, sin autoplay al abrir la landing ni al abrir la ficha.
+
+Los archivos están en `public/videos/`. Para regenerarlos localmente, con Node.js 24 y FFmpeg disponible, ejecuta `node scripts/generate-school-trailers.mjs`. La compilación y Vercel sirven los archivos ya incluidos y no necesitan FFmpeg. Los cursos nuevos sin un clip muestran «Avance en preparación». La exportación autocontenida incluye también los videos y sus pistas VTT.
