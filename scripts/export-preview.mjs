@@ -26,6 +26,11 @@ for (const course of schoolCourses) {
     js = js.replaceAll(JSON.stringify(key), `window.__VASEES_ASSETS[${JSON.stringify(key)}]`);
   }
 }
+{
+  const key = '/videos/hero-flower-breeze.mp4';
+  assets[key] = `data:video/mp4;base64,${(await readFile(path.join(dist, key))).toString('base64')}`;
+  js = js.replaceAll(JSON.stringify(key), `window.__VASEES_ASSETS[${JSON.stringify(key)}]`);
+}
 const font = `data:font/ttf;base64,${(await readFile(path.join(dist, 'fonts/pathway-extreme.ttf'))).toString('base64')}`;
 css = css.replace(/url\((?:"|')?\/fonts\/pathway-extreme\.ttf(?:"|')?\)/g, `url("${font}")`);
 html = html.replace(/\s*<link[^>]+rel="preload"[^>]*>/g, '');

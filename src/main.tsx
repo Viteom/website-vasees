@@ -3,6 +3,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 import { InnerPage } from './inner-pages';
 import { DemoProvider, isPortalPath, useDemo } from './portal/demo-store';
 import { Portal } from './portal';
+import { FlowerMotion } from './flower-motion';
 import { SiteLink, usePath, navigate } from './navigation';
 import { pageMeta } from './content/pages';
 import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, List, X, Pause, Play, ArrowLeft, Sparkle, Check, GlobeHemisphereWest } from '@phosphor-icons/react';
@@ -101,7 +102,7 @@ function SiteApp({ initialPath }: { initialPath?: string }) {
 
     {route === "/" ? <main id="contenido">
       <section className="hero" id="inicio" aria-labelledby="hero-heading">
-        <img className="hero-image" src="/images/hero-flower.png" alt="Flor coral translúcida sobre un fondo azul petróleo, una exploración visual entre naturaleza y tecnología" width="1536" height="1024" fetchPriority="high" />
+        <FlowerMotion />
         <div className="hero-shade" />
         <div className="hero-copy">
           <p className="eyebrow hero-eyebrow"><span className="status-dot" /> Más años. Más futuro.</p>

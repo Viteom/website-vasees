@@ -152,3 +152,18 @@ Evidencias: `.qa/portal-public-school-{1440,768,390}.png`, `.qa/portal-public-tr
 No quedan hallazgos P0/P1/P2 en el alcance de este ajuste. El acceso sigue siendo una demostración temporal y las integraciones técnicas continúan pendientes.
 
 final result: passed
+
+
+## Ajuste: brisa sutil en la flor del hero
+
+Petición: animar los pétalos con una brisa leve y repetición sin salto visible. Higgsfield fue mencionado por la usuaria; la búsqueda de herramientas y habilidades disponibles no encontró acceso a ese proveedor, por lo que se comunicó la limitación y se realizó una animación local sobre la fotografía existente.
+
+Resultado: desplazamiento localizado en los pétalos coral, con componentes periódicos suaves y el centro anclado. Fondo, tallo, encuadre y composición permanecen fijos. Se exportaron un clip MP4 silencioso de 12 segundos y un GIF de 720×480. La web utiliza el clip con reproducción inline y bucle; el GIF queda disponible como archivo independiente.
+
+Se conservó la imagen original como alternativa. Hay control de pausa/reanudación, suspensión fuera de pantalla o al ocultar la pestaña y una versión fija con movimiento reducido, que evita descargar el medio animado. En móvil el control queda visible cerca de la cabecera. Durante las pruebas se corrigió la superposición del área inferior que interceptaba el botón de pausa.
+
+Verificación: render de inicio/cierre con diferencia máxima y media de píxeles igual a cero; diferencia media cero en las regiones comprobadas del fondo y tallo; 270.430 píxeles con cambio perceptible en los pétalos. Los medios y el renderizador están ligados por hashes SHA-256. Pasaron 31 comprobaciones específicas de movimiento, las 29 de home y las 103 de internas/exportación. El hero no presenta infracciones WCAG A/AA automatizadas en la revisión. Se inspeccionaron las capturas de escritorio y móvil, con el texto y el encuadre conservados.
+
+Evidencias: `.qa/flower-home-1440.png`, `.qa/flower-home-390.png`, `.qa/flower-pose-a.png`, `.qa/flower-pose-b.png` y `.qa/flower-test-results.json`.
+
+final result: passed

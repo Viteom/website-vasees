@@ -14,6 +14,7 @@ npm run dev -- --port 5173 --strictPort
 ```sh
 npm run build
 npm run smoke
+npm run smoke:flower
 node scripts/export-preview.mjs
 npm run smoke:pages
 npm run smoke:school
@@ -107,3 +108,12 @@ El repositorio está vinculado al proyecto Vercel `website-vasees`. Los cambios 
 Los seis cursos iniciales disponen de un clip MP4 de 10 segundos, silencioso e identificado como avance visual de demostración. La landing muestra los cuatro cursos publicados; los otros dos conservan sus clips preparados para una publicación de muestra desde el panel. Cada avance presenta el tema y el recorrido. Se incluye un archivo VTT en español y el índice textual de las lecciones junto al video. La reproducción es una acción del visitante, sin autoplay al abrir la landing ni al abrir la ficha.
 
 Los archivos están en `public/videos/`. Para regenerarlos localmente, con Node.js 24 y FFmpeg disponible, ejecuta `node scripts/generate-school-trailers.mjs`. La compilación y Vercel sirven los archivos ya incluidos y no necesitan FFmpeg. Los cursos nuevos sin un clip muestran «Avance en preparación». La exportación autocontenida incluye también los videos y sus pistas VTT.
+
+
+## Movimiento sutil de la flor
+
+El hero de la home conserva su fotografía y encuadre. Sus pétalos tienen una oscilación localizada de 12 segundos; el fondo y el tallo permanecen quietos. El movimiento se generó localmente mediante el renderizador `src/flower-wind.ts`. Las herramientas de Higgsfield no estaban disponibles en este chat.
+
+La web reproduce `public/videos/hero-flower-breeze.mp4` (H.264, sin audio, 1296×864) en bucle, con pausa/reanudación y suspensión fuera de pantalla o al ocultar la pestaña. La imagen original aparece al cargar, si falla la reproducción y con movimiento reducido. En una visita con movimiento reducido no se solicita el video. `public/images/hero-flower-breeze.gif` es la versión GIF descargable de 720×480, también en bucle. La exportación autocontenida incluye la versión MP4.
+
+`npm run smoke:flower` comprueba reproducción, pausa, continuidad del bucle, encuadre, ausencia de cambios en la posición del texto, suspensión fuera de pantalla, movimiento reducido, imagen de respaldo y accesibilidad del hero. Los hashes y la comprobación de cierre del render están en `src/content/flower-motion-proof.json`. Para regenerar los medios, con Chromium y FFmpeg disponibles, ejecuta `node scripts/generate-flower-motion.mjs`; la compilación de Vercel sirve los archivos ya generados.

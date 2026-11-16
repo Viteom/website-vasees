@@ -1,0 +1,14 @@
+{
+  "duration": 12,
+  "seamMax": 0,
+  "seamMean": 0,
+  "movingPixels": 270430,
+  "backgroundMeanDifference": 0,
+  "stemMeanDifference": 0,
+  "sha256": {
+    "public/images/hero-flower.png": "ccc430dd4fe4b4b8d43f55bea40ea569cb444c5132e1a643399a924ee5dd9a03",
+    "src/flower-wind.ts": "03a9ce62c002ca4c2e9babeb924376f31fc7f1659ca1e6e1192c3a2e17cdc4bd",
+    "public/videos/hero-flower-breeze.mp4": "0c0baaf38a03aadeb6fa16400d8dca8aa8e5d14925b271ea3cd86a7dd84affed",
+    "public/images/hero-flower-breeze.gif": "72932a50da2a8803e9219de875e3475cc3d51a64f3c0bbb0b85ed7701e7bfcac"
+  }
+}
