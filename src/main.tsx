@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { InnerPage } from './inner-pages';
+import { DemoProvider, isPortalPath } from './portal/demo-store';
+import { Portal } from './portal';
 import { SiteLink, usePath, navigate } from './navigation';
 import { pageMeta } from './content/pages';
 import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, List, X, Pause, Play, ArrowLeft, Sparkle, Check, GlobeHemisphereWest } from '@phosphor-icons/react';
@@ -8,12 +10,17 @@ import { site, services, clients, initiatives, research, faqGroups, type Service
 import './styles.css';
 import './inner-pages.css';
 import './school.css';
+import './portal/portal.css';
 
 type ModalContent = { eyebrow: string; title: string; body: React.ReactNode; image?: string; subject?: string };
 const mail = (subject: string, body = '') => `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 const IconArrow = () => <ArrowUpRight size={21} weight="regular" aria-hidden="true" />;
 
 export function App({ initialPath }: { initialPath?: string } = {}) {
+  return <DemoProvider><SiteApp initialPath={initialPath} /></DemoProvider>;
+}
+
+function SiteApp({ initialPath }: { initialPath?: string }) {
   const route = usePath(initialPath);
   const [menu, setMenu] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -75,6 +82,7 @@ export function App({ initialPath }: { initialPath?: string } = {}) {
   function closeModal() { setModal(null); setDiagnostic(false); }
   function showResearch() { navigate('/observatorio/vivir-mas'); }
 
+  if (isPortalPath(route)) return <Portal path={route} />;
 
   return <>
     <SiteLink className="skip-link" href="#contenido">Ir al contenido</SiteLink>

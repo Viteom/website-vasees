@@ -108,3 +108,30 @@ Validación: compilación y prerender correctos; **35 comprobaciones específica
 No quedan hallazgos P0/P1/P2 en el alcance de esta iteración. La versión se entrega mediante el repositorio conectado a Vercel; un push no demuestra que el despliegue haya terminado.
 
 final result: passed
+
+
+## Iteración: acceso a Escuela, área de estudiante y backoffice CMS
+
+Alcance solicitado: adaptar el componente de acceso adjunto a Vasees, hacer que Escuela abra mediante login, preparar perfil, cursos y pago dummy, y crear un panel para gestionar cursos, páginas, medios, personas y mensajes. Las integraciones técnicas quedan para la siguiente fase. Se incorporó también la corrección del retrato de Melissa y el pedido de fondos con degradado.
+
+Resultado visual: acceso dividido entre portada azul con Mateo y Melissa y formulario blanco; navegación lateral petróleo, acentos lima, superficies marfil y degradados azul/cian y salvia. Se mantienen Pathway Extreme, logo sin eslogan y acentos editoriales en Georgia. El componente adjunto se adaptó al router y a los iconos existentes. La composición de presentadores se sustituyó usando el nuevo retrato de Melissa como referencia, conservando su gesto de la mano bajo el mentón y el vestuario. La composición se preparó con la herramienta de edición de imagen.
+
+Recorridos de estudiante: acceso con código de muestra, registro, recuperación, inicio, catálogo con filtros y búsqueda, ficha, curso gratuito, pago aprobado/rechazado con tarjeta de solo lectura y PSE de muestra, biblioteca, aula, progreso, notas, perfil, preferencias y resumen de pagos. Las credenciales no se guardan ni se registran en consola. Los cambios son temporales y se explica su reinicio al recargar.
+
+Recorridos administrativos: resumen, cursos publicados/borradores/archivados, duplicación, edición y orden de lecciones, portadas y recurso de muestra, publicación al catálogo de la sesión, editor de las diez páginas públicas, secciones ordenables y visibles, previsualización, biblioteca local, perfiles ficticios e invitaciones simuladas, pagos, plantillas y configuración. El CMS muestra sus cambios en su propia vista previa; no modifica el sitio público ni despliega Vercel. Las vistas de seguridad distinguen la entrega de mensajes de Resend de la autenticación y permisos pendientes de implementar en servidor.
+
+Hallazgos corregidos durante la revisión:
+
+- Etiquetas de selectores y áreas de texto incorporaban el contenido del control a su nombre accesible. Ahora tienen nombres estables y coherentes con la etiqueta visible.
+- Los pagos se filtraban por nombre del participante y desaparecían al editarlo. Se usa una identidad estable de demostración.
+- La etiqueta oculta de una tabla escapaba de su contenedor y ampliaba el documento móvil. Se corrigió su contenedor de posicionamiento, manteniendo el desplazamiento horizontal de la tabla.
+- Textos secundarios no alcanzaban el contraste requerido. Se oscurecieron, manteniendo la jerarquía visual.
+- Las URL estáticas sin barra final recibían la home y producían errores de hidratación. El prerender genera también documentos para URL limpias; se probaron acceso y recarga de estas rutas.
+
+Validación final: compilación TypeScript y prerender correctos; 155 comprobaciones de Escuela/CMS aprobadas, incluyendo ambos roles de muestra, edición de contenidos, paso de cursos de administrador a estudiante, pago, progreso, recuperación, recarga y ausencia de envíos de red. 39 ejecuciones de axe sobre acceso, áreas de estudiante/admin, editores, aula, ficha y checkout no detectaron infracciones WCAG A/AA automatizadas. Se revisaron 1440, 768 y 390 px; sin desbordamiento del documento en las vistas comprobadas. La home conserva sus 29 comprobaciones aprobadas y las internas/exportación sus 103 comprobaciones aprobadas. Resultados: `.qa/school-test-results.json` y `.qa/portal-accessibility.json`.
+
+Evidencias visuales: `.qa/portal-login-{1440,768,390}.png`, `.qa/portal-student-home-{1440,390}.png`, `.qa/portal-admin-home-{1440,390}.png`, `.qa/portal-course-editor-{1440,768,390}.png`, `.qa/portal-page-editor-{1440,768,390}.png`, `.qa/portal-classroom-{1440,768,390}.png`, `.qa/portal-checkout-{1440,768,390}.png`, `.qa/portal-cms-preview-1440.png` y `.qa/portal-resend-preview-1440.png`. Se inspeccionaron capturas reales del acceso y paneles de escritorio, acceso móvil, editor móvil, checkout móvil y correo. El conjunto de capturas cubre además catálogo, biblioteca, perfiles, pagos, medios y configuración.
+
+No quedan hallazgos P0/P1/P2 en el alcance visual revisado. No se presenta esta maqueta como autenticación, CMS persistente, cobro o servicio de envío real. La verificación del despliegue Ready corresponde a Vercel; enviar un commit no demuestra que haya terminado. La publicación del entorno de Codex sigue siendo una acción separada de su interfaz.
+
+final result: passed

@@ -1,82 +1,100 @@
-# Vasees — Más años. Más futuro.
+# Vasees · Más años. Más futuro.
 
-Home e internas editoriales responsive para comunicación, cultura, tecnología y longevidad. React 19, TypeScript y Vite. Tipografía Pathway Extreme alojada localmente, licencia OFL en `public/fonts/OFL.txt`.
+Web editorial y prototipo interactivo de la Escuela de Hijos y Nietos y su backoffice. React 19, TypeScript y Vite; tipografía Pathway Extreme alojada localmente (licencia OFL en `public/fonts/OFL.txt`).
 
-## Desarrollo
+## Desarrollo y verificación
 
-Node.js 24 y npm (validados en este entorno).
+Node.js 24 y npm, con Chromium disponible en el entorno.
 
 ```sh
-cd /workspace/website-vasees
 npm ci --cache /workspace/.npm --no-audit --no-fund
 npm run dev -- --port 5173 --strictPort
 ```
 
 ```sh
 npm run build
-npm run preview -- --port 4173 --strictPort
 npm run smoke
 node scripts/export-preview.mjs
 npm run smoke:pages
 npm run smoke:school
 ```
 
-El smoke test de la home abre Chromium y levanta su propio servidor temporal en el puerto 5174. Comprueba navegación entre home y páginas, lectura del Observatorio, servicios, FAQ, diagnóstico, newsletter, preparación del correo, diseño a 1440/768/390 px y movimiento reducido. Guarda capturas en `.qa/` (ignoradas en Git). Usa `/usr/bin/chromium`; puedes indicar otra instalación mediante `CHROMIUM_PATH`. No necesita descargar un navegador. No detiene el servidor de desarrollo.
+La compilación valida TypeScript y genera 31 rutas estáticas y un 404. Las rutas de Escuela y administración generan el acceso de muestra: no se prerenderiza un perfil autenticado. Las pruebas levantan y cierran sus propios servidores en 5174, 5176 y 5177; usan Chromium del sistema (`CHROMIUM_PATH` permite cambiarlo). Las capturas y resultados quedan en `.qa/`, ignorada en Git. `smoke:pages` necesita la exportación reciente; `smoke:school` utiliza axe-core para comprobaciones automatizadas WCAG A/AA.
 
-Cada tarea del entorno ya está aislada: utiliza este checkout; no crees un worktree salvo petición expresa. Los procesos deben iniciarse de nuevo después de restaurar el entorno. No hacen falta secretos ni backend para este alcance.
+## Recorrer la Escuela y el backoffice
 
-## Edición
+- `/escuela` abre el acceso con Mateo y Melissa y el degradado azul de Vasees.
+- Los botones **Vista estudiante** y **Vista administrador** permiten recorrer ambos perfiles de demostración.
+- El formulario de estudiante pasa por la vista de código: utiliza **123456**. El código es fijo y no se envía por correo.
+- Registro, recuperación y nueva contraseña son recorridos visuales. Usar datos ficticios.
+- `/admin` abre el acceso al backoffice; desde la Escuela se requiere un cambio explícito de vista demo.
 
-- `src/content/home.ts`: servicios, capacidades, estados, iniciativas, clientes, preguntas, investigación y contacto. `enabled` controla qué servicios se muestran; `status` identifica Tech como línea en desarrollo.
-- `src/main.tsx`: recorrido de la home, navegación, fichas en diálogo, formulario de correo y ejercicio de diagnóstico.
-- `src/styles.css`: tokens de marca, home, tamaños responsive, tarjetas superpuestas y movimiento reducido.
-- `src/inner-pages.tsx` y `src/inner-pages.css`: composición y contenido de las internas.
-- `src/content/pages.ts`: metadatos, organizaciones y temas de Consulting.
-- `src/school.tsx`, `src/school.css` y `src/content/school.ts`: Escuela, catálogo de seis cursos demo y sus tres lecciones de muestra por curso.
-- `src/navigation.tsx`: enlaces, historial y navegación con hash en la vista descargable.
-- `public/images/`: fotografías conceptuales generadas con IA y versión raster del logo sin slogan, preparada a partir del adjunto. Sustituir por el vector oficial antes del lanzamiento. El hero de Escuela usa `school-mateo-melissa.webp`, una composición con fondo retirado a partir de las dos fotografías aportadas por el usuario; `school-care.webp` y `school-generations.webp` son imágenes conceptuales para cursos de muestra.
+Todo el estado vive en memoria: se conserva al navegar en la misma pestaña y se reinicia al recargar. No se crean cuentas, no se validan identidades, no se guardan contraseñas, no hay permisos de servidor, transacciones, suscripciones ni envíos reales. El selector de rol es una herramienta para revisar la maqueta, no una implementación de seguridad.
 
-## Internas y salida estática
+### Estudiante
 
-| Ruta | Recorrido |
+| Ruta | Experiencia |
 |---|---|
-| `/studio` | Marca, capacidades, proceso, experiencia relacionada, FAQ y contacto |
-| `/consulting` | Conversaciones expandibles, diseño de experiencias, cuidado y FAQ |
-| `/tech` | Enfoque en construcción y acceso a Kánna |
-| `/ecosistema` | Red con filtros por categoría e iniciativas propias |
-| `/observatorio` | Portada editorial, líneas de exploración, lecturas y fuentes |
-| `/observatorio/vivir-mas` | Lectura completa con índice y fuentes |
-| `/escuela` | Hero con Mateo y Melissa, carrusel, búsqueda, filtros y seis cursos demo con tres lecciones cada uno |
-| `/ecosistema/kanna` | Presentación de la iniciativa de talento senior en desarrollo |
-| `/la-chispa` | Proyecto editorial y acceso informativo al newsletter |
+| `/escuela` | Inicio, cursos en biblioteca, progreso y recomendaciones |
+| `/escuela/explorar` | Catálogo publicado, búsqueda sin acentos, categorías y ficha de curso |
+| `/escuela/mis-cursos` | Biblioteca de muestra con progreso |
+| `/escuela/aula` | Lectura de lecciones, reflexión, recursos y notas temporales |
+| `/escuela/perfil` | Datos, preferencias, newsletter y vista de acceso |
+| `/escuela/pago` | Pago simulado con tarjeta fija o PSE de muestra; aprobado y rechazado |
+| `/escuela/pagos` | Historial y resumen sin validez fiscal |
 
-`npm run build` genera HTML prerenderizado para la home y cada interna mediante `scripts/prerender.mjs`. Cada documento tiene su H1 y metadatos sin depender de JavaScript para leer su contenido. Las rutas se pueden servir desde sus directorios en cualquier alojamiento estático; también se genera `dist/404.html`.
+Hay seis cursos iniciales con tres lecciones cada uno: cuatro publicados y dos borradores visibles en administración. Los valores en COP son ilustrativos. El pago aprobado añade el curso a la biblioteca de esta demo; el curso gratuito se añade sin pasar por pago. La tarjeta de muestra es de solo lectura y no admite datos reales. Las notas del aula duran mientras se permanezca en esa vista.
 
-Después de compilar, `node scripts/export-preview.mjs` crea `.qa/Vasees-vista-previa.html`: un único archivo con imágenes y fuente incluidas. Utiliza rutas hash para navegar, volver atrás y recargar sin servidor. `npm run smoke:pages` requiere esta exportación y el build recientes; prueba las nueve internas, sus documentos HTML, tres anchos, filtros, temas, navegación y el archivo autocontenido.
+### Administración
 
-La Escuela incluye un catálogo de demostración: las fichas permiten leer tres lecciones, moverse entre ellas y marcarlas como leídas. Ese estado vive en memoria y se reinicia al cerrar la ficha. No hay cuentas, pagos, certificados, matrículas, vacantes ni integraciones de newsletter simuladas.
+| Ruta | Experiencia |
+|---|---|
+| `/admin` | Resumen y accesos a contenidos |
+| `/admin/cursos` | Buscar, filtrar, crear, duplicar, archivar y recuperar cursos |
+| `/admin/curso` | Información, precio, portada, lecciones, orden, recurso de muestra y publicación en demo |
+| `/admin/contenido` | Las diez páginas públicas de Vasees |
+| `/admin/pagina` | Título, descripción, secciones, orden, visibilidad y previsualización editorial |
+| `/admin/medios` | Biblioteca, incorporación local de archivos y detalle |
+| `/admin/usuarios` | Perfiles ficticios, roles, estado e invitaciones simuladas |
+| `/admin/pagos` | Registro, filtros y detalle de operaciones de muestra |
+| `/admin/mensajes` | Plantillas para códigos, bienvenida, recuperación y resumen; vista de correo |
+| `/admin/ajustes` | Identidad, navegación de muestra, roles propuestos e integraciones pendientes |
 
-`npm run smoke:school` comprueba la navegación (Escuela sustituye a Insights en el menú; Insights permanece en la home), catálogo, búsqueda sin acentos, filtros, carrusel, lectura de lecciones, estado de progreso, teclado, foco y diseño a 1440/768/390 px. Requiere el build reciente y usa su propio puerto 5177.
+Publicar un curso en el panel actualiza el catálogo del estudiante en la misma sesión. Editar páginas y navegación actualiza su previsualización del CMS; no reescribe los archivos del sitio público ni despliega Vercel. Las imágenes locales se pueden elegir como portada durante esa sesión. Los recursos PDF/MP4 muestran sus metadatos; no hay reproducción, descarga o almacenamiento de esos recursos en un servidor.
 
-## Contenido e interacciones
+## Fase técnica pendiente
 
-- Los clientes aparecen mediante sus nombres, sin inventar sus identidades gráficas. La franja se puede pausar y se detiene con movimiento reducido.
-- El manifiesto revela «Futuro. Longevidad. Humanidad.» de desenfoque a nitidez según el scroll. Con movimiento reducido queda nítido y estático.
-- El Observatorio tiene una exploración editorial completa de muestra. No se presenta como una investigación propia finalizada ni ofrece un PDF inexistente. Las dos cifras son proyecciones mundiales 60+ con fuente OMS enlazada.
-- El newsletter se llama **El Futuro tiene Canas**. Su acceso y suscripción están pendientes; la ficha ofrece una consulta por correo, sin confirmar altas ficticias.
-- Contacto prepara un `mailto:info@vasees.co` con los datos introducidos. El visitante revisa y envía en su aplicación de correo. No se simula envío ni se guardan datos.
-- El diagnóstico es un ejercicio orientativo de tres preguntas, no una evaluación validada. Las respuestas viven solo en memoria mientras el diálogo está abierto. Su acción final prepara un correo con el resumen.
-- Los cursos de Escuela están identificados como muestras y Kánna continúa en desarrollo. No hay inscripciones ni reproducción de videos ficticia.
+El alcance aprobado es visual. Resend es el único proveedor previsto para códigos y mensajes transaccionales. Las plantillas no realizan solicitudes de envío ni solicitan una clave API.
 
-## Revisión y lanzamiento
+Resend entrega correos; el backend deberá crear y verificar los códigos, gestionar su caducidad y límites de intentos, autenticar sesiones y aplicar permisos de estudiante, editor y administrador. También quedan pendientes la base de datos del CMS, almacenamiento de archivos, pasarela de pago y sus confirmaciones. Esta demo no requiere secretos de esos servicios.
 
-Esta versión incluye `noindex, nofollow` y una nota de revisión. No está desplegada a producción. Revisar antes de lanzar:
+## Web pública
 
-1. Archivos y permisos de logos de clientes y logo vectorial oficial sin slogan.
-2. Fotografías autorizadas para sustituir las imágenes conceptuales, si se desean personas/proyectos reales.
-3. Investigación publicada, autoría, fecha y PDF real.
-4. URL del newsletter y proveedor de suscripción, consentimiento y política de privacidad si se activa captura de datos.
-5. Disponibilidad comercial de Tech y estado de cada iniciativa.
-6. Decisión de indexación y revisión editorial final.
+Home con hero floral, clientes por sus nombres, manifiesto que se revela de desenfoque a nitidez al hacer scroll, soluciones, Observatorio, ecosistema, diagnóstico, FAQ e Insights. Insights se conserva en la home; Escuela ocupa su lugar en la navbar. El newsletter se llama **El Futuro tiene Canas**.
 
-El usuario gestiona la publicación del entorno desde Codex. Este trabajo prepara su contenido y configuración; no realiza la publicación de una versión ni un despliegue web público.
+| Ruta | Contenido |
+|---|---|
+| `/studio` | Marca, comunicación, capacidades, proceso y FAQ |
+| `/consulting` | Cultura, cuidado, conversaciones y colaboración intergeneracional |
+| `/tech` | Tecnología para longevidad; línea en desarrollo |
+| `/ecosistema` | Organizaciones e iniciativas, con filtros |
+| `/observatorio` | Líneas de exploración, lecturas y fuentes |
+| `/observatorio/vivir-mas` | Lectura editorial de muestra con índice y contexto |
+| `/ecosistema/kanna` | Iniciativa de talento senior en desarrollo |
+| `/la-chispa` | Proyecto editorial sobre vida, vejez, cultura y arte |
+
+El contacto público prepara un `mailto:info@vasees.co` para revisar en la aplicación de correo; el sitio no lo envía. El diagnóstico es un ejercicio orientativo, con respuestas temporales. El newsletter público ofrece información, sin activar suscripciones. Se respetan movimiento reducido, navegación por teclado y foco en los diálogos. La web conserva `noindex, nofollow` durante esta etapa de revisión.
+
+## Archivos principales
+
+- `src/main.tsx`, `src/styles.css`: home y navegación pública.
+- `src/inner-pages.tsx`, `src/inner-pages.css`, `src/content/`: internas, contenidos y metadatos.
+- `src/components/ui/sign-in-page.tsx`: adaptación visual del componente adjunto, con los enlaces e iconos ya utilizados por Vasees.
+- `src/portal/demo-store.tsx`: datos ficticios y estado temporal compartido.
+- `src/portal/index.tsx`, `shared.tsx`, `student.tsx`, `admin.tsx`, `portal.css`: acceso, layouts, estudiante, CMS y estilos.
+- `src/navigation.tsx`: navegación interna e historial; rutas hash para la exportación sin servidor.
+- `src/school.tsx`, `src/school.css`: primera composición de Escuela, conservada como referencia; el acceso actual está en `src/portal/`.
+- `public/images/`: logo, fotografía conceptual y composición de Mateo y Melissa. La composición se corrigió usando el nuevo retrato de Melissa como referencia y se convirtió a WebP.
+- `scripts/prerender.mjs`: documentos estáticos; `scripts/export-preview.mjs`: exportación autocontenida de revisión.
+
+El repositorio está vinculado al proyecto Vercel `website-vasees`. Los cambios enviados a su rama de producción pueden iniciar un despliegue; el estado **Ready** se comprueba en Vercel. Publicar una versión del entorno de Codex es una acción separada de la interfaz de Codex.

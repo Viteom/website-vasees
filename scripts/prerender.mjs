@@ -20,10 +20,13 @@ try {
     const folder = route === '/' ? 'dist' : path.join('dist', route.slice(1));
     await mkdir(folder, { recursive: true });
     await writeFile(path.join(folder, 'index.html'), html);
+    // Clean URLs must receive the matching document even on static servers
+    // that do not redirect directory URLs to a trailing slash.
+    if (route !== '/') await writeFile(path.join('dist', `${route.slice(1)}.html`), html);
   }
   const notFound = renderToString(React.createElement(App, { initialPath: '/404' }));
   await writeFile('dist/404.html', template.replace('<div id="root"></div>', () => `<div id="root">${notFound}</div>`).replace(/<title>[^<]*<\/title>/, '<title>Página no encontrada | Vasees</title>'));
-  console.log(`Pre-rendered ${Object.keys(pageMeta).length} public pages and a 404 document.`);
+  console.log(`Pre-rendered ${Object.keys(pageMeta).length} static routes (including demo access gates) and a 404 document.`);
 } finally {
   await vite.close();
 }

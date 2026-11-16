@@ -53,8 +53,7 @@ try {
   await page.locator('.consulting-topics summary').nth(2).click();
   ok(await page.locator('.consulting-topics details').nth(2).getAttribute('open') !== null, 'Consulting topic expands');
   await page.goto('http://127.0.0.1:5176/escuela/', { waitUntil: 'networkidle' });
-  await page.locator('.school-categories').getByRole('button', { name: 'Generaciones', exact: true }).click();
-  ok((await page.locator('.school-catalog-grid article').count()) === 2, 'School filters its demo courses');
+  ok(await page.locator('.vp-auth-form').isVisible(), 'School opens through the login prototype');
   await page.goto('http://127.0.0.1:5176/tech/', { waitUntil: 'networkidle' });
   await page.getByRole('link', { name: 'Conocer Kánna', exact: true }).click();
   ok(page.url().endsWith('/ecosistema/kanna'), 'Tech links to its initiative');

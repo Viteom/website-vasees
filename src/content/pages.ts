@@ -11,6 +11,11 @@ export const pageMeta: Record<string, { title: string; description: string }> = 
   '/la-chispa': { title: 'La Chispa — Historias para mirar de otra manera | Vasees', description: 'Un proyecto editorial de Vasees sobre vida, vejez, cultura y arte. Historias para ampliar nuestra mirada sobre la longevidad.' },
 };
 
+const portalTitles: Record<string, string> = {
+  '/escuela/ingresar': 'Acceso a la Escuela', '/escuela/registro': 'Crea tu perfil de muestra', '/escuela/verificar': 'Código de acceso de muestra', '/escuela/recuperar': 'Recuperar acceso', '/escuela/nueva-contrasena': 'Nueva contraseña de muestra', '/escuela/explorar': 'Explorar cursos', '/escuela/mis-cursos': 'Mis cursos', '/escuela/aula': 'Mi aula de muestra', '/escuela/perfil': 'Mi perfil', '/escuela/pagos': 'Mis pagos de muestra', '/escuela/pago': 'Pago de prueba', '/admin': 'Backoffice Vasees', '/admin/cursos': 'Administrar cursos', '/admin/curso': 'Editor de cursos', '/admin/contenido': 'Páginas y contenido', '/admin/pagina': 'Editor de página', '/admin/medios': 'Biblioteca de medios', '/admin/usuarios': 'Personas y acceso', '/admin/pagos': 'Administrar pagos de muestra', '/admin/mensajes': 'Correos y códigos', '/admin/ajustes': 'Configuración del ecosistema',
+};
+for (const [path, title] of Object.entries(portalTitles)) pageMeta[path] = { title: `${title} | Vasees`, description: 'Prototipo interactivo de la Escuela y el CMS Vasees. Acceso, cursos, perfiles, pagos y correos de demostración.' };
+
 export const collaborationTopics = [
   ['Colaborar entre generaciones', 'Explorar qué supuestos sobre la edad aparecen en el trabajo y qué acuerdos ayudarían a colaborar.'],
   ['Compartir lo que sabemos', 'Hacer visible el conocimiento que se aprende con la experiencia y buscar formas de compartirlo dentro del equipo.'],
