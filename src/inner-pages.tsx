@@ -3,6 +3,7 @@ import { ArrowUpRight, ArrowRight, ArrowLeft, Plus, Minus, Sparkle, Check } from
 import { services, initiatives, research, site } from './content/home';
 import { collaborationTopics, connections, learningTopics } from './content/pages';
 import { SiteLink } from './navigation';
+import { SchoolPage } from './school';
 
 const Arrow = () => <ArrowUpRight size={21} aria-hidden="true" />;
 const email = (subject: string) => `mailto:${site.email}?subject=${encodeURIComponent(subject)}`;
@@ -113,20 +114,6 @@ function ResearchArticle() {
   return <article className="research-article"><header className="article-heading section-wrap"><div className="inner-breadcrumb"><SiteLink href="/">Inicio</SiteLink><span>/</span><SiteLink href="/observatorio">Observatorio</SiteLink><span>/</span><span>Lectura destacada</span></div><p className="eyebrow">Exploración editorial de muestra · Tres miradas</p><h1 tabIndex={-1}>Vivir más.<br /><em>¿Estamos listos?</em></h1><p>Más años de vida cambian las preguntas que hacemos sobre el trabajo, el cuidado y el diseño. Tres puntos de partida para conversar sobre esas decisiones.</p><div className="article-cover"><img src="/images/editorial.webp" alt="Retrato conceptual de una mujer mirando hacia la luz" fetchPriority="high" /><span className="image-note">Imagen conceptual</span></div></header><div className="article-reading section-wrap"><aside><p className="eyebrow">En esta lectura</p>{research.map(item => <SiteLink href={`#lectura-${item.number}`} key={item.number}><span>{item.number}</span>{item.short}</SiteLink>)}<SiteLink href="#fuentes"><Arrow />Fuentes y contexto</SiteLink></aside><div className="article-body"><p className="article-lead">Vivir más no es solo añadir años. También nos invita a revisar qué hacemos con ellos y qué posibilidades ayudan a construir nuestras organizaciones.</p><p>El trabajo, las redes de cuidado y los servicios reúnen decisiones que tomamos hoy. Mirarlas desde la longevidad abre preguntas sobre las distintas trayectorias de las personas y los entornos que las acompañan.</p>{research.map(item => <section id={`lectura-${item.number}`} key={item.number}><span className="eyebrow">{item.number} / {item.short}</span><h2>{item.title}</h2><p>{item.text}</p><blockquote>{item.number === '01' ? 'La experiencia no sigue una sola línea.' : item.number === '02' ? 'Una responsabilidad compartida necesita conversaciones compartidas.' : 'Diseñar empieza por observar, no por suponer.'}</blockquote></section>)}<section id="fuentes" className="article-sources"><span className="eyebrow">Fuentes y contexto</span><h2>Los datos también<br />necesitan una mirada.</h2><p>Según las proyecciones mundiales recogidas por la OMS, en 2030 una de cada seis personas tendrá 60 años o más. Para 2050, la población mundial de 60 años o más se proyecta en 2.100 millones.</p><a className="text-link" href={site.source} target="_blank" rel="noreferrer">OMS · Envejecimiento y salud (2025)<Arrow /></a><p className="source-note">Las cifras son proyecciones mundiales para población de 60 años o más. Los tres territorios anteriores son una reflexión editorial de muestra de Vasees, no resultados de investigación propia. No se ofrece un PDF de estudio.</p></section><SiteLink className="button button-dark" href="/observatorio"><ArrowLeft size={18} />Volver al Observatorio</SiteLink></div></div><Closing title={'El futuro se entiende\ncon más de una mirada.'} text="¿Qué cambia en tu organización cuando las personas viven más? Abramos esa pregunta." cta="Conversemos sobre longevidad" subject="Una pregunta para el Observatorio" /></article>;
 }
 
-function School() {
-  const [selected, setSelected] = useState(0);
-  const current = learningTopics[selected];
-  return <>
-    <Hero category="Escuela de Hijos y Nietos" title={'Aprender a vivir\nmás, juntos.'} description="¿Cómo ofrecemos ayuda sin decidir por otra persona? ¿Cómo nos repartimos el cuidado? Un espacio en preparación para abrir conversaciones que a veces dejamos para después." image="/images/consulting.webp" alt="Imagen conceptual de dos generaciones compartiendo un aprendizaje" cta="Quiero conocer la Escuela" subject="Escuela de Hijos y Nietos" tone="school-hero" status="En preparación" />
-    <section className="learning section-wrap" id="cursos"><Chapter label="Lo que estamos preparando" /><div className="section-heading"><h2>Aprendizajes para<br />la vida que compartimos.</h2><p>Propuestas editoriales en preparación.<br />Aún no hay cursos ni inscripciones abiertas.</p></div><div className="learning-grid">{learningTopics.map((topic, index) => <article key={topic.id}><img src={topic.image} alt="Imagen conceptual para ilustrar el tema de aprendizaje" loading="lazy" /><div><span className="eyebrow">{topic.category} · En preparación</span><h3>{topic.title}</h3><p>{topic.text}</p><button className="text-link" onClick={() => { setSelected(index); document.getElementById('enfoque')?.scrollIntoView({ behavior: 'auto' }); }}>Explorar este tema<Arrow /></button></div></article>)}</div></section>
-    <section className="learning-focus section-wrap" id="enfoque"><Chapter label="Aprender · Conectar · Aplicar" /><div className="learning-tabs" role="group" aria-label="Temas de aprendizaje">{learningTopics.map((item, index) => <button key={item.id} onClick={() => setSelected(index)} aria-pressed={selected === index}>{item.category}</button>)}</div><div className="learning-focus-content" aria-live="polite"><h2>{current.title}</h2><div><p className="lead">{current.text}</p><p>Comprender qué cambia al envejecer. Reconocer lo que cada generación puede enseñar. Llevar una pregunta o un ejercicio a una situación cotidiana.</p><span className="tag">Contenido en preparación</span></div></div></section>
-    <FAQ items={[
-      ['¿Quién puede aprender en la Escuela?', 'La propuesta se dirige a personas mayores, hijos, nietos y quienes quieren comprender el envejecimiento, el cuidado y las relaciones entre generaciones.'],
-      ['¿Ya puedo crear una cuenta o inscribirme?', 'Todavía no. Los temas que ves son propuestas editoriales en preparación. El catálogo, las cuentas y las inscripciones se anunciarán cuando estén habilitados.'],
-    ]} />
-    <Closing title={'Hay conversaciones\nque nos acercan.'} text="Cuéntanos qué te gustaría aprender o qué pregunta no has encontrado dónde hacer." cta="Conversemos sobre la Escuela" subject="Escuela de Hijos y Nietos" tone="lilac-closing" />
-  </>;
-}
 
 function Kanna() {
   return <>
@@ -149,7 +136,7 @@ export function InnerPage({ path }: { path: string }) {
   const pages: Record<string, () => ReactNode> = {
     '/studio': Studio, '/consulting': Consulting, '/tech': Tech,
     '/ecosistema': Ecosystem, '/observatorio': Observatory,
-    '/observatorio/vivir-mas': ResearchArticle, '/escuela': School,
+    '/observatorio/vivir-mas': ResearchArticle, '/escuela': SchoolPage,
     '/ecosistema/kanna': Kanna, '/la-chispa': Chispa,
   };
   const Page = pages[path];

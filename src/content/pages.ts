@@ -6,7 +6,7 @@ export const pageMeta: Record<string, { title: string; description: string }> = 
   '/ecosistema': { title: 'Ecosistema silver | Vasees', description: 'Conoce las iniciativas y organizaciones que amplían nuestra mirada sobre longevidad, cuidado, conocimiento y talento senior.' },
   '/observatorio': { title: 'Observatorio de Envejecimiento y Vejez | Vasees', description: 'Preguntas, fuentes y lecturas sobre longevidad, trabajo, cuidado y diseño de servicios.' },
   '/observatorio/vivir-mas': { title: 'Vivir más. ¿Estamos listos? | Observatorio Vasees', description: 'Una exploración editorial de muestra sobre trabajo, redes de cuidado y diseño para una sociedad más longeva.' },
-  '/escuela': { title: 'Escuela de Hijos y Nietos | Vasees', description: 'Un espacio en preparación para aprender sobre envejecimiento, cuidado y relaciones entre generaciones.' },
+  '/escuela': { title: 'Escuela de Hijos y Nietos | Vasees', description: 'Aprender a vivir más, juntos. Con Mateo y Melissa, explora cursos de muestra sobre cuidado, generaciones, tecnología y proyecto de vida.' },
   '/ecosistema/kanna': { title: 'Kánna — La experiencia sigue abriendo caminos | Vasees', description: 'Conoce la iniciativa de Vasees en desarrollo para reconocer el talento senior y conectar trayectorias con oportunidades.' },
   '/la-chispa': { title: 'La Chispa — Historias para mirar de otra manera | Vasees', description: 'Un proyecto editorial de Vasees sobre vida, vejez, cultura y arte. Historias para ampliar nuestra mirada sobre la longevidad.' },
 };

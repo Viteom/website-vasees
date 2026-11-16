@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build && node scripts/prerender.mjs",
     "preview": "vite preview --host 0.0.0.0",
     "smoke": "node scripts/smoke.mjs",
-    "smoke:pages": "node scripts/smoke-pages.mjs"
+    "smoke:pages": "node scripts/smoke-pages.mjs",
+    "smoke:school": "node scripts/smoke-school.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

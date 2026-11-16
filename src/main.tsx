@@ -7,6 +7,7 @@ import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, List, X, Pause, Play,
 import { site, services, clients, initiatives, research, faqGroups, type Service } from './content/home';
 import './styles.css';
 import './inner-pages.css';
+import './school.css';
 
 type ModalContent = { eyebrow: string; title: string; body: React.ReactNode; image?: string; subject?: string };
 const mail = (subject: string, body = '') => `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -81,12 +82,12 @@ export function App({ initialPath }: { initialPath?: string } = {}) {
       <nav className="nav-pill" aria-label="Navegación principal">
         <SiteLink className="brand" href="/" aria-label="Vasees, inicio" onClick={() => setMenu(false)}><img src="/images/vasees-logo.png" width="112" height="38" alt="Vasees" /></SiteLink>
         <div className={`nav-links ${menu ? 'is-open' : ''}`}>
-          {[['Soluciones', '/#soluciones'], ['Observatorio', '/observatorio'], ['Ecosistema', '/ecosistema'], ['Insights', '/#insights']].map(([label, href]) => <SiteLink key={href} href={href} onClick={() => setMenu(false)} aria-current={route === href ? "page" : undefined}>{label}</SiteLink>)}
+          {[['Soluciones', '/#soluciones'], ['Observatorio', '/observatorio'], ['Ecosistema', '/ecosistema'], ['Escuela', '/escuela']].map(([label, href]) => <SiteLink key={href} href={href} onClick={() => setMenu(false)} aria-current={route === href ? "page" : undefined}>{label}</SiteLink>)}
         </div>
         <button className="menu-toggle" aria-expanded={menu} aria-controls="mobile-navigation" aria-label={menu ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setMenu(!menu)}>{menu ? <X size={24} /> : <List size={24} />}</button>
       </nav>
       <SiteLink className="header-cta" href="/#contacto"><span>Diseña tu futuro</span><span className="cta-icon"><IconArrow /></span></SiteLink>
-      {menu && <nav id="mobile-navigation" className="mobile-menu" aria-label="Navegación móvil">{[['Soluciones', '/#soluciones'], ['Observatorio', '/observatorio'], ['Ecosistema', '/ecosistema'], ['Insights', '/#insights'], ['Conversemos', '/#contacto']].map(([label, href]) => <SiteLink key={href} href={href} onClick={() => setMenu(false)}>{label}<IconArrow /></SiteLink>)}</nav>}
+      {menu && <nav id="mobile-navigation" className="mobile-menu" aria-label="Navegación móvil">{[['Soluciones', '/#soluciones'], ['Observatorio', '/observatorio'], ['Ecosistema', '/ecosistema'], ['Escuela', '/escuela'], ['Conversemos', '/#contacto']].map(([label, href]) => <SiteLink key={href} href={href} onClick={() => setMenu(false)}>{label}<IconArrow /></SiteLink>)}</nav>}
     </header>
 
     {route === "/" ? <main id="contenido">
@@ -160,7 +161,7 @@ export function App({ initialPath }: { initialPath?: string } = {}) {
       <Contact />
       <section className="closing"><p className="eyebrow">Future proof. Human first.</p><h2>Más años.<br /><span>Más futuro.</span></h2><a className="round-arrow" href="#inicio" aria-label="Volver al inicio"><ArrowUpRight size={28} /></a></section>
     </main> : <InnerPage path={route} />}
-    <footer className="footer"><div className="footer-top"><SiteLink className="footer-brand" href="/"><img src="/images/vasees-logo.png" alt="Vasees" width="170" height="58" /></SiteLink><p>Comunicación, cultura y tecnología<br />para una sociedad más longeva.</p><a href={mail('Hablemos del futuro')}>{site.email}<IconArrow /></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Vasees</span><div><SiteLink href="/#soluciones">Soluciones</SiteLink><SiteLink href="/ecosistema">Ecosistema</SiteLink><SiteLink href="/observatorio">Observatorio</SiteLink><button onClick={() => setModal({ eyebrow: 'Información del sitio', title: 'Privacidad y contacto', body: <><p>Esta vista de revisión no almacena formularios, respuestas al diagnóstico ni suscripciones. Los botones de correo abren tu aplicación de correo para que revises y envíes el mensaje.</p><p>La política de tratamiento de datos y las integraciones de formularios se incorporarán antes de habilitar la recopilación de información.</p></> })}>Privacidad</button></div><span>Hecho para lo que viene.</span></div><p className="preview-note">Vista de diseño · Fotografías conceptuales generadas con IA. Nombres de organizaciones como referencia; logos oficiales pendientes.</p></footer>
+    <footer className="footer"><div className="footer-top"><SiteLink className="footer-brand" href="/"><img src="/images/vasees-logo.png" alt="Vasees" width="170" height="58" /></SiteLink><p>Comunicación, cultura y tecnología<br />para una sociedad más longeva.</p><a href={mail('Hablemos del futuro')}>{site.email}<IconArrow /></a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Vasees</span><div><SiteLink href="/#soluciones">Soluciones</SiteLink><SiteLink href="/ecosistema">Ecosistema</SiteLink><SiteLink href="/observatorio">Observatorio</SiteLink><button onClick={() => setModal({ eyebrow: 'Información del sitio', title: 'Privacidad y contacto', body: <><p>Esta vista de revisión no almacena formularios, respuestas al diagnóstico ni suscripciones. Los botones de correo abren tu aplicación de correo para que revises y envíes el mensaje.</p><p>La política de tratamiento de datos y las integraciones de formularios se incorporarán antes de habilitar la recopilación de información.</p></> })}>Privacidad</button></div><span>Hecho para lo que viene.</span></div><p className="preview-note">Vista de diseño · Imágenes conceptuales y fotografías aportadas. Logos de organizaciones pendientes.</p></footer>
 
     <dialog ref={dialog} className={`detail-dialog ${diagnostic ? 'diagnostic-dialog' : ''}`} aria-labelledby="dialog-title" onCancel={closeModal} onClick={event => { if (event.target === event.currentTarget) closeModal(); }}>
       <button className="dialog-close" aria-label="Cerrar ventana" onClick={closeModal}><X size={24} /></button>

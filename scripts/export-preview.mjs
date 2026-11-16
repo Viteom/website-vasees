@@ -12,7 +12,7 @@ if (!jsFile || !cssFile) throw new Error('Run npm run build before exporting.');
 let js = await readFile(path.join(dist, jsFile), 'utf8');
 let css = await readFile(path.join(dist, cssFile), 'utf8');
 const assets = {};
-for (const name of ['hero.webp', 'hero-flower.png', 'editorial.webp', 'studio.webp', 'consulting.webp', 'vasees-logo.png']) {
+for (const name of ['hero.webp', 'hero-flower.png', 'editorial.webp', 'studio.webp', 'consulting.webp', 'vasees-logo.png', 'school-mateo-melissa.webp', 'school-care.webp', 'school-generations.webp']) {
   const key = `/images/${name}`;
   const mime = name.endsWith('.png') ? 'image/png' : 'image/webp';
   assets[key] = `data:${mime};base64,${(await readFile(path.join(dist, key))).toString('base64')}`;

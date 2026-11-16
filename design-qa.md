@@ -91,4 +91,20 @@ Verificación: compilación y prerender de 10 páginas, **29 comprobaciones de h
 
 La publicación del entorno sigue siendo una acción del producto Codex. Guardar la configuración no publica la versión. No se ha hecho un despliegue de la web a Internet.
 
+## Iteración: Escuela con Mateo y Melissa
+
+Petición: sustituir Insights por Escuela en la navbar, mantener Insights en la home, desarrollar Escuela con cursos dummy e incluir a Mateo y Melissa en su hero. Fuentes visuales: las capturas adjuntas de Heal Learning y BBVA Aprendemos Juntos, más las dos fotografías aportadas por el usuario.
+
+Implementación: hero azul con composición fotográfica transparente de los dos presentadores; seis cursos de muestra en carrusel y catálogo, búsqueda insensible a acentos, filtros por tema, ficha de curso con tres lecciones demo, ejercicios de reflexión y marcado de lectura. No hay pagos, matrículas, videos o certificaciones ficticios. El progreso se reinicia al cerrar la ficha y así se indica en ella.
+
+Activos: `public/images/school-mateo-melissa.webp` deriva de las fotografías suministradas (Melissa en posición vertical y fondos retirados). Se comprobó visualmente la composición y las identidades respecto a las fotos del usuario. `school-care.webp` y `school-generations.webp` son fotografías conceptuales generadas para ilustrar los cursos, optimizadas en WebP.
+
+Evidencia final: `.qa/school-final-1440.png`, `.qa/school-final-768.png`, `.qa/school-final-390.png`, sus versiones `-full.png`, `.qa/school-course-desktop.png` y `.qa/school-final-mobile-dialog.png`. Se revisaron el hero, los retratos, el catálogo, los recortes y los estados de la ficha. Las diferencias respecto a las referencias (marca, texto, colores, personas y ausencia de reproducción de videos sin contenido) son adaptaciones intencionales.
+
+Superficies revisadas: Pathway Extreme con acentos editoriales en Georgia, ritmo y espacios, azul/lila/marfil de Vasees, calidad y transparencia de fotografías, copy español y etiquetas de demostración. El menú de escritorio y móvil contiene Escuela y no contiene Insights; la sección Insights de la home se conserva.
+
+Validación: compilación y prerender correctos; **35 comprobaciones específicas de Escuela aprobadas**, incluido foco dentro del diálogo y restitución al cerrar, lectura completa, reinicio de progreso, filtros y estados vacíos; sin overflow a 1440, 768 y 390 px. Axe no detectó infracciones WCAG 2 A/AA y 2.1 AA en página y ficha, tanto a 1440 como a 390 px (4 ejecuciones). Los resultados de interacción están en `.qa/school-test-results.json`.
+
+No quedan hallazgos P0/P1/P2 en el alcance de esta iteración. La versión se entrega mediante el repositorio conectado a Vercel; un push no demuestra que el despliegue haya terminado.
+
 final result: passed
