@@ -11,11 +11,11 @@ server.stderr.on('data', data => logs += data.toString());
 const ok = (condition, message) => { assert.ok(condition, message); count++; };
 const routes = ['/studio', '/consulting', '/tech', '/ecosistema', '/observatorio', '/observatorio/vivir-mas', '/escuela', '/ecosistema/kanna', '/la-chispa'];
 try {
-  for (let i = 0; i < 100 && !logs.includes('Local:'); i++) {
+  for (let i = 0; i < 100 && !/Local/.test(logs); i++) {
     if (server.exitCode !== null) throw new Error(logs);
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  ok(logs.includes('Local:'), 'Production preview starts');
+  ok(/Local/.test(logs), 'Production preview starts');
   await mkdir('.qa', { recursive: true });
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });

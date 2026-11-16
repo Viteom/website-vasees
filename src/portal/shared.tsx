@@ -259,7 +259,9 @@ export function PortalShell({
       <a className="skip-link" href="#portal-content">
         Ir al contenido
       </a>
-      <aside className="vp-sidebar">{sidebar}</aside>
+      <aside className="vp-sidebar" aria-label="Menú de la plataforma">
+        {sidebar}
+      </aside>
       <dialog
         ref={menuDialog}
         className="vp-mobile-nav"
@@ -306,7 +308,11 @@ export function PortalShell({
             </button>
           </div>
         </header>
-        <div className="vp-demo-banner">
+        <div
+          className="vp-demo-banner"
+          role="region"
+          aria-label="Aviso de modo demo"
+        >
           <Info size={16} />
           <span>
             <strong>Modo demo.</strong> No hay autenticación, cobros ni envíos

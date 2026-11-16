@@ -19,11 +19,11 @@ async function audit(page, name, selector) {
   ok(results.violations.length === 0, `${name}: ${JSON.stringify(results.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })))}`);
 }
 try {
-  for (let i = 0; i < 100 && !logs.includes('Local:'); i++) {
+  for (let i = 0; i < 100 && !/Local/.test(logs); i++) {
     if (server.exitCode !== null) throw new Error(logs);
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  ok(logs.includes('Local:'), 'Production server starts');
+  ok(/Local/.test(logs), 'Production server starts');
   await mkdir('.qa/brands', { recursive: true });
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage'] });
   const page = await browser.newPage();

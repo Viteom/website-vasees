@@ -27,11 +27,11 @@ const ok = (value, message) => {
 };
 const base = "http://127.0.0.1:5177";
 try {
-  for (let i = 0; i < 100 && !logs.includes("Local:"); i++) {
+  for (let i = 0; i < 100 && !/Local/.test(logs); i++) {
     if (server.exitCode !== null) throw new Error(logs);
     await new Promise((resolve) => setTimeout(resolve, 100));
   }
-  ok(logs.includes("Local:"), "Production preview starts");
+  ok(/Local/.test(logs), "Production preview starts");
   await mkdir(".qa", { recursive: true });
   browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || "/usr/bin/chromium",

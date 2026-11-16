@@ -335,6 +335,11 @@ export function StudentCatalog({ mine = false }: { mine?: boolean }) {
         ))}
       </div>
       {shown.length ? (
+        <h2 className="sr-only">
+          {mine ? "Cursos en tu biblioteca" : "Cursos disponibles"}
+        </h2>
+      ) : null}
+      {shown.length ? (
         <div className="vp-course-grid">
           {shown.map((course) => (
             <CourseTile
@@ -769,6 +774,9 @@ export function Checkout() {
     "idle",
   );
   const [consent, setConsent] = useState(false);
+  // Evaluated once on entry: returning to this view (for example with the
+  // browser's back button) must not offer a second payment for an owned course.
+  const [ownedOnEntry] = useState(() => store.enrolled.includes(course.id));
   async function pay(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!consent || state === "loading") return;
@@ -804,7 +812,31 @@ export function Checkout() {
         title="Tu próximo aprendizaje."
         description="Recorre una pasarela de pago de muestra. No se solicita una tarjeta real ni se realiza ningún cargo."
       />
-      {state === "success" ? (
+      {ownedOnEntry ? (
+        <div className="vp-payment-success">
+          <CheckCircle size={58} weight="light" />
+          <Badge>Ya en tu biblioteca</Badge>
+          <h2>Este curso ya es parte de tu recorrido.</h2>
+          <p>
+            No hace falta repetir el pago de prueba. Puedes continuar donde te
+            quedaste o explorar otra conversación.
+          </p>
+          <div className="vp-payment-summary">
+            <span>{course.title}</span>
+            <strong>En tu biblioteca</strong>
+          </div>
+          <button
+            className="vp-btn vp-btn-primary"
+            onClick={() => navigate("/escuela/aula")}
+          >
+            Ir a mi curso
+            <ArrowRight size={18} />
+          </button>
+          <SiteLink href="/escuela/explorar" className="vp-text-button">
+            Explorar otros cursos
+          </SiteLink>
+        </div>
+      ) : state === "success" ? (
         <div className="vp-payment-success">
           <CheckCircle size={58} weight="light" />
           <Badge>Operación simulada</Badge>
