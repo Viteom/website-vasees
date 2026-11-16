@@ -34,7 +34,7 @@ try {
       ok(await page.locator('h1').count() === 1, `${route} at ${width}: one heading after hydration`);
       ok(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), `${route} at ${width}: no horizontal overflow`);
       for (const image of await page.locator('main img').all()) {
-        await image.scrollIntoViewIfNeeded();
+        if (!await image.evaluate(el => Boolean(el.closest('.chispa-guest')))) await image.scrollIntoViewIfNeeded();
         await image.evaluate(img => img.decode());
       }
       ok(await page.locator('img').evaluateAll(images => images.every(img => img.complete && img.naturalWidth)), `${route} at ${width}: images loaded`);

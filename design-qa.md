@@ -187,3 +187,23 @@ Evidencias: `.qa/brands/cards-{1440,768,390}.png`, `.qa/brands/chispa-{1440,768,
 No quedan hallazgos P0/P1/P2 en el alcance revisado. El estado Ready del despliegue corresponde a Vercel y no se deduce del envío del commit.
 
 final result: passed
+
+## Iteración: hero de La Chispa centrado en el podcast
+
+**Referencia y alcance.** Captura de `trendstudio.framer.website` adjunta por el usuario (1920×1080, con navegador), con tarjetas en arco y perspectiva. La adaptación conserva la identidad de La Chispa: tinta, naranja, marfil, logotipos originales y serif editorial. Las fotografías originales proceden de `Fotos invitados chispa.rar`, descargado y extraído localmente. La URL de referencia no se pudo descargar desde esta red (403 del proxy); la captura aportada en el chat fue la referencia visual de composición. La comparación es compositiva, con contenido y marca propios, sin afirmar una coincidencia de píxeles entre ambas páginas.
+
+**Implementación y estado.** Hero con «Conversaciones que encienden», acción principal para escuchar el podcast, acceso a Cartografía de Pieles y ocho retratos con el nombre debajo. El estado capturado es pausa manual en Natalia. El resto de La Chispa mantiene su campaña, galería, podcast y revista. Cada invitado aparece una vez en el DOM. El ciclo de 72 segundos recorre el arco; la reposición de cada tarjeta se produce con opacidad inferior al 0,4 %. Las flechas recorren los ocho nombres y detienen el avance automático. Hay pausa/reanudación, pausa por cursor o foco, suspensión fuera de pantalla y al ocultar la pestaña. Movimiento reducido conserva la navegación manual.
+
+**Evidencia de navegador.** `.qa/chispa-guests/hero-1440.png` (1440×1000, DPR 1), `hero-768.png` (768×1000), `hero-390.png` y `hero-320.png` (390/320×844). Las capturas completas `hero-{1440,768,390}-full.png` aíslan el hero; para la versión móvil completa se usó un viewport de 390×1100 que permite capturar toda la capa 3D dentro del área visible del navegador. Se revisaron las capturas de escritorio, hero móvil completo y controles móviles.
+
+**Comparación fotográfica enfocada.** `.qa/chispa-guests/portraits-comparison.jpg` reúne en una misma imagen las ocho fuentes y sus tarjetas capturadas en navegador, con cada retrato centrado. Se revisaron nombre, rostro, encuadre y calidad de cada par. Las diferencias de recorte son la adaptación al formato vertical de las tarjetas. Las capturas de Instagram se recortan de forma nativa antes de publicar los activos para excluir navegador, comentarios y controles. No se generaron ni retocaron rostros o fondos.
+
+**Superficies revisadas.** Tipografía: Georgia editorial, cursiva naranja y Pathway Extreme para controles y nombres; saltos de línea legibles a 320 px. Ritmo: título centrado, acción principal antes del arco, nombres bajo las fotos y controles al pie. Colores: tinta `#201E1B`, marfil `#F5EFE5`, naranja de marca `#E5572D` y acento cálido `#EF996C`. Imágenes: ocho fuentes correctas y reconocibles, WebP local, aproximadamente 810 KB en conjunto. Copy: los nombres corresponden a la lista del usuario; no se añaden episodios ni citas sin fuente.
+
+**Historial de correcciones.** La primera revisión encontró el hero demasiado alto y un estado en el que Reanudar podía quedar detenido por el foco del propio botón. Se redujo el espacio sobre las tarjetas y se permitió que la reanudación explícita funcione manteniendo el foco. Se verificó de nuevo en navegador. Se sustituyó el recorte visual de las capturas por archivos fotográficos recortados, se volvieron a capturar las ocho tarjetas y se repitieron las comprobaciones. La primera prueba de la acción de escucha se adelantaba al scroll suave; ahora espera a que el reproductor entre en la vista. El viewport móvil de la captura completa se amplió para evitar un artefacto de rasterización de Chromium más allá del pliegue.
+
+**Validación final.** Compilación y prerender de 32 rutas correctos. Pasaron 39 comprobaciones específicas del hero, 58 de identidades/La Chispa y 103 de internas/exportación: 200 en total. Las diez ejecuciones de axe de estas suites no detectaron infracciones WCAG A/AA automatizadas. Se verificaron nombres, ocho imágenes, desplazamiento manual, ciclo completo con reloj virtual, pausa, reanudación, foco, suspensión, movimiento reducido, CTA y ausencia de desbordamiento a 1440, 768, 390 y 320 px. Sin errores de consola o JavaScript en las pruebas. La activación y configuración del iframe de YouTube se verifican con una respuesta simulada; no se certifica reproducción remota desde este entorno.
+
+Resultados: `.qa/podcast-test-results.json`, `.qa/brands-test-results.json` y `.qa/pages-test-results.json`. No quedan hallazgos P0/P1/P2 en el alcance revisado.
+
+final result: passed

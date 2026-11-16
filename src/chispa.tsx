@@ -3,17 +3,19 @@ import { ArrowUpRight, ArrowRight, ArrowLeft, Microphone, BookOpen, Plus, Play }
 import { SiteLink } from './navigation';
 import { chispa, campaignPhotos } from './content/chispa';
 import { Modal } from './portal/shared';
+import { ChispaPodcastHero } from './chispa-podcast-hero';
 
 export function ChispaPage() {
   const [photo, setPhoto] = useState<number | null>(null);
   const [playing, setPlaying] = useState(false);
   const selected = photo === null ? null : campaignPhotos[photo];
   const contact = `mailto:${chispa.email}?subject=${encodeURIComponent('Una conversación con La Chispa')}`;
+  const listen = () => {
+    setPlaying(true);
+    requestAnimationFrame(() => document.getElementById('podcast')?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' }));
+  };
   return <article className="chispa-editorial">
-    <section className="chispa-cover">
-      <div className="chispa-cover-copy"><div className="inner-breadcrumb"><SiteLink href="/">Inicio</SiteLink><span>/</span><SiteLink href="/ecosistema">Ecosistema</SiteLink><span>/</span><span>La Chispa</span></div><img className="chispa-cover-wordmark" src="/images/brands/chispa-wordmark.svg" alt="La Chispa" width="252" height="39" /><p className="eyebrow">El medio editorial de Vasees</p><h1 tabIndex={-1}>Vida, vejez,<br />cultura <em>y arte.</em></h1><p className="chispa-cover-description">Somos un podcast y una revista. Un espacio para escuchar experiencias, hacer preguntas y ampliar las formas de mirar el envejecimiento.</p><div className="chispa-cover-actions"><SiteLink className="button chispa-button-ink" href="#cartografia">Conoce nuestra última campaña<ArrowRight size={18} /></SiteLink><SiteLink className="chispa-text-link" href="#formatos">Podcast y revista<ArrowUpRight size={17} /></SiteLink></div></div>
-      <SiteLink className="chispa-cover-story" href="#cartografia"><img src="/images/brands/cartografia-city.webp" alt={campaignPhotos[1].alt} fetchPriority="high" width="2048" height="1365" /><div><span className="eyebrow">Nuestra última campaña</span><h2>Cartografía<br /><em>de Pieles.</em></h2><span>Memoria, cuerpo y ciudad<ArrowUpRight size={23} /></span></div></SiteLink>
-    </section>
+    <ChispaPodcastHero onListen={listen} />
     <nav className="chispa-local-nav" aria-label="Dentro de La Chispa"><span>Historias que encienden conversaciones.</span><div><SiteLink href="#cartografia">La campaña</SiteLink><SiteLink href="#podcast">El podcast</SiteLink><SiteLink href="#revista">La revista</SiteLink></div></nav>
 
     <section className="chispa-campaign chispa-wrap" id="cartografia"><div className="chispa-chapter"><span>01 / Última campaña</span><span>La Chispa × Vasees</span></div><div className="chispa-campaign-heading"><h2>Cartografía<br /><em>de Pieles.</em></h2><div><p className="chispa-lead">¿Y si miramos las arrugas como los caminos de una vida?</p><p>Cartografía de Pieles explora la relación entre la piel, la memoria y las formas de habitar la ciudad. Cada línea puede abrir un recorrido por experiencias, vínculos y recuerdos.</p><p>Desde una mirada gerofeminista, la campaña invita a escuchar a las mujeres mayores y a cuestionar las representaciones que reducen una vida a su edad.</p><p className="chispa-credit">Investigación-creación · {chispa.author}</p></div></div><div className="chispa-campaign-feature"><button className="chispa-photo-button" onClick={() => setPhoto(0)} aria-label="Ampliar fotografía: La piel como territorio de memoria"><img src={campaignPhotos[0].image} alt={campaignPhotos[0].alt} loading="lazy" width="736" height="1104" /><span><Plus size={20} />Ver fotografía</span></button><div><p className="eyebrow">Un cuerpo también es un territorio</p><h3>La piel guarda<br /><em>más que años.</em></h3><p>El punto de partida es «Habitar la ciudad: Cartografía de la piel», una exploración que encuentra en las arrugas una imagen de los mapas: senderos de memoria y relatos que se cruzan.</p><p>Fotografía, voces y conversación se encuentran para abrir preguntas sobre el cuerpo, el género y la experiencia de envejecer.</p><div className="chispa-campaign-topics"><span>Piel y memoria</span><span>Gerofeminismo</span><span>Habitar la ciudad</span></div></div></div></section>

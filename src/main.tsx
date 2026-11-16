@@ -14,6 +14,7 @@ import './inner-pages.css';
 import './school.css';
 import './portal/portal.css';
 import './brand-pages.css';
+import './chispa-podcast-hero.css';
 
 type ModalContent = { eyebrow: string; title: string; body: React.ReactNode; image?: string; subject?: string };
 const mail = (subject: string, body = '') => `mailto:${site.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

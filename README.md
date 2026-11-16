@@ -112,6 +112,10 @@ De `Cartografia_de_Pieles_Vasees (1).pdf` se utilizaron **solo fotografías**, s
 
 `npm run smoke:brands` comprueba las tarjetas en ambas páginas, tamaños de pantalla, galería, foco, enlaces del podcast, activación y configuración del reproductor, accesibilidad y navegación sin servidor. La prueba del reproductor utiliza una respuesta simulada de YouTube; no certifica la reproducción remota.
 
+El hero de La Chispa se centra en el podcast con `src/chispa-podcast-hero.tsx` y su CSS. Presenta a Natalia Hurtado, Laura Polanía, Nancy Botero, Jessie Bonder, Marce Conecta, Juan Pablo Triana, Laura Espinosa y Alexandra Lándazuri con sus fotografías aportadas y sus nombres debajo. Las tarjetas recorren un arco en perspectiva, con ciclo continuo de 72 segundos, flechas y pausa/reanudación. La animación se detiene al pasar el cursor sobre las fotos, al enfocar sus controles, fuera de pantalla o al ocultar la pestaña. Con movimiento reducido queda manual. El botón principal activa el reproductor existente y lo lleva a la vista.
+
+Las ocho imágenes optimizadas están en `public/images/brands/chispa-guest-*.webp`; de las capturas de Instagram se extrajo solo la fotografía. No se regeneraron los rostros. `npm run smoke:podcast` comprueba los ocho nombres, imágenes, navegación manual, ciclo sin salto visible, pausa, reanudación con foco, movimiento reducido, visibilidad, CTA, accesibilidad y anchos de 1440, 768, 390 y 320 px.
+
 
 ## Avances públicos de cursos
 

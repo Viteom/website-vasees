@@ -1,0 +1,34 @@
+.chispa-podcast-hero{background:#201e1b;color:#f5efe5;overflow:hidden;padding:28px 0 25px}
+.chispa-podcast-topline{display:flex;align-items:center;justify-content:space-between;gap:25px;padding:0 45px;color:#cbbfaf;font-size:9px}
+.chispa-podcast-topline .inner-breadcrumb{color:inherit;font-size:10px;margin:0}
+.chispa-podcast-topline>span{text-transform:uppercase;letter-spacing:1.3px}
+.chispa-podcast-intro{padding:32px 25px 0;text-align:center;position:relative;z-index:2}
+.chispa-podcast-brand{display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:23px}
+.chispa-podcast-brand>img:first-child{width:29px;height:29px}
+.chispa-podcast-brand>img:nth-child(2){width:178px;height:auto}
+.chispa-podcast-brand>span{font-size:10px;letter-spacing:2px;text-transform:uppercase;border-left:1px solid #a99b88;padding-left:15px;color:#ec9b6d}
+.chispa-podcast-intro h1{font-size:83px;line-height:.98;letter-spacing:-3.8px;margin:0}
+.chispa-podcast-intro h1 em{color:#ef996c}
+.chispa-podcast-intro>p{font-size:14px;line-height:1.85;color:#ded2c2;max-width:480px;margin:23px auto 0}
+.chispa-podcast-hero-actions{display:flex;align-items:center;justify-content:center;gap:25px;margin:23px 0 0}
+.chispa-podcast-hero-actions>.button{background:#e5572d;color:#211811;gap:10px;font-size:12px;min-height:48px;padding:15px 22px}
+.chispa-podcast-hero-actions>.button:hover{background:#f06b43}
+.chispa-podcast-hero-actions>a{display:inline-flex;gap:9px;align-items:center;font-size:11px;color:#f5efe5;min-height:44px;border-bottom:1px solid #a99b88}
+.chispa-podcast-hero a:focus-visible,.chispa-podcast-hero button:focus-visible{outline-color:#fcca46}
+.chispa-guests-stage{--guest-width:216px;--guest-gap:22px;position:relative;height:350px;perspective:1100px;perspective-origin:center 50%;list-style:none;padding:0;margin:0}
+.chispa-guest{position:absolute;width:var(--guest-width);left:calc(50% - var(--guest-width)/2);top:55px;transform-style:preserve-3d;backface-visibility:hidden;transform:translate3d(calc(var(--guest-slot) * (var(--guest-width) + var(--guest-gap))),var(--guest-lift),0) rotateY(var(--guest-turn)) rotateZ(var(--guest-tilt));will-change:transform}
+.chispa-guest figure{margin:0}
+.chispa-guest-portrait{position:relative;width:100%;aspect-ratio:4/5;overflow:hidden;border-radius:15px;background:#3c322b;box-shadow:0 7px 20px #0002}
+.chispa-guest-portrait>img{height:100%;width:100%;object-fit:cover;display:block}
+.chispa-guest figcaption{font-size:13px;line-height:1.6;padding:13px 0 0;text-align:center;color:#f5efe5}
+.chispa-guests-toolbar{display:flex;align-items:center;justify-content:space-between;gap:25px;padding:16px 45px 0;position:relative;z-index:2}
+.chispa-guests-toolbar>p{text-transform:uppercase;letter-spacing:1.7px;font-size:8px;color:#cbbfaf}
+.chispa-guests-toolbar>div{display:flex;align-items:center;gap:8px}
+.chispa-guests-toolbar button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:40px;min-width:40px;border:1px solid #cbbfaf65;border-radius:30px;color:#f5efe5}
+.chispa-guests-toolbar button:hover{background:#f5efe51a}
+.chispa-guests-toolbar .chispa-guests-pause{padding:0 14px;font-size:10px;min-width:96px}
+@media(min-width:1600px){.chispa-guests-stage{perspective:1300px}.chispa-podcast-intro h1{font-size:90px}}
+@media(max-width:1100px){.chispa-podcast-topline{padding:0 30px}.chispa-podcast-intro{padding-top:32px}.chispa-podcast-intro h1{font-size:72px;letter-spacing:-3px}.chispa-guests-stage{height:365px}.chispa-guest{top:90px}.chispa-guests-toolbar{padding:12px 30px 0}.chispa-guest figcaption{font-size:12px}}
+@media(max-width:600px){.chispa-podcast-hero{padding:24px 0 20px}.chispa-podcast-topline{padding:0 24px}.chispa-podcast-topline .inner-breadcrumb{font-size:8px;gap:8px}.chispa-podcast-topline>span{display:none}.chispa-podcast-intro{padding:30px 24px 0}.chispa-podcast-brand{gap:10px;margin-bottom:25px}.chispa-podcast-brand>img:first-child{width:23px;height:23px}.chispa-podcast-brand>img:nth-child(2){width:141px}.chispa-podcast-brand>span{font-size:8px;letter-spacing:1.5px;padding-left:10px}.chispa-podcast-intro h1{font-size:47px;line-height:1.04;letter-spacing:-2px}.chispa-podcast-intro>p{font-size:12px;line-height:1.85;margin-top:20px}.chispa-podcast-hero-actions{gap:14px;flex-wrap:wrap;margin-top:22px}.chispa-podcast-hero-actions>.button{font-size:11px;padding:14px 19px;min-height:46px}.chispa-podcast-hero-actions>a{font-size:10px}.chispa-guests-stage{height:290px;perspective:850px}.chispa-guest{top:45px}.chispa-guest-portrait{border-radius:13px}.chispa-guest figcaption{font-size:12px;padding-top:12px}.chispa-guests-toolbar{padding:13px 20px 0;flex-wrap:wrap;justify-content:center;gap:17px}.chispa-guests-toolbar>p{font-size:7px;letter-spacing:1.1px}.chispa-guests-toolbar button{min-width:39px;min-height:39px}.chispa-guests-toolbar .chispa-guests-pause{font-size:9px;min-width:87px;padding:0 11px}}
+@media(max-width:360px){.chispa-podcast-intro h1{font-size:42px}.chispa-podcast-intro{padding-left:18px;padding-right:18px}.chispa-podcast-brand>img:nth-child(2){width:130px}}
+@media(prefers-reduced-motion:reduce){.chispa-guest{will-change:auto}}

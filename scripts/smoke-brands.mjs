@@ -51,7 +51,7 @@ try {
           else await cards.screenshot({ path: `.qa/brands/cards-${width}.png` });
         }
       } else {
-        for (const img of await page.locator('main img').all()) { await img.scrollIntoViewIfNeeded(); await img.evaluate(img => img.decode()); }
+        for (const img of await page.locator('main img').all()) { if (!await img.evaluate(el => Boolean(el.closest('.chispa-guest')))) await img.scrollIntoViewIfNeeded(); await img.evaluate(img => img.decode()); }
         ok(await page.locator('main img').evaluateAll(items => items.every(img => img.complete && img.naturalWidth)), `La Chispa ${width}: all photography/logos load`);
         ok(await page.locator('.chispa-photo-button').count() === 5, `La Chispa ${width}: five photograph controls`);
         ok(await page.locator('main a[href$=".pdf"]').count() === 0, `La Chispa ${width}: no source PDF publication`);
@@ -107,7 +107,7 @@ try {
   ok(offlinePage.url().includes('#/la-chispa?section=cartografia'), 'Offline anchors preserve the editorial page');
   await offlinePage.reload({ waitUntil: 'networkidle' });
   ok(await offlinePage.locator('.chispa-editorial').isVisible(), 'Offline editorial survives reload');
-  for (const img of await offlinePage.locator('main img').all()) { await img.scrollIntoViewIfNeeded(); await img.evaluate(img => img.decode()); }
+  for (const img of await offlinePage.locator('main img').all()) { if (!await img.evaluate(el => Boolean(el.closest('.chispa-guest')))) await img.scrollIntoViewIfNeeded(); await img.evaluate(img => img.decode()); }
   ok(requests.length === 0, `Offline brand assets are embedded: ${requests.join(', ')}`);
   ok(errors.length === 0, `No browser exceptions: ${errors.join('; ')}`);
   await writeFile('.qa/brands-test-results.json', JSON.stringify({ passed, accessibilityRuns: accessibility.length, accessibility, browserErrors: errors, offlineExternalRequests: requests, thirdPartyPlayback: 'Embed URL and activation verified using a stub; remote playback not asserted.' }, null, 2));

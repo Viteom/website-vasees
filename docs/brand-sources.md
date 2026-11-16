@@ -43,3 +43,22 @@ Las imágenes se extrajeron de los objetos fotográficos del PDF y se convirtier
 La redacción de contexto procede de `Cartografías de piel_Investigación creación_Melissa Usme Botero.pdf` y `Feministas Rodantes X La Chispa Podcast.pdf`: piel y memoria, ciudad, gerofeminismo y escucha de mujeres mayores. Se acredita a Melissa Usme Botero. Las leyendas son descripciones editoriales, no citas ni testimonios atribuidos. No se incorporan cifras, resultados, fechas de eventos ni episodios sin verificar.
 
 La Escuela utiliza azul fuerte `#0756D8`, según la petición explícita del usuario. Conserva su landing pública, sus presentadores y el acceso posterior al área de aprendizaje.
+
+## Invitados del podcast
+
+Fuente: `Fotos invitados chispa.rar`, aportado por el usuario para el nuevo hero. Contiene ocho fotografías distintas y un duplicado de la foto de Nancy. Se utilizan los nombres y la correspondencia de imágenes facilitados en el chat.
+
+| Invitado | Archivo original dentro del RAR |
+|---|---|
+| Natalia Hurtado | `Imagen de ChatGPT 16 nov 2026, 09_58_18 a.m.png` |
+| Laura Polanía | `Imagen de ChatGPT 16 nov 2026, 09_58_21 a.m.png` |
+| Nancy Botero | `WhatsApp Image 2026-11-16 at 9.50.34 AM.jpeg` |
+| Jessie Bonder | `Imagen de ChatGPT 16 nov 2026, 09_58_25 a.m.png` |
+| Marce Conecta | `Imagen de ChatGPT 16 nov 2026, 09_58_27 a.m.png` |
+| Juan Pablo Triana | `Imagen de ChatGPT 16 nov 2026, 09_58_28 a.m.png` |
+| Laura Espinosa | `Imagen de ChatGPT 16 nov 2026, 09_58_30 a.m.png` |
+| Alexandra Lándazuri | `Imagen de ChatGPT 16 nov 2026, 09_58_32 a.m.png` |
+
+Las capturas de Laura Polanía, Marce Conecta y Laura Espinosa se recortaron al área fotográfica: `(229, 182)–(1047, 962)` en el original de 1920×1080. Se excluyen navegador, interfaz de Instagram, comentarios y controles superpuestos inferiores. Las demás fotos conservan su contenido. Se aplicaron orientación EXIF, reducción de tamaño y conversión a WebP; no se generaron ni retocaron caras o fondos. Los encuadres de las tarjetas se ajustan con `object-fit` y `object-position`. El conjunto optimizado pesa aproximadamente 810 KB.
+
+La referencia de composición es la captura de `trendstudio.framer.website` adjunta por el usuario: tarjetas curvas en perspectiva y movimiento. Se adapta a la identidad editorial de La Chispa, con tinta, naranja, marfil, el logo original y nombres bajo cada retrato. No se atribuyen títulos de episodios ni enlaces individuales sin una fuente; la acción principal abre el podcast ya facilitado.

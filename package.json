@@ -11,7 +11,8 @@
     "smoke:pages": "node scripts/smoke-pages.mjs",
     "smoke:school": "node scripts/smoke-school.mjs",
     "smoke:flower": "node scripts/smoke-flower.mjs",
-    "smoke:brands": "node scripts/smoke-brands.mjs"
+    "smoke:brands": "node scripts/smoke-brands.mjs",
+    "smoke:podcast": "node scripts/smoke-podcast.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
