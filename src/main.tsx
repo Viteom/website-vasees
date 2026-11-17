@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { InnerPage } from './inner-pages';
-import { DemoProvider, isPortalPath, useDemo } from './portal/demo-store';
+import { DemoProvider, isPortalPath, portalPaths, useDemo } from './portal/demo-store';
 import { Portal } from './portal';
 import { FlowerMotion } from './flower-motion';
 import { InitiativeCards } from './initiative-cards';
@@ -84,10 +84,23 @@ function SiteApp({ initialPath }: { initialPath?: string }) {
     setMenu(false); setModal(null); setDiagnostic(false);
   }, [route]);
 
+  useEffect(() => {
+    if (!menu) return;
+    // The mobile menu behaves like a disclosure: Escape closes it and returns focus to its toggle.
+    function onKey(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      setMenu(false);
+      document.querySelector<HTMLElement>('.menu-toggle')?.focus();
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [menu]);
+
   function closeModal() { setModal(null); setDiagnostic(false); }
   function showResearch() { navigate('/observatorio/vivir-mas'); }
 
-  if (isPortalPath(route)) return <Portal path={route} />;
+  // Unknown URLs under /escuela/ or /admin fall through to the public 404, matching the static 404 document.
+  if (isPortalPath(route) && portalPaths.includes(route)) return <Portal path={route} />;
 
   return <>
     <SiteLink className="skip-link" href="#contenido">Ir al contenido</SiteLink>
@@ -117,7 +130,7 @@ function SiteApp({ initialPath }: { initialPath?: string }) {
           <div className="client-module"><div className="clients-heading"><span>Las conexiones que amplían nuestra mirada</span><button onClick={() => setPaused(!paused)} aria-label={paused ? 'Reanudar movimiento de nombres' : 'Pausar movimiento de nombres'}>{paused ? <Play size={12} weight="fill" /> : <Pause size={12} weight="fill" />}</button></div><div className={`client-viewport ${paused ? 'paused' : ''}`}><div className="client-track">{[0, 1].map(copy => <div className="client-row" key={copy} aria-hidden={copy === 1 ? true : undefined}>{clients.map((client, i) => <span className={`client-name client-${i}`} key={client}>{client}</span>)}</div>)}</div></div></div>
           <button className="hero-research" onClick={showResearch}><img src="/images/editorial.webp" width="140" height="160" alt="" /><span className="hero-research-content"><span className="tag">Desde el Observatorio</span><strong>Vivir más.<br />¿Estamos listos?</strong><span className="research-link">Explora nuestra última lectura <ArrowUpRight size={18} /></span></span></button>
         </div>
-        <a className="scroll-hint" href="#manifiesto" aria-label="Descubrir más"><ArrowDown size={16} /><span>Hay más por descubrir</span></a>
+        <a className="scroll-hint" href="#manifiesto"><ArrowDown size={16} /><span>Hay más por descubrir</span></a>
       </section>
 
       <section className="intro section-wrap" id="nosotros">

@@ -9,7 +9,15 @@ import {
   ShieldCheck,
 } from "@phosphor-icons/react";
 import { SiteLink, navigate } from "../../navigation";
-import { useDemo } from "../../portal/demo-store";
+import { portalPaths, useDemo } from "../../portal/demo-store";
+
+const accessRoutes = [
+  "/escuela/ingresar",
+  "/escuela/registro",
+  "/escuela/verificar",
+  "/escuela/recuperar",
+  "/escuela/nueva-contrasena",
+];
 
 export function LoginPage({ path }: { path: string }) {
   const store = useDemo();
@@ -18,6 +26,10 @@ export function LoginPage({ path }: { path: string }) {
   const verify = path === "/escuela/verificar";
   const recover = path === "/escuela/recuperar";
   const reset = path === "/escuela/nueva-contrasena";
+  // When the access screen replaces a private view, remember that view so the
+  // visitor lands where they were heading instead of always on the home screen.
+  const requested =
+    portalPaths.includes(path) && !accessRoutes.includes(path) ? path : null;
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -38,7 +50,14 @@ export function LoginPage({ path }: { path: string }) {
             email: store.authEmail || "laura@ejemplo.com",
           },
     );
-    const destination = role === "admin" ? "/admin" : store.authDestination;
+    const destination =
+      role === "admin"
+        ? requested?.startsWith("/admin")
+          ? requested
+          : "/admin"
+        : requested && !requested.startsWith("/admin")
+          ? requested
+          : store.authDestination;
     const course = store.courses.find(item => item.id === store.selectedCourse);
     if (role === "student" && destination === "/escuela/aula" && course?.price === 0) {
       store.setEnrolled(old => [...new Set([...old, course.id])]);
@@ -75,6 +94,7 @@ export function LoginPage({ path }: { path: string }) {
       demo("admin");
       return;
     }
+    if (requested) store.setAuthDestination(requested);
     store.setAuthEmail(email);
     store.setAuthName(name || "Laura Gómez");
     store.setAuthIntent(recover ? "reset" : register ? "register" : "login");

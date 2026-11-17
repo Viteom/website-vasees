@@ -6,3 +6,5 @@
 /* Secondary copy keeps AA contrast on lilac and coral surfaces. */
 .inner-breadcrumb{color:#3a5260}.inner-capability-grid p{color:#435b66}.inner-page .source-note{color:#3a5260}.chispa-hero .inner-title-block>p:not(.eyebrow){color:#3a5260}
 .inner-page summary:focus-visible{outline:3px solid #78863c;outline-offset:5px;border-radius:5px}
+/* Very small phones (≤360px): long words in display headings must fit their column. */
+@media(max-width:360px){.kanna-feature h2{font-size:35px;letter-spacing:-1.5px}.inner-closing h2{font-size:34px;letter-spacing:-1.5px}.kanna-word h3{font-size:64px;letter-spacing:-3px}.tech-steps h3{font-size:42px;letter-spacing:-1.8px}}

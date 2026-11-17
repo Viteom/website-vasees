@@ -92,7 +92,7 @@ export function SchoolPage() {
 
     <section className="school-featured school-wrap" aria-labelledby="featured-heading"><div className="school-section-heading"><div><p className="eyebrow">Abre una nueva conversación</p><h2 id="featured-heading">Cursos para empezar.</h2></div><div className="school-featured-actions"><a className="text-link" href="#catalogo">Ver todos<Arrow /></a><SliderControls slider={slider} /></div></div><p className="school-demo-note">Descubre los temas y reproduce sus avances visuales. Cursos y tráileres de demostración, sin audio.</p><div className="school-featured-row" ref={slider}>{schoolCourses.slice(0, 4).map(item => <CourseCard key={item.id} course={item} onOpen={openCourse} />)}</div></section>
 
-    <section className="school-manifesto" id="enfoque"><div className="school-wrap"><p className="eyebrow">Aprender · Conectar · Aplicar</p><h2>Nadie tiene todas las respuestas.<br /><em>Podemos buscarlas juntos.</em></h2><div className="school-approach-grid">{[
+    <section className="school-manifesto" id="enfoque"><div className="school-wrap"><p className="eyebrow">Aprender · Conectar · Aplicar</p><h2>Nadie tiene todas las respuestas. <br /><em>Podemos buscarlas juntos.</em></h2><div className="school-approach-grid">{[
       ['01', 'Aprender.', 'Comprender lo que cambia al envejecer, más allá de los supuestos y de una sola forma de vivir.'],
       ['02', 'Conectar.', 'Reconocer lo que cada generación puede enseñar, lo que necesita escuchar y lo que le gustaría conversar.'],
       ['03', 'Llevarlo a la vida.', 'Salir con una pregunta, un ejercicio o una idea para una situación de tu vida cotidiana.'],
