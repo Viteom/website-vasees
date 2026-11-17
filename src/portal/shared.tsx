@@ -211,7 +211,7 @@ export function PortalShell({
         />
       </SiteLink>
       <p className="vp-sidebar-caption">
-        {admin ? "Administración del ecosistema" : "Escuela de Hijos y Nietos"}
+        {admin ? "Administración del ecosistema" : "Escuela de Familia y Longevidad"}
       </p>
       <nav aria-label={admin ? "Administración" : "Mi Escuela"}>
         {menu.map((item) => {

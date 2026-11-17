@@ -186,7 +186,7 @@ export function StudentDashboard() {
       />
       <section className="vp-student-welcome">
         <div>
-          <Badge tone="ivory">Escuela de Hijos y Nietos</Badge>
+          <Badge tone="ivory">Escuela de Familia y Longevidad</Badge>
           <h2>
             Hay mucho por vivir.
             <br />
@@ -298,7 +298,7 @@ export function StudentCatalog({ mine = false }: { mine?: boolean }) {
   return (
     <>
       <PageHeading
-        eyebrow="Escuela de Hijos y Nietos"
+        eyebrow="Escuela de Familia y Longevidad"
         title={mine ? "Mis cursos." : "¿Qué quieres aprender hoy?"}
         description={
           mine

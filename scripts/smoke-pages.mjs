@@ -9,7 +9,7 @@ let logs = '', count = 0, browser, offlineServer;
 server.stdout.on('data', data => logs += data.toString());
 server.stderr.on('data', data => logs += data.toString());
 const ok = (condition, message) => { assert.ok(condition, message); count++; };
-const routes = ['/studio', '/consulting', '/tech', '/ecosistema', '/observatorio', '/observatorio/vivir-mas', '/escuela', '/ecosistema/kanna', '/la-chispa'];
+const routes = ['/soluciones', '/ecosistema', '/observatorio', '/observatorio/vivir-mas', '/escuela', '/ecosistema/kanna', '/la-chispa', '/privacidad', '/terminos', '/cookies', '/terminos-escuela'];
 try {
   for (let i = 0; i < 100 && !/Local/.test(logs); i++) {
     if (server.exitCode !== null) throw new Error(logs);
@@ -47,24 +47,29 @@ try {
   }
   ok(titles.size === routes.length, 'Each public page has unique metadata');
   await page.goto('http://127.0.0.1:5176/ecosistema/', { waitUntil: 'networkidle' });
-  await page.getByRole('button', { name: 'Cuidado', exact: true }).click();
-  ok(await page.locator('.connection-grid article').count() === 2, 'Connection filter returns care organizations');
-  await page.goto('http://127.0.0.1:5176/consulting/', { waitUntil: 'networkidle' });
-  await page.locator('.consulting-topics summary').nth(2).click();
-  ok(await page.locator('.consulting-topics details').nth(2).getAttribute('open') !== null, 'Consulting topic expands');
+  const doors = await page.locator('.ecosystem-doors a').evaluateAll(links => links.map(link => [link.querySelector('strong').textContent, link.getAttribute('href')]));
+  ok(JSON.stringify(doors) === JSON.stringify([['Quiero contratar una solución', '/soluciones'], ['Quiero aprender', '/escuela'], ['Quiero colaborar o investigar', '/observatorio'], ['Quiero conocer historias y contenidos', '/la-chispa']]), 'Ecosystem has four participation doors with real routes');
+  ok((await page.locator('.map-level a').count()) === 6 && (await page.locator('.map-axis').count()) === 1, 'Ecosystem map shows three solutions, three platforms and the transversal axis');
+  ok((await page.locator('.map-diagram').innerText()).includes('Escuela de Familia y Longevidad'), 'Ecosystem uses the new School name');
+  for (const route of ['/', '/ecosistema/', '/soluciones/']) {
+    await page.goto(`http://127.0.0.1:5176${route}`, { waitUntil: 'networkidle' });
+    ok((await page.locator('a[href="/ecosistema/kanna"]').count()) === 0 && !(await page.locator('main').innerText()).includes('Kánna'), `${route}: Kánna is not advertised`);
+  }
   await page.goto('http://127.0.0.1:5176/escuela/', { waitUntil: 'networkidle' });
   ok(await page.locator('.school-landing-hero').isVisible(), 'School landing remains public before login');
-  await page.goto('http://127.0.0.1:5176/tech/', { waitUntil: 'networkidle' });
-  await page.getByRole('link', { name: 'Conocer Kánna', exact: true }).click();
-  ok(page.url().endsWith('/ecosistema/kanna'), 'Tech links to its initiative');
-  await page.goBack();
-  await page.locator('.tech-hero').waitFor();
-  ok(page.url().includes('/tech'), 'Browser back restores the previous page');
-  await page.getByRole('link', { name: 'Diseña tu futuro' }).click();
+  await page.goto('http://127.0.0.1:5176/soluciones/', { waitUntil: 'networkidle' });
+  await page.locator('.anchor-nav').getByRole('link', { name: 'Desarrollo tecnológico' }).click();
+  ok(page.url().endsWith('/soluciones/#tech') || page.url().endsWith('/soluciones#tech'), 'Anchor navigation reaches the Tech section');
+  await page.getByRole('link', { name: 'Quiero desarrollar una plataforma' }).click();
   await page.locator('#contacto').waitFor();
-  ok(page.url().includes('/#contacto') && await page.locator('#contacto form').isVisible(), 'Internal page CTA reaches home contact');
+  ok(await page.locator('input[name=interest][value=tech]').isChecked(), 'Tech CTA preselects its interest');
+  await page.goBack();
+  await page.locator('.solutions-hero').waitFor();
+  ok(page.url().includes('/soluciones'), 'Browser back restores the previous page');
+  await page.getByRole('link', { name: 'Hablemos' }).first().click();
+  await page.locator('#contacto').waitFor();
+  ok(page.url().includes('/#contacto') && await page.locator('#contacto form').isVisible(), 'Header CTA reaches the single contact form');
   await page.keyboard.press('Tab');
-
   // Check the single-file handoff separately: no server routes or asset requests.
   const offlineHtml = await readFile('.qa/Vasees-vista-previa.html');
   offlineServer = http.createServer((req, res) => { res.setHeader('Content-Type', 'text/html; charset=utf-8'); res.end(offlineHtml); });
@@ -75,7 +80,9 @@ try {
   offlinePage.on('pageerror', error => errors.push(error.message));
   offlinePage.on('request', req => { if (!req.isNavigationRequest() && req.url().startsWith('http')) extraRequests.push(req.url()); });
   await offlinePage.goto(offlineUrl, { waitUntil: 'networkidle' });
-  await offlinePage.locator('.hero-research').click();
+  await offlinePage.getByRole('link', { name: 'Explora el Observatorio' }).click();
+  await offlinePage.locator('.observatory-cover').waitFor();
+  await offlinePage.locator('.observatory-cover-image').click();
   await offlinePage.locator('.research-article').waitFor();
   await offlinePage.locator('.article-reading aside').getByRole('link', { name: 'Fuentes y contexto' }).click();
   ok(await offlinePage.locator('.research-article').isVisible() && offlinePage.url().includes('section=fuentes'), 'Offline article anchors preserve the page');
@@ -87,7 +94,7 @@ try {
   ok(extraRequests.length === 0, 'Offline preview requests no external assets');
   ok(errors.length === 0, `No hydration or browser errors: ${errors.join('; ')}`);
   await writeFile('.qa/pages-test-results.json', JSON.stringify({ passed: count, routes, viewportWidths: [1440, 768, 390], browserErrors: errors, offlineExternalRequests: extraRequests.length }, null, 2));
-  console.log(`${count} checks passed across 9 internal pages, 3 viewports and the offline preview.`);
+  console.log(`${count} checks passed across ${routes.length} internal pages, 3 viewports and the offline preview.`);
 } finally {
   await browser?.close();
   offlineServer?.close();

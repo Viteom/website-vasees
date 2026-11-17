@@ -26,6 +26,7 @@ export function routeHref(href: string) {
   if (href.startsWith('#') && readPath() !== '/') return `#${readPath()}?section=${encodeURIComponent(href.slice(1))}`;
   if (!href.startsWith('/')) return href;
   if (href.startsWith('/#')) return href.slice(1);
+  if (href.startsWith('/?')) { const [query, hash = 'inicio'] = href.slice(2).split('#'); return `#${hash}?${query}`; }
   return href === '/' ? '#inicio' : `#${href}`;
 }
 
@@ -33,9 +34,14 @@ export function navigate(href: string) {
   const target = routeHref(href);
   window.history.pushState({}, '', target);
   window.dispatchEvent(new PopStateEvent('popstate'));
-  const hash = href.startsWith('/#') ? href.slice(2) : href.startsWith('#') ? href.slice(1) : null;
+  const hash = href.includes('#') ? href.slice(href.indexOf('#') + 1) : null;
   requestAnimationFrame(() => {
-    if (hash) document.getElementById(hash)?.scrollIntoView({ behavior: 'auto' });
+    if (hash) {
+      const scroll = () => document.getElementById(hash)?.scrollIntoView({ behavior: 'auto' });
+      scroll();
+      // A freshly mounted page can still shift while fonts and media settle; land on the section once more.
+      window.setTimeout(() => { const top = document.getElementById(hash)?.getBoundingClientRect().top ?? 0; if (Math.abs(top) > 140) scroll(); }, 400);
+    }
     else { window.scrollTo({ top: 0, behavior: 'instant' }); document.querySelector<HTMLElement>('h1')?.focus({ preventScroll: true }); }
   });
 }
@@ -48,4 +54,13 @@ export function SiteLink({ href = '/', children, onClick, ...props }: AnchorHTML
     navigate(href);
   }
   return <a {...props} href={routeHref(href)} onClick={click}>{children}</a>;
+}
+
+/** Reads a query parameter from the real URL, or from the hash query used by the offline export. */
+export function readQuery(name: string) {
+  if (typeof window === 'undefined') return null;
+  const fromSearch = new URLSearchParams(window.location.search).get(name);
+  if (fromSearch) return fromSearch;
+  const hashQuery = window.location.hash.split('?')[1];
+  return hashQuery ? new URLSearchParams(hashQuery).get(name) : null;
 }

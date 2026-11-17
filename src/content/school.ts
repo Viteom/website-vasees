@@ -65,3 +65,14 @@ export const schoolCourses: SchoolCourse[] = [
 ];
 
 export const schoolCategories = ['Todos', 'Cuidado', 'Generaciones', 'Proyecto de vida', 'Tecnología'];
+
+// Brief v3 §8.3: interest routes for the public landing. They group the demo course categories and are editable.
+export const schoolRoutes = [
+  { id: 'longevidad', title: 'Mi propia longevidad', text: 'Hábitos, proyecto de vida, nuevas etapas y autonomía.', categories: [] as string[] },
+  { id: 'cuidado', title: 'Cuidado y autocuidado', text: 'Relaciones de cuidado, bienestar cotidiano y redes de apoyo.', categories: ['Cuidado'] },
+  { id: 'generaciones', title: 'Familias y generaciones', text: 'Convivencia, comunicación y acompañamiento.', categories: ['Generaciones'] },
+  { id: 'tecnologia', title: 'Tecnología y vida cotidiana', text: 'Habilidades digitales, herramientas útiles y confianza.', categories: ['Tecnología'] },
+  { id: 'proposito', title: 'Propósito y nuevas oportunidades', text: 'Aprendizaje, trabajo, participación y emprendimiento.', categories: ['Proyecto de vida'] },
+];
+
+export const schoolAudience = ['Personas que quieren preparar su propia longevidad', 'Familias', 'Personas cuidadoras', 'Profesionales, docentes y organizaciones'];

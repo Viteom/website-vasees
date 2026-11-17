@@ -107,13 +107,22 @@ try {
   );
   ok(await page.locator('.site-header').isVisible(), 'Public School keeps the website header');
   ok(await page.locator('.school-catalog-grid article').count() === 4, 'Public School shows published courses only');
-  await page.locator('.school-categories').getByRole('button', { name: 'Tecnología', exact: true }).click();
-  ok(await page.locator('.school-catalog-grid article').count() === 1, 'Public course category filter works');
-  await page.locator('.school-categories').getByRole('button', { name: 'Todos', exact: true }).click();
+  ok((await page.locator('.school-hero-name').innerText()) === 'Escuela de Familia y Longevidad' && (await page.locator('.school-audience h2').innerText()) === '¿Para quién es?', 'School hero names the School and who it is for');
+  ok((await page.locator('.school-hero-actions a').getAttribute('href')) === '#intereses', 'School hero leads to the interest routes');
+  ok((await page.locator('.school-routes button').count()) === 5, 'School offers five interest routes');
+  ok((await page.getByText('Conversemos sobre la Escuela').count()) === 0 && (await page.locator('.school-faq details').count()) <= 5, 'School has a short FAQ and no sales call');
+  ok((await page.locator('.school-closing a').getAttribute('href')) === '#intereses', 'School closing points to the courses');
+  const techRoute = page.locator('.school-routes').getByRole('button', { name: /^Tecnología y vida cotidiana/ });
+  await techRoute.click();
+  ok(await page.locator('.school-catalog-grid article').count() === 1 && await techRoute.getAttribute('aria-pressed') === 'true', 'Public interest route filter works');
+  await techRoute.click();
+  await page.locator('.school-routes').getByRole('button', { name: /^Mi propia longevidad/ }).click();
+  ok((await page.locator('.school-empty h3').innerText()) === 'Esta ruta llegará pronto.', 'A route without courses says it is coming soon');
+  await page.locator('.school-empty').getByRole('button', { name: 'Ver todos los cursos' }).click();
   await page.getByRole('searchbox', { name: 'Buscar cursos', exact: true }).fill('tecnologia');
   ok(await page.locator('.school-catalog-grid article').count() === 1, 'Public course search ignores accents');
   await page.getByRole('button', { name: 'Limpiar búsqueda' }).click();
-  const publicPreview = page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Cuidar sin dejar de vivir', exact: true });
+  const publicPreview = page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Cuidar sin dejar de vivir (próximamente)', exact: true });
   await publicPreview.click();
   const video = page.locator('.school-course-dialog video');
   await video.evaluate(element => element.play());
@@ -383,8 +392,8 @@ try {
   );
   await link("Páginas y contenido").click();
   ok(
-    (await page.locator(".vp-page-card").count()) === 10,
-    "CMS covers all public pages, excluding access forms",
+    (await page.locator(".vp-page-card").count()) === 12,
+    `CMS covers all public pages, excluding access forms (${await page.locator(".vp-page-card").count()})`,
   );
   await page
     .locator(".vp-page-card")
@@ -664,11 +673,11 @@ try {
     await shot(`public-school-${width}`);
     ok(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), `Public landing ${width}: no document overflow`);
     await audit('Landing pública de Escuela', width);
-    await page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Tecnología que nos acerca', exact: true }).click();
+    await page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Tecnología que nos acerca (próximamente)', exact: true }).click();
     if (width !== 768) { await shot(`public-trailer-${width}`); await audit('Tráiler público', width); }
     await page.keyboard.press('Escape');
   }
-  await page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Tecnología que nos acerca', exact: true }).click();
+  await page.locator('.school-catalog-grid').getByRole('button', { name: 'Ver tráiler de muestra: Tecnología que nos acerca (próximamente)', exact: true }).click();
   await button('Ingresar para continuar').click();
   await label('Contraseña de muestra').fill('demo-1234');
   await button('Entrar a mi Escuela').click();

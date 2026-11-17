@@ -4,7 +4,7 @@ import { podcastGuests, type PodcastGuest } from './content/chispa';
 import { SiteLink } from './navigation';
 
 function GuestPortrait({ guest, priority }: { guest: PodcastGuest; priority: boolean }) {
-  return <div className="chispa-guest-portrait"><img src={guest.image} alt={guest.name} style={{ objectPosition: guest.position }} width="400" height="500" fetchPriority={priority ? 'high' : 'auto'} decoding="async" /></div>;
+  return <div className="chispa-guest-portrait"><img src={guest.image} alt={`Retrato de ${guest.name}`} style={{ objectPosition: guest.position }} width="400" height="500" fetchPriority={priority ? 'high' : 'auto'} decoding="async" /></div>;
 }
 
 export function ChispaPodcastHero({ onListen }: { onListen: () => void }) {

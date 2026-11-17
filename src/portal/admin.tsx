@@ -275,7 +275,7 @@ export function AdminCourses() {
   return (
     <>
       <PageHeading
-        eyebrow="Escuela de Hijos y Nietos"
+        eyebrow="Escuela de Familia y Longevidad"
         title="Una biblioteca de posibilidades."
         description="Crea, organiza y prepara los cursos que abrirán nuevas conversaciones."
         actions={

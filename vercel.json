@@ -1,0 +1,7 @@
+{
+  "redirects": [
+    { "source": "/studio", "destination": "/soluciones#marca", "permanent": true },
+    { "source": "/consulting", "destination": "/soluciones#cultura", "permanent": true },
+    { "source": "/tech", "destination": "/soluciones#tech", "permanent": true }
+  ]
+}
