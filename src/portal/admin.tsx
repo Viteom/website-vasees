@@ -38,6 +38,7 @@ import {
 } from "./demo-store";
 import { SiteLink, navigate } from "../navigation";
 import { Badge, Empty, Modal, PageHeading } from "./shared";
+import { AuthorizedReviews } from "./learning";
 
 const normalized = (text: string) =>
   text
@@ -217,6 +218,7 @@ export function AdminDashboard() {
           </div>
         </section>
       </div>
+      <AuthorizedReviews />
       <div className="vp-integration-note">
         <ShieldCheck size={24} weight="light" />
         <div>

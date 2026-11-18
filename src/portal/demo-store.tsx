@@ -7,6 +7,16 @@ import {
 } from "react";
 import { schoolCourses, type SchoolCourse } from "../content/school";
 import { pageMeta } from "../content/pages";
+import type { LearnerPlan } from "../content/school-learning";
+
+export type CourseReview = {
+  courseId: string;
+  name: string;
+  stars: number;
+  comment: string;
+  suggestion: string;
+  shareable: boolean;
+};
 
 export type DemoRole = "student" | "admin";
 export type DemoSession = { role: DemoRole; name: string; email: string };
@@ -67,6 +77,7 @@ export const money = (value: number) =>
       }).format(value);
 export const portalPaths = [
   "/escuela/inicio",
+  "/escuela/bienvenida",
   "/escuela/ingresar",
   "/escuela/registro",
   "/escuela/verificar",
@@ -180,6 +191,14 @@ type DemoStore = {
   setAuthIntent: (value: "login" | "register" | "reset") => void;
   profile: { city: string; notifications: boolean; newsletter: boolean };
   setProfile: React.Dispatch<React.SetStateAction<DemoStore["profile"]>>;
+  /** Personal goal from the welcome flow. Private: never shown in admin reports. */
+  plan: LearnerPlan | null;
+  setPlan: React.Dispatch<React.SetStateAction<LearnerPlan | null>>;
+  /** Lesson tests passed per course, by lesson index. Sequential: a badge needs all of them. */
+  tests: Record<string, number[]>;
+  setTests: React.Dispatch<React.SetStateAction<Record<string, number[]>>>;
+  reviews: CourseReview[];
+  setReviews: React.Dispatch<React.SetStateAction<CourseReview[]>>;
 };
 const Context = createContext<DemoStore | null>(null);
 
@@ -343,6 +362,26 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     notifications: true,
     newsletter: false,
   });
+  const [plan, setPlan] = useState<LearnerPlan | null>(null);
+  const [tests, setTests] = useState<Record<string, number[]>>({});
+  const [reviews, setReviews] = useState<CourseReview[]>([
+    {
+      courseId: schoolCourses[1].id,
+      name: "Andrés Pérez",
+      stars: 5,
+      comment: "Ejemplo de opinión autorizada para mostrar cómo se verá el reporte.",
+      suggestion: "",
+      shareable: true,
+    },
+    {
+      courseId: schoolCourses[0].id,
+      name: "Daniela Ruiz",
+      stars: 4,
+      comment: "Ejemplo de opinión no autorizada: no debe aparecer en reportes.",
+      suggestion: "Más ejemplos cotidianos.",
+      shareable: false,
+    },
+  ]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 8000);
@@ -387,12 +426,26 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         setAuthIntent,
         profile,
         setProfile,
+        plan,
+        setPlan,
+        tests,
+        setTests,
+        reviews,
+        setReviews,
       }}
     >
       {children}
     </Context.Provider>
   );
 }
+
+/** A badge is earned when every lesson test of the course has been passed. */
+export const hasBadge = (
+  tests: Record<string, number[]>,
+  course: { id: string; lessons: unknown[] },
+) =>
+  course.lessons.length > 0 &&
+  (tests[course.id] ?? []).length >= course.lessons.length;
 
 export function useDemo() {
   const value = useContext(Context);

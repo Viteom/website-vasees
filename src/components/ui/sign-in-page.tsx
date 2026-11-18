@@ -63,6 +63,12 @@ export function LoginPage({ path }: { path: string }) {
       store.setEnrolled(old => [...new Set([...old, course.id])]);
     }
     store.setAuthDestination("/escuela/inicio");
+    // A new profile starts with the short welcome: goal, interests and availability.
+    if (role === "student" && store.authIntent === "register" && destination === "/escuela/inicio") {
+      store.setPlan(null);
+      navigate("/escuela/bienvenida");
+      return;
+    }
     navigate(destination);
   }
   function submit(event: React.SubmitEvent<HTMLFormElement>) {
