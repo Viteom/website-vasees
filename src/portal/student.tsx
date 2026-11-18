@@ -17,7 +17,16 @@ import {
   WarningCircle,
 } from "@phosphor-icons/react";
 import {
+  BadgeEarned,
+  BadgeRules,
+  CourseReviewForm,
+  GoalPanel,
+  LessonTest,
+  MyBadges,
+} from "./learning";
+import {
   useDemo,
+  hasBadge,
   money,
   type ManagedCourse,
   type DemoOrder,
@@ -69,7 +78,9 @@ function CourseTile({
         <div className="vp-course-card-bottom">
           <span>
             {learning
-              ? `${completed} de ${course.lessons.length} lecciones`
+              ? hasBadge(store.tests, course)
+                ? "Insignia obtenida"
+                : `${completed} de ${course.lessons.length} lecciones vistas`
               : enrolled
                 ? "En tu biblioteca"
                 : money(course.price)}
@@ -127,6 +138,7 @@ function CoursePreview({
                 <li key={lesson.title}>{lesson.title}</li>
               ))}
             </ol>
+            <BadgeRules lessons={course.lessons.length} />
             <div className="vp-preview-price">
               <span>
                 {store.enrolled.includes(course.id)
@@ -160,10 +172,7 @@ export function StudentDashboard() {
   const mine = store.courses.filter((course) =>
     store.enrolled.includes(course.id),
   );
-  const completed = mine.filter(
-    (course) =>
-      (store.progress[course.id] ?? []).length >= course.lessons.length,
-  ).length;
+  const badges = mine.filter((course) => hasBadge(store.tests, course)).length;
   function learn(course: ManagedCourse) {
     store.setSelectedCourse(course.id);
     navigate("/escuela/aula");
@@ -184,6 +193,7 @@ export function StudentDashboard() {
           </SiteLink>
         }
       />
+      <GoalPanel />
       <section className="vp-student-welcome">
         <div>
           <Badge tone="ivory">Escuela de Familia y Longevidad</Badge>
@@ -220,9 +230,9 @@ export function StudentDashboard() {
           <small>Un paso a la vez</small>
         </div>
         <div>
-          <span>Recorridos completados</span>
-          <strong>{completed}</strong>
-          <small>Siempre hay algo por descubrir</small>
+          <span>Insignias obtenidas</span>
+          <strong>{badges}</strong>
+          <small>Se obtienen al aprobar los tests</small>
         </div>
       </div>
       <div className="vp-section-heading">
@@ -408,6 +418,12 @@ export function Classroom() {
     );
   const current = course.lessons[Math.min(lesson, course.lessons.length - 1)];
   const read = store.progress[course.id] ?? [];
+  const passed = store.tests[course.id] ?? [];
+  const badge = hasBadge(store.tests, course);
+  function goToTest(index: number) {
+    setLesson(index);
+    setTab("Test");
+  }
   function mark() {
     if (!course) return;
     store.setProgress((old) => ({
@@ -432,9 +448,14 @@ export function Classroom() {
           <div>
             <h2>Tu recorrido</h2>
             <span>
-              {read.length} de {course.lessons.length} lecciones
+              {read.length} de {course.lessons.length} lecciones vistas
             </span>
             <progress value={read.length} max={course.lessons.length} />
+            <span>
+              {badge
+                ? "Insignia obtenida"
+                : `${passed.length} de ${course.lessons.length} tests aprobados`}
+            </span>
           </div>
           <nav aria-label="Lecciones del curso">
             {course.lessons.map((item, index) => (
@@ -449,14 +470,20 @@ export function Classroom() {
                 <span className={read.includes(index) ? "complete" : ""}>
                   {read.includes(index) ? <Check size={15} /> : `0${index + 1}`}
                 </span>
-                <span>{item.title}</span>
+                <span>
+                  {item.title}
+                  <small>
+                    {passed.includes(index)
+                      ? "Test aprobado"
+                      : index === 0 || passed.includes(index - 1)
+                        ? "Test disponible"
+                        : "Test en espera"}
+                  </small>
+                </span>
               </button>
             ))}
           </nav>
-          <p>
-            <BookOpen size={16} />
-            Cada conversación cuenta.
-          </p>
+          <BadgeRules lessons={course.lessons.length} />
         </aside>
         <div className="vp-classroom-main">
           <div className="vp-lesson-poster">
@@ -474,7 +501,7 @@ export function Classroom() {
             role="group"
             aria-label="Contenido de la lección"
           >
-            {["Lección", "Recursos", "Mis notas"].map((item) => (
+            {["Lección", "Test", "Recursos", "Mis notas", "Valorar"].map((item) => (
               <button
                 key={item}
                 aria-pressed={tab === item}
@@ -503,7 +530,25 @@ export function Classroom() {
                     ? "Lección completada"
                     : "Marcar como completada"}
                 </button>
+                <button
+                  className="vp-text-button vp-test-link"
+                  onClick={() => setTab("Test")}
+                >
+                  {passed.includes(lesson)
+                    ? "Test aprobado · Repasar"
+                    : "Responder el test de esta lección"}
+                  <ArrowRight size={16} />
+                </button>
               </>
+            ) : tab === "Test" ? (
+              <LessonTest
+                key={lesson}
+                course={course}
+                lesson={lesson}
+                onGo={goToTest}
+              />
+            ) : tab === "Valorar" ? (
+              <CourseReviewForm course={course} />
             ) : tab === "Recursos" ? (
               <>
                 <h2>Una idea para llevar contigo.</h2>
@@ -541,7 +586,8 @@ export function Classroom() {
                   Guardar nota de muestra
                 </button>
                 <p className="vp-small-note">
-                  Las notas se conservan mientras permanezcas en esta vista.
+                  Tus notas son privadas: no aparecen en reportes. En esta
+                  demo se conservan mientras permanezcas en esta vista.
                 </p>
               </>
             )}
@@ -563,13 +609,15 @@ export function Classroom() {
                 <ArrowRight size={18} />
               </button>
             </div>
-            {read.length >= course.lessons.length && (
+            {badge ? (
+              <BadgeEarned course={course} />
+            ) : read.length >= course.lessons.length ? (
               <div className="vp-feedback">
                 <CheckCircle size={20} />
-                Completaste este recorrido de muestra. Siempre hay una nueva
-                pregunta por explorar.
+                Viste todas las lecciones. Cuando quieras la insignia, responde
+                los tests en orden.
               </div>
-            )}
+            ) : null}
           </section>
         </div>
       </div>
@@ -628,7 +676,7 @@ export function StudentProfile() {
             role="group"
             aria-label="Secciones del perfil"
           >
-            {["Mis datos", "Preferencias", "Acceso"].map((item) => (
+            {["Mis datos", "Mis insignias", "Preferencias", "Acceso"].map((item) => (
               <button
                 key={item}
                 aria-pressed={tab === item}
@@ -681,6 +729,11 @@ export function StudentProfile() {
                 <Check size={17} />
               </button>
             </form>
+          ) : tab === "Mis insignias" ? (
+            <div className="vp-panel-body">
+              <h2>Mis insignias.</h2>
+              <MyBadges />
+            </div>
           ) : tab === "Preferencias" ? (
             <div className="vp-panel-body vp-form">
               <h2>Sigamos conversando.</h2>

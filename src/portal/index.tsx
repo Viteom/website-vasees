@@ -9,6 +9,7 @@ import {
   Checkout,
   StudentPayments,
 } from "./student";
+import { Welcome } from "./learning";
 import {
   AdminDashboard,
   AdminCourses,
@@ -40,6 +41,7 @@ export function Portal({ path }: { path: string }) {
   if (admin && store.session.role !== "admin") return <AccessPreview />;
   const routes: Record<string, React.ReactNode> = {
     "/escuela/inicio": <StudentDashboard />,
+    "/escuela/bienvenida": <Welcome />,
     "/escuela/explorar": <StudentCatalog key={path} />,
     "/escuela/mis-cursos": <StudentCatalog key={path} mine />,
     "/escuela/aula": <Classroom key={store.selectedCourse} />,

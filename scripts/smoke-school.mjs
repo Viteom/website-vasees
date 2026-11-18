@@ -160,6 +160,12 @@ try {
     await page.locator(".vp-student-welcome").isVisible(),
     "Valid demo code opens the student dashboard",
   );
+  ok(
+    (await page.locator(".vp-goal-invite").innerText()).includes(
+      "Definir mi meta",
+    ),
+    "Dashboard invites to set a personal goal",
+  );
   await shot("student-1440");
   await link("Explorar cursos").click();
   ok(
@@ -240,6 +246,57 @@ try {
     (await page.locator(".vp-lesson-sidebar").innerText()).includes("3 de 3"),
     "Lesson progress completes in memory",
   );
+  await button("Test").click();
+  ok(
+    (await page.locator(".vp-test-locked").innerText()).includes(
+      "se abre después del anterior",
+    ),
+    "Lesson tests unlock in order while lessons stay open",
+  );
+  await button("Ir al test de la lección 1").click();
+  await page.getByLabel("Una lista de todas sus funciones", { exact: true }).check();
+  await button("Comprobar respuesta").click();
+  ok(
+    (await page.locator(".vp-test [role=status]").innerText()).includes(
+      "Esa no es la respuesta",
+    ),
+    "A wrong test answer can be retried",
+  );
+  const answers = [
+    "Algo que queremos hacer con ella",
+    "Explicar un paso y dejar que lo pruebe a su ritmo",
+    "Reconocer una duda y consultar una fuente de confianza también es aprender",
+  ];
+  for (let i = 0; i < answers.length; i++) {
+    await page.getByLabel(answers[i], { exact: true }).check();
+    await button("Comprobar respuesta").click();
+    if (i < answers.length - 1) await button("Siguiente test").click();
+  }
+  ok(
+    (await page.locator(".vp-badge-earned").isVisible()) &&
+      (await page.locator(".vp-lesson-sidebar").innerText()).includes(
+        "Insignia obtenida",
+      ),
+    "Passing every test in order earns the badge",
+  );
+  await audit("Insignia y test", 1440);
+  await button("Valorar").click();
+  await button("Enviar valoración de muestra").click();
+  ok(
+    (await page.locator(".vp-review [role=alert]").innerText()).includes(
+      "estrellas",
+    ),
+    "Review asks for a rating",
+  );
+  await page.getByLabel("4 estrellas", { exact: true }).check();
+  await page.getByLabel("Tu opinión (opcional)", { exact: true }).fill(
+    "Me sirvió para acompañar a mi mamá.",
+  );
+  await page
+    .getByLabel(/Autorizo que Vasees use mi valoración/)
+    .check();
+  await button("Enviar valoración de muestra").click();
+  await audit("Valoración", 1440);
   await button("Mis notas").click();
   await label("Mis notas de esta vista").fill(
     "Una conversación para compartir.",
@@ -263,6 +320,12 @@ try {
     "Free course enrolls without checkout",
   );
   await link("Mi perfil").click();
+  await button("Mis insignias").click();
+  ok(
+    (await page.locator(".vp-badge-list li").count()) === 1,
+    "Profile lists the earned badge",
+  );
+  await button("Mis datos").click();
   await label("Nombre completo").fill("Laura de la Escuela");
   await label("Ciudad").fill("Bogotá");
   await button("Guardar datos de muestra").click();
@@ -320,6 +383,13 @@ try {
   ok(
     await page.locator(".vp-admin-intro").isVisible(),
     "Explicit switch opens admin demo",
+  );
+  const report = await page.locator(".vp-reviews-report").innerText();
+  ok(
+    report.includes("Tecnología que nos acerca") &&
+      !report.includes("no debe aparecer") &&
+      !report.includes("Tecnología y vida cotidiana"),
+    "Admin report shows only authorized reviews, never goals",
   );
   await shot("admin-1440");
   await link("Cursos").click();
@@ -525,6 +595,44 @@ try {
     (await page.locator("h1").innerText()).includes("Camila"),
     "Registration opens the named demo profile",
   );
+  ok(
+    page.url().endsWith("/escuela/bienvenida"),
+    "A new profile starts with the welcome flow",
+  );
+  await button("Continuar").click();
+  ok(
+    await page.evaluate(() =>
+      document.activeElement?.getAttribute("role") === "alert",
+    ),
+    "Welcome asks for a goal and focuses the message",
+  );
+  await page.getByLabel(/^Tecnología y vida cotidiana/).check();
+  await button("Continuar").click();
+  await page.getByLabel(/^Familias y generaciones/).check();
+  await button("Continuar").click();
+  await page.getByLabel(/^30 minutos a la semana/).check();
+  await audit("Bienvenida", 1440);
+  await button("Ver mi ruta sugerida").click();
+  const routeText = await page.locator(".vp-route-result").innerText();
+  ok(
+    routeText.includes("Tecnología que nos acerca") &&
+      routeText.includes("Generaciones que se encuentran") &&
+      routeText.includes("Ver una lección y responder su test."),
+    "Welcome suggests a route and a weekly action",
+  );
+  await audit("Ruta sugerida", 1440);
+  await button("Ir a mi inicio").click();
+  const goalText = await page.locator(".vp-goal").innerText();
+  ok(
+    goalText.includes("Tecnología y vida cotidiana") && goalText.includes("50%"),
+    "Dashboard charts progress toward the goal from passed tests",
+  );
+  await button("La cumplí esta semana").click();
+  ok(
+    (await page.locator(".vp-goal").innerText()).includes("1 semana cumplida"),
+    "Weekly action can be checked off",
+  );
+  await audit("Meta personal", 1440);
   await page.reload({ waitUntil: "networkidle" });
   ok(
     await page.locator(".vp-auth-form").isVisible(),
@@ -646,6 +754,22 @@ try {
       `Classroom ${width}: no overflow`,
     );
     if (width !== 768) await audit("Aula", width);
+    await button("Test").click();
+    if (width !== 768) await audit("Test de lección", width);
+    await page.evaluate(() => {
+      history.pushState({}, "", "/escuela/bienvenida");
+      dispatchEvent(new PopStateEvent("popstate"));
+    });
+    ok(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth === innerWidth,
+      ),
+      `Welcome ${width}: no overflow`,
+    );
+    if (width !== 768) {
+      await shot(`welcome-${width}`);
+      await audit("Bienvenida", width);
+    }
     await openWorkspace("Explorar cursos");
     await page
       .locator(".vp-course-card")
