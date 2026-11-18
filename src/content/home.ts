@@ -1,62 +1,73 @@
 export const site = {
   email: 'info@vasees.co',
   newsletter: 'El Futuro tiene Canas',
+  // No newsletter provider is connected yet; the subscribe CTA explains that honestly until this URL exists.
   newsletterUrl: null as string | null,
   researchPdf: null as string | null,
   source: 'https://www.who.int/es/news-room/fact-sheets/detail/ageing-and-health',
 };
 
-export type Service = {
-  id: string; name: string; label: string; title: string; description: string;
-  image: string; alt: string; tags: string[]; details: string[];
-  enabled: boolean; status: 'active' | 'in-development' | 'planned';
+export const schoolName = 'Escuela de Familia y Longevidad';
+
+// Brief v3 §4.1: the Colombia figure stays unpublished until it is checked against a primary DANE source.
+export const statColombia = {
+  value: null as string | null,
+  year: null as number | null,
+  ageBand: '60 años o más',
+  source: null as string | null,
+  projectionOrObservation: null as 'proyección' | 'observación' | null,
+  verified: false,
 };
 
-export const services: Service[] = [
-  {
-    id: 'studio', name: 'Vasees Studio', label: 'Comunicación & marca',
-    title: 'Lo que eres.\nLo que proyectas.',
-    description: 'Diseñamos marcas y comunicaciones que conectan con distintas formas de vivir y envejecer. De la esencia de tu organización a las historias que la hacen relevante.',
-    image: '/images/studio.webp', alt: 'Composición conceptual de libros y materiales de diseño en tonos cálidos',
-    tags: ['Estrategia de marca', 'Identidad visual y verbal', 'Comunicación y contenidos'],
-    details: [
-      'Estrategia de marca: definimos qué lugar quiere ocupar tu marca, a quién quiere llegar y qué promesa puede sostener.',
-      'Identidad visual y verbal: traducimos esa dirección en un sistema de diseño, imágenes, mensajes y tono que tu equipo pueda aplicar.',
-      'Comunicación y contenidos: diseñamos campañas para conversaciones concretas con tus públicos y equipos.',
-    ], enabled: true, status: 'active',
-  },
-  {
-    id: 'consulting', name: 'Vasees Consulting', label: 'Cultura & generaciones',
-    title: 'Generaciones distintas.\nUn propósito común.',
-    description: 'Acompañamos a equipos que quieren crecer juntos. Diseñamos experiencias sobre colaboración intergeneracional, cuidado, propósito y transiciones de la vida laboral.',
-    image: '/images/consulting.webp', alt: 'Imagen conceptual de dos generaciones compartiendo ideas en un taller',
-    tags: ['Cultura organizacional', 'Talleres intergeneracionales', 'Propósito e Ikigai'],
-    details: [
-      'Colaborar entre generaciones: reconocemos los supuestos sobre la edad y construimos acuerdos para trabajar mejor.',
-      'Compartir lo que sabemos: hacemos visible el conocimiento de la experiencia y exploramos maneras de transferirlo.',
-      'Cuidado, propósito y prejubilación: abrimos conversaciones sobre rutinas, vínculos y nuevas etapas. Cada experiencia parte de la realidad de tu equipo.',
-    ], enabled: true, status: 'active',
-  },
-  {
-    id: 'tech', name: 'Vasees Tech', label: 'Tecnología & longevidad',
-    title: 'Antes del código,\nlas personas.',
-    description: 'Exploramos soluciones digitales para necesidades de una sociedad más longeva. Comprendemos el problema, probamos posibilidades y evaluamos qué vale la pena desarrollar.',
-    image: '/images/hero.webp', alt: 'Imagen conceptual de personas de distintas edades trabajando juntas',
-    tags: ['Descubrimiento', 'UX/UI y prototipos', 'Validación con personas'],
-    details: [
-      'Comprender: escuchamos a las personas y estudiamos el contexto antes de proponer una herramienta.',
-      'Probar: convertimos preguntas de uso en prototipos y experiencias que se pueden validar.',
-      'Definir: evaluamos viabilidad y alcance. Esta línea está en desarrollo y se orienta exclusivamente a retos vinculados con longevidad.',
-    ], enabled: true, status: 'in-development',
-  },
+export const context = {
+  heading: 'Vivir más está cambiando cómo trabajamos, compramos y nos relacionamos.',
+  text: 'El cambio demográfico no es solamente una estadística: obliga a repensar a quién escucha una marca, cómo se comparte el conocimiento en un equipo y qué productos necesitamos diseñar. Esa es la conversación que queremos abrir en Vasees.',
+  stat: { value: '1 de cada 6', text: 'personas en el mundo tendrá 60 años o más en 2030.', source: 'OMS · Envejecimiento y salud, proyección mundial' },
+};
+
+export const vision = {
+  heading: 'No queremos ser solo una agencia. Estamos construyendo un ecosistema para la nueva longevidad.',
+  text: 'Comenzamos ayudando a las marcas a encontrar su voz y hacer visible su propósito. Hoy sumamos gerontología, cultura organizacional y desarrollo tecnológico para acompañar una transformación más grande: aprender a vivir, trabajar y crear en una sociedad que vive más años. Hacia 2031 queremos integrar investigación, consultoría, comunicación, tecnología y educación en un mismo ecosistema.',
+};
+
+export const observatory = {
+  name: 'Observatorio de Envejecimiento, Vejez y Longevidad',
+  heading: 'Investigar para diseñar mejor',
+  text: 'El Observatorio de Envejecimiento, Vejez y Longevidad nace como la apuesta de Vasees por convertir preguntas y datos en conocimiento útil para empresas y comunidades. Es la fuente de conocimiento que queremos construir para alimentar Studio, Consulting, Tech y nuestros proyectos educativos.',
+};
+
+// Brief v3 §2: organizations shown as names until authorized logos arrive. `relation` must be confirmed before launch.
+export const organizations = [
+  { name: 'Fundación Provida Colombia', relation: 'cliente' },
+  { name: 'Rödea Care', relation: 'por confirmar' },
+  { name: 'Precisión Logística', relation: 'por confirmar' },
+  { name: 'Comfama', relation: 'por confirmar' },
+] as const;
+
+export type InitiativeConfig = {
+  slug: string; displayName: string; kind: 'servicio' | 'plataforma' | 'impacto';
+  status: 'active' | 'pilot' | 'planned'; publicEnabled: boolean; route: string;
+  description: string; cta: string;
+};
+
+export const initiativeConfig: InitiativeConfig[] = [
+  { slug: 'studio', displayName: 'Vasees Studio', kind: 'servicio', status: 'active', publicEnabled: true, route: '/soluciones#marca', description: 'Marca, lenguaje, comunicación, campañas, lanzamientos y contenidos.', cta: 'Conocer Studio' },
+  { slug: 'consulting', displayName: 'Vasees Consulting', kind: 'servicio', status: 'active', publicEnabled: true, route: '/soluciones#cultura', description: 'Cultura organizacional, comunicación interna, aprendizaje intergeneracional, cuidado, propósito y transiciones laborales.', cta: 'Conocer Consulting' },
+  { slug: 'tech', displayName: 'Vasees Tech', kind: 'servicio', status: 'active', publicEnabled: true, route: '/soluciones#tech', description: 'Diseño y desarrollo de software a la medida para retos vinculados con la longevidad.', cta: 'Conocer Tech' },
+  { slug: 'observatorio', displayName: 'Observatorio', kind: 'plataforma', status: 'planned', publicEnabled: true, route: '/observatorio', description: 'Preguntas, datos y fuentes convertidos en conocimiento útil para empresas y comunidades.', cta: 'Explora el Observatorio' },
+  { slug: 'escuela', displayName: schoolName, kind: 'plataforma', status: 'planned', publicEnabled: true, route: '/escuela', description: 'Aprendizajes para personas de distintas edades, familias, personas cuidadoras y organizaciones.', cta: 'Conoce la Escuela' },
+  { slug: 'la-chispa', displayName: 'La Chispa', kind: 'plataforma', status: 'active', publicEnabled: true, route: '/la-chispa', description: 'Medio editorial: historias, podcast y conversaciones públicas sobre vida, vejez, cultura y arte.', cta: 'Explora La Chispa' },
+  // Brief v3 §5: Kánna is not advertised until its publication is explicitly authorized.
+  { slug: 'kanna', displayName: 'Kánna', kind: 'plataforma', status: 'planned', publicEnabled: false, route: '/ecosistema/kanna', description: 'Plataforma propia en desarrollo para talento senior.', cta: 'Conocer Kánna' },
+  { slug: 'impacto', displayName: 'Impacto', kind: 'impacto', status: 'planned', publicEnabled: true, route: '/ecosistema#transversal', description: 'Resultado transversal que medimos en todas las líneas. No es una entidad constituida.', cta: 'Ver el eje transversal' },
 ];
 
-export const clients = ['Fundación Provida Colombia', 'Rödea Care', 'Precisión Logística', 'Comfama'];
-
-export const initiatives = [
-  { name: 'Kánna', label: 'Talento con trayectoria', title: 'Experiencia que abre\nposibilidades.', text: 'Una plataforma en desarrollo para conectar trayectorias, conocimientos y habilidades con nuevos retos.', status: 'En desarrollo', className: 'kanna' },
-  { name: 'La Chispa', label: 'Medio editorial de Vasees', title: 'Podcast. Revista.\nHistorias que conectan.', text: 'Vida, vejez, cultura y arte. Nuestra última campaña: Cartografía de Pieles.', status: 'Explorar La Chispa', className: 'chispa' },
-  { name: 'Escuela de Hijos y Nietos', label: 'Aprender a vivir más', title: 'Más generaciones.\nMás aprendizajes.', text: 'Un espacio para explorar el envejecimiento, el cuidado, el propósito y las relaciones entre generaciones.', status: 'Explora la Escuela', className: 'escuela' },
+export const experience = [
+  { area: 'Marca y comunicación', title: 'Marca, brandbook y campañas', text: 'Proyectos de marca, brandbook, comunicación y campañas, entre ellos para Fundación Provida Colombia.' },
+  { area: 'Cultura y cuidado', title: 'Ceremonias del cuidado', text: 'Actividades de cuidado y ceremonias del cuidado en el sector hospitalario.' },
+  { area: 'Transiciones laborales', title: 'Preparación para la prejubilación', text: 'Trabajo con personas próximas al retiro y con las organizaciones que las acompañan.' },
+  { area: 'Propósito', title: 'Talleres de Ikigai', text: 'Talleres de Ikigai con personas mayores para conversar sobre intereses, capacidades y proyectos.' },
+  { area: 'Desarrollo tecnológico', title: 'Software propio', text: 'Vasees ya desarrolla soluciones digitales propias relacionadas con la longevidad.' },
 ];
 
 export const research = [
@@ -64,21 +75,3 @@ export const research = [
   { number: '02', title: 'Cuidar también necesita una red.', short: 'Cuidado y conexiones', text: 'El cuidado cotidiano reúne tareas, decisiones y conversaciones que pueden repartirse entre varias personas. ¿Qué responsabilidades están claras y cuáles siguen dependiendo de quien siempre toma la iniciativa?' },
   { number: '03', title: 'Diseñar para las vidas que vienen.', short: 'Comunicación y servicios', text: 'La edad por sí sola dice poco sobre cómo alguien usa un servicio. Observar dónde una persona necesita ayuda, en qué momento abandona y qué decisiones quiere seguir tomando orienta mejor el diseño.' },
 ];
-
-export const faqGroups = {
-  'Sobre Vasees': [
-    ['¿Qué hace Vasees?', 'Conectamos comunicación estratégica, cultura intergeneracional y tecnología para ayudar a las organizaciones a comprender la longevidad y convertirla en decisiones, experiencias y soluciones relevantes.'],
-    ['¿Trabajan solo con organizaciones para personas mayores?', 'Trabajamos con distintos sectores cuando el reto tiene una relación concreta con la longevidad: en sus públicos, sus equipos, sus productos o sus servicios. Vivir más nos involucra a todos.'],
-    ['¿Por qué conectar futuro, longevidad y humanidad?', 'Porque vivir más cambia cómo trabajamos, cuidamos, aprendemos y nos relacionamos. Comprender a las personas es el punto de partida para diseñar organizaciones relevantes en esa realidad.'],
-  ],
-  'Cómo trabajamos': [
-    ['¿Cómo empieza un proyecto?', 'Con una conversación. Cuéntanos qué está cambiando en tu organización y qué te gustaría resolver. Escuchamos el contexto y acordamos un alcance, participantes, tiempos y entregables.'],
-    ['¿Puedo combinar varios servicios?', 'Sí. Una necesidad de marca puede conectarse con cultura, talleres o diseño de experiencias. El alcance se define a partir del reto, no de una solución prefabricada.'],
-    ['¿Qué incluye el diagnóstico de futuro?', 'El ejercicio de esta página ofrece preguntas orientativas sobre públicos, equipos y servicios. No es una evaluación validada. Un diagnóstico con Vasees comienza con escucha y un alcance acordado para tu organización.'],
-  ],
-  'Conocimiento': [
-    ['¿Dónde encuentro las investigaciones?', 'El Observatorio reúne fuentes y exploraciones sobre longevidad. La lectura destacada es una muestra editorial, no una investigación propia concluida. Los informes y sus descargas se incorporarán cuando estén publicados.'],
-    ['¿Cómo puedo leer El Futuro tiene Canas?', 'Estamos preparando el acceso al newsletter. Mientras tanto puedes escribir a info@vasees.co para consultar su disponibilidad. Aquí no se registran suscripciones ni se almacenan tus datos.'],
-    ['¿La Escuela ya tiene inscripciones abiertas?', 'La Escuela de Hijos y Nietos está en preparación. Por ahora presentamos su enfoque; los cursos y las inscripciones se anunciarán cuando estén disponibles.'],
-  ],
-};

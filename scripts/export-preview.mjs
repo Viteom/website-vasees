@@ -48,7 +48,11 @@ css = css.replace(/url\((?:"|')?\/fonts\/pathway-extreme\.ttf(?:"|')?\)/g, `url(
 html = html.replace(/\s*<link[^>]+rel="preload"[^>]*>/g, '');
 html = html.replace(/<script[^>]+src="[^"]+"[^>]*><\/script>/, () => `<script>window.__VASEES_OFFLINE__=true;window.__VASEES_ASSETS=${JSON.stringify(assets)};</script><script type="module">${js.replaceAll('</script', '<\\/script')}</script>`);
 html = html.replace(/<link[^>]+rel="stylesheet"[^>]*>/, `<style>${css}</style>`);
-html = html.replace('href="/images/vasees-logo.png"', `href="${assets['/images/vasees-logo.png']}"`);
+// The offline file carries only the PNG favicon, inlined, so it requests nothing from a server.
+const favicon = `data:image/png;base64,${(await readFile(path.join(dist, 'favicon.png'))).toString('base64')}`;
+html = html.replace(/\s*<link rel="(?:icon|apple-touch-icon)"[^>]*>/g, '');
+html = html.replace('</head>', `<link rel="icon" type="image/png" href="${favicon}" />
+  </head>`);
 await mkdir('.qa', { recursive: true });
 await writeFile('.qa/Vasees-vista-previa.html', html);
 console.log('Offline preview exported to .qa/Vasees-vista-previa.html');

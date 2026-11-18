@@ -102,6 +102,7 @@ const initialPages: ContentPage[] = Object.entries(pageMeta)
   .filter(
     ([path]) =>
       !path.startsWith("/admin") &&
+      !["/studio", "/consulting", "/tech"].includes(path) &&
       (!path.startsWith("/escuela") || path === "/escuela"),
   )
   .map(([path, meta], index) => ({
@@ -112,7 +113,7 @@ const initialPages: ContentPage[] = Object.entries(pageMeta)
       path === "/"
         ? "El futuro cambia.\nLo humano permanece."
         : path === "/escuela"
-          ? "Aprender a vivir más, juntos."
+          ? "Aprender para vivir más y mejor, en cualquier etapa."
           : meta.title.split("|")[0].trim(),
     description: meta.description,
     status: "Publicado",
@@ -299,7 +300,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       id: "code",
       name: "Código de acceso",
       subject: "Tu código para entrar a la Escuela",
-      body: "Hola, {nombre}.\n\nTu código es {codigo}. Úsalo para continuar en la Escuela de Hijos y Nietos.\n\nSi no solicitaste este acceso, puedes ignorar este mensaje.\n\nEquipo Vasees",
+      body: "Hola, {nombre}.\n\nTu código es {codigo}. Úsalo para continuar en la Escuela de Familia y Longevidad.\n\nSi no solicitaste este acceso, puedes ignorar este mensaje.\n\nEquipo Vasees",
     },
     {
       id: "welcome",

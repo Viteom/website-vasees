@@ -44,6 +44,6 @@ export function FlowerMotion() {
       <img className="hero-image" src="/images/hero-flower.png" alt="Flor coral translúcida sobre un fondo azul petróleo, una exploración visual entre naturaleza y tecnología" width="1536" height="1024" fetchPriority="high" />
       {!reduced && !failed && <video ref={video} className="hero-flower-video" src="/videos/hero-flower-breeze.mp4" poster="/images/hero-flower.png" autoPlay muted loop playsInline preload="metadata" aria-hidden="true" tabIndex={-1} onPlaying={() => setReady(true)} onError={() => { setFailed(true); setReady(false); }} />}
     </div>
-    {showingMotion && <button className="hero-flower-control" aria-label={paused ? 'Reanudar animación de la flor' : 'Pausar animación de la flor'} onClick={() => setPaused(value => !value)}>{paused ? <Play size={15} weight="fill" /> : <Pause size={15} weight="fill" />}<span>{paused ? 'Reanudar flor' : 'Pausar flor'}</span></button>}
+    {showingMotion && <button className="hero-flower-control" aria-label={paused ? 'Reanudar animación de la flor' : 'Pausar animación de la flor'} onClick={() => setPaused(value => !value)}>{paused ? <Play size={15} weight="fill" /> : <Pause size={15} weight="fill" />}<span>{paused ? 'Reanudar animación' : 'Pausar animación'}</span></button>}
   </>;
 }

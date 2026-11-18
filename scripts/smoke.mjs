@@ -28,61 +28,76 @@ try {
   await page.goto(base, { waitUntil: 'networkidle' });
   await page.addStyleTag({ content: 'html{scroll-behavior:auto!important}' });
   ok((await page.locator('h1').count()) === 1 && (await page.title()).includes('Vasees'), 'Unique heading and document title');
-  await page.getByRole('button', { name: 'Pausar movimiento de nombres' }).click();
-  ok(await page.getByRole('button', { name: 'Reanudar movimiento de nombres' }).isVisible(), 'Client strip pauses');
-  await page.locator('.hero-research').click();
-  await page.locator('.research-article').waitFor();
-  ok(page.url().includes('/observatorio/vivir-mas'), 'Research opens its public article');
-  ok((await page.locator('.article-body section[id^=lectura-]').count()) === 3, 'Full editorial has all three territories');
-  ok((await page.locator('.article-sources .text-link').getAttribute('href')).includes('who.int'), 'Article links its source');
-  await page.getByRole('link', {name:'Vasees, inicio'}).click();
-  await page.locator('.hero').waitFor();
-  for (const [index, name] of ['Studio', 'Consulting', 'Tech'].entries()) {
-    const card = page.locator('.service-card').nth(index);
-    await card.evaluate(el => window.scrollTo(0, el.getBoundingClientRect().top + scrollY - 120));
-    await card.getByRole('link', { name: `Conoce ${name}` }).click();
-    await page.locator('.inner-page').waitFor();
-    ok(page.url().endsWith('/'+name.toLowerCase()) && (await page.locator('h1').count()) === 1, `${name} public page is accessible`);
-    await page.getByRole('link', {name:'Vasees, inicio'}).click();
+  const heroActions = await page.locator('.hero-copy a, .hero-copy button').evaluateAll(items => items.map(item => item.getAttribute('href')));
+  ok(heroActions.length === 1 && heroActions[0] === '/#soluciones', 'Hero has a single action to the solutions');
+  ok((await page.locator('.hero .client-module, .hero .hero-research, .section-index').count()) === 0, 'Hero has no logos, Observatorio card or decorative numbering');
+  ok(await page.locator('.image-note').evaluateAll(notes => notes.every(note => getComputedStyle(note).display === 'none')), '"Imagen conceptual" badges are hidden');
+  ok(await page.locator('.hero + .organizations h2').innerText() === 'Organizaciones con las que hemos trabajado', 'Organizations sit right below the hero');
+  ok((await page.locator('#diagnostico').count()) === 0, 'The starting-point questionnaire is gone');
+  const order = await page.locator('main > section').evaluateAll(sections => sections.map(section => section.id || section.className.split(' ')[0]));
+  ok(JSON.stringify(order) === JSON.stringify(['inicio', 'organizations', 'nosotros', 'soluciones', 'ecosistema', 'school-teaser', 'insights', 'experience', 'contacto', 'closing']), `Home follows the brief order: ${order.join(', ')}`);
+  ok((await page.locator('.closing').innerText()).replace(/\s+/g, ' ').trim() === 'Más vida. Más futuro.', 'Brand signature closes the home');
+  const cardTops = await page.locator('.solution-card').evaluateAll(cards => cards.map(card => Math.round(card.getBoundingClientRect().top)));
+  ok(cardTops.length === 3 && new Set(cardTops).size === 1, 'Desktop shows the three solutions side by side');
+  for (const [name, anchor] of [['Studio', 'marca'], ['Consulting', 'cultura'], ['Tech', 'tech']]) {
+    await page.getByRole('link', { name: `Conocer ${name}` }).click();
+    await page.locator('.solutions-hero').waitFor();
+    ok(page.url().endsWith(`/soluciones#${anchor}`) && (await page.locator('h1').count()) === 1, `${name} card opens its /soluciones section`);
+    await page.getByRole('link', { name: 'Vasees, inicio' }).click();
     await page.locator('.hero').waitFor();
   }
-  await page.getByRole('tab', { name: 'Cómo trabajamos' }).click();
-  ok(await page.getByRole('button', { name: '¿Cómo empieza un proyecto?' }).getAttribute('aria-expanded') === 'true', 'FAQ category changes');
-  await page.getByRole('button', { name: '¿Cómo empieza un proyecto?' }).click();
-  ok(await page.getByRole('button', { name: '¿Cómo empieza un proyecto?' }).getAttribute('aria-expanded') === 'false', 'FAQ collapses');
-  await page.getByRole('button', { name: 'Abre la conversación' }).click();
-  ok(await page.getByRole('button', { name: 'Continuar', exact: true }).isDisabled(), 'Diagnostic requires an answer');
-  await page.getByLabel('En nuestros equipos y su cultura', { exact: true }).check();
-  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
-  await page.getByLabel('Cómo compartir experiencia y colaborar entre generaciones', { exact: true }).check();
-  await page.getByRole('button', { name: 'Continuar', exact: true }).click();
-  await page.getByLabel('Tenemos un reto y queremos explorarlo', { exact: true }).check();
-  await page.getByRole('button', { name: 'Ver mi punto de partida' }).click();
-  ok((await page.locator('dialog').innerText()).includes('Vasees Consulting'), 'Diagnostic produces a relevant conversation starter');
-  const diagnosticLink = await page.getByRole('link', { name: 'Lleva tu pregunta a Vasees' }).getAttribute('href');
-  ok(decodeURIComponent(diagnosticLink).includes('En nuestros equipos y su cultura'), 'Diagnostic mail includes chosen answers');
-  await page.screenshot({ path: '.qa/diagnostic.png' });
-  await page.keyboard.press('Escape');
-  await page.locator('.newsletter-card').click();
-  ok((await page.locator('#dialog-title').innerText()) === 'El Futuro tiene Canas', 'Newsletter detail opens');
-  ok((await page.getByRole('link', { name: 'Conversemos por correo' }).getAttribute('href')).startsWith('mailto:info@vasees.co'), 'Newsletter has honest email fallback');
+  await page.goto(`${base}/soluciones`, { waitUntil: 'networkidle' });
+  ok((await page.locator('.anchor-nav a').count()) === 3, 'Solutions page has its anchor navigation');
+  await page.getByRole('link', { name: 'Quiero lanzar o fortalecer mi marca' }).click();
+  await page.locator('#contacto').waitFor();
+  ok(page.url().endsWith('/?interes=studio#contacto') && await page.locator('input[name=interest][value=studio]').isChecked(), 'Solution CTA preselects the interest in the single form');
+  await page.goto(`${base}/?interes=tech#contacto`, { waitUntil: 'networkidle' });
+  ok(await page.locator('input[name=interest][value=tech]:checked').waitFor({ timeout: 10000 }).then(() => true, () => false), `Direct link preselects the interest (${page.url()})`);
+  await page.goto(base, { waitUntil: 'networkidle' });
+  await page.addStyleTag({ content: 'html{scroll-behavior:auto!important}' });
+  await page.getByRole('button', { name: 'Suscríbete a nuestro newsletter' }).click();
+  ok((await page.locator('#dialog-title').innerText()) === 'El Futuro tiene Canas', 'Newsletter CTA opens its detail');
+  ok((await page.locator('dialog').innerText()).includes('no registra correos'), 'Newsletter state is honest');
+  ok((await page.getByRole('link', { name: 'Escribir a Vasees' }).getAttribute('href')).startsWith('mailto:info@vasees.co'), 'Newsletter has an email fallback');
   await page.keyboard.press('Escape');
   ok(await page.evaluate(() => localStorage.length === 0 && sessionStorage.length === 0), 'No personal data persisted in browser storage');
-  await page.getByLabel('Tu nombre', { exact: true }).fill('Prueba de QA');
-  await page.getByLabel('Tu correo', { exact: true }).fill('prueba@example.com');
-  await page.getByLabel('Organización', { exact: true }).fill('Organización de prueba');
+  await page.getByRole('button', { name: 'Abrir mi correo para escribir a Vasees' }).click();
+  ok(await page.locator('.form-errors').isVisible() && (await page.locator('.form-errors li').count()) === 3, 'Empty form lists its three missing fields');
+  ok(await page.locator('.form-errors').evaluate(el => el === document.activeElement), 'Error summary receives focus');
+  await page.getByLabel('Aún no lo tengo claro; quiero contarles mi reto').check();
+  ok((await page.locator('label[for=contact-challenge]').innerText()).includes('recomendado'), 'Challenge is recommended when the visitor is exploring');
+  await page.getByLabel('Nombre', { exact: true }).fill('Prueba de QA');
+  await page.getByLabel('Correo', { exact: true }).fill('correo-invalido');
+  await page.getByRole('button', { name: 'Abrir mi correo para escribir a Vasees' }).click();
+  ok((await page.locator('#contact-email-error').innerText()).includes('formato'), 'Invalid email is explained');
+  await page.getByLabel('Correo', { exact: true }).fill('prueba@example.com');
+  await page.getByLabel('Organización (opcional)').fill('Organización de prueba');
+  ok((await page.locator('input[type=tel]').count()) === 0, 'The form does not ask for a phone number');
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Page.enable');
   const navigations = [];
   cdp.on('Page.frameRequestedNavigation', event => navigations.push(event.url));
-  await page.getByRole('button', { name: 'Preparar correo', exact: true }).click();
+  await page.getByRole('button', { name: 'Abrir mi correo para escribir a Vasees' }).click();
   await page.waitForTimeout(300);
-  ok(navigations.some(url => url.startsWith('mailto:info@vasees.co') && decodeURIComponent(url).includes('Prueba de QA')), 'Contact prepares the entered email without claiming delivery');
+  ok(navigations.some(url => url.startsWith('mailto:info@vasees.co') && decodeURIComponent(url).includes('Prueba de QA') && decodeURIComponent(url).includes('Aún no lo tengo claro')), 'Contact prepares the email with the chosen interest, without claiming delivery');
+  const legalLinks = await page.locator('footer nav[aria-label="Información legal"] a').evaluateAll(links => links.map(link => link.getAttribute('href')));
+  ok(JSON.stringify(legalLinks) === JSON.stringify(['/privacidad', '/terminos', '/cookies', '/terminos-escuela']), 'Footer links every legal page');
+  for (const path of legalLinks) {
+    await page.goto(base + path, { waitUntil: 'networkidle' });
+    ok((await page.locator('h1').count()) === 1 && (await page.locator('.legal-status').innerText()).includes('Pendiente de revisión jurídica'), `${path} is marked as pending legal review`);
+  }
+  for (const [old, target] of [['/studio', '/soluciones#marca'], ['/consulting', '/soluciones#cultura'], ['/tech', '/soluciones#tech']]) {
+    await page.goto(base + old, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(200);
+    await page.locator('.solutions-hero').waitFor({ timeout: 4000 }).catch(() => {});
+    ok(page.url().endsWith(target) && await page.locator('.solutions-hero').isVisible(), `${old} moves to ${target} (now ${page.url()})`);
+  }
+  ok(await page.evaluate(() => [...document.querySelectorAll('a')].every(link => link.getAttribute('href') !== '#' && !link.getAttribute('href')?.startsWith('javascript:'))), 'No empty or script links');
   for (const [name, width, height] of [['desktop', 1440, 1000], ['tablet', 768, 1024], ['mobile', 390, 844]]) {
     await page.setViewportSize({ width, height });
     await page.goto(base, { waitUntil: 'networkidle' });
     await page.addStyleTag({ content: 'html{scroll-behavior:auto!important}' });
-    for (const id of ['soluciones', 'observatorio', 'insights', 'contacto']) {
+    for (const id of ['soluciones', 'ecosistema', 'insights', 'contacto']) {
       await page.locator(`#${id}`).scrollIntoViewIfNeeded();
       await page.waitForTimeout(150);
     }
@@ -93,26 +108,11 @@ try {
     await page.screenshot({ path: `.qa/${name}-full.png`, fullPage: true });
     if (width === 390) {
       await page.getByRole('button', { name: 'Abrir menú' }).click();
+      ok((await page.locator('.mobile-menu a').count()) === 6, 'Mobile menu lists the five sections and Hablemos');
       await page.locator('.mobile-menu').getByRole('link', { name: 'Observatorio' }).click();
       ok(await page.getByRole('button', { name: 'Abrir menú' }).isVisible() && page.url().endsWith('/observatorio'), 'Mobile menu navigates and closes');
     }
   }
-  await page.getByRole('link', {name:'Vasees, inicio'}).click();
-  await page.locator('.hero').waitFor();
-  await page.setViewportSize({width:1440,height:1000});
-  const sectionY = await page.locator('#manifiesto').evaluate(el => el.getBoundingClientRect().top + scrollY);
-  await page.evaluate(y => window.scrollTo(0,y-300), sectionY);
-  await page.waitForTimeout(100);
-  const earlyBlur = await page.locator('[data-reveal]').last().evaluate(el=>getComputedStyle(el).filter);
-  await page.evaluate(y => window.scrollTo(0,y+600), sectionY);
-  await page.waitForTimeout(100);
-  const lateBlur = await page.locator('[data-reveal]').last().evaluate(el=>getComputedStyle(el).filter);
-  ok(earlyBlur !== lateBlur && lateBlur === 'blur(0px)', 'Scrolling reveals the blurred manifesto');
-  await page.screenshot({path:'.qa/manifesto-revealed.png'});
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.locator('#manifiesto').scrollIntoViewIfNeeded();
-  ok(await page.locator('[data-reveal]').evaluateAll(words => words.every(word => getComputedStyle(word).filter === 'none' && getComputedStyle(word).opacity === '1')), 'Reduced motion keeps manifesto clear');
-  ok(await page.locator('.client-track').evaluate(el => getComputedStyle(el).animationName === 'none'), 'Reduced motion stops the client strip');
   ok(errors.length === 0, `No browser errors: ${errors.join('; ')}`);
   console.log(`${checks} browser checks passed. Screenshots: .qa/`);
 } finally {

@@ -1,14 +1,19 @@
 export const pageMeta: Record<string, { title: string; description: string }> = {
-  '/': { title: 'Vasees — Más años. Más futuro.', description: 'Comunicación, cultura y tecnología para una sociedad más longeva. En Vasees conectamos lo que cambia con lo que nos hace humanos.' },
-  '/studio': { title: 'Branding y comunicación para la longevidad | Vasees Studio', description: 'Estrategia de marca, identidad y comunicación para organizaciones que quieren conectar con distintas formas de vivir y envejecer.' },
-  '/consulting': { title: 'Cultura y colaboración intergeneracional | Vasees Consulting', description: 'Talleres y experiencias sobre propósito, cuidado, colaboración intergeneracional y transiciones de la vida laboral.' },
-  '/tech': { title: 'Tecnología para la longevidad | Vasees Tech', description: 'Exploramos soluciones digitales a medida vinculadas con longevidad. Conoce el enfoque de Vasees Tech, una línea en desarrollo.' },
-  '/ecosistema': { title: 'Ecosistema silver | Vasees', description: 'Conoce las iniciativas y organizaciones que amplían nuestra mirada sobre longevidad, cuidado, conocimiento y talento senior.' },
-  '/observatorio': { title: 'Observatorio de Envejecimiento y Vejez | Vasees', description: 'Preguntas, fuentes y lecturas sobre longevidad, trabajo, cuidado y diseño de servicios.' },
+  '/': { title: 'Vasees — El futuro cambia. Lo humano permanece.', description: 'Diseñamos marcas, culturas organizacionales y tecnología para una sociedad que vive más.' },
+  '/soluciones': { title: 'Soluciones: marca, cultura organizacional y software | Vasees', description: 'Vasees Studio, Consulting y Tech: marcas y campañas, cultura organizacional y desarrollo de software para los retos de una sociedad más longeva.' },
+  '/studio': { title: 'Vasees Studio ahora está en Soluciones | Vasees', description: 'Marca, campañas, lanzamientos y comunicación. Esta página se trasladó a /soluciones#marca.' },
+  '/consulting': { title: 'Vasees Consulting ahora está en Soluciones | Vasees', description: 'Cultura organizacional, talleres y transferencia de conocimiento. Esta página se trasladó a /soluciones#cultura.' },
+  '/tech': { title: 'Vasees Tech ahora está en Soluciones | Vasees', description: 'Diseño y desarrollo de software a la medida. Esta página se trasladó a /soluciones#tech.' },
+  '/ecosistema': { title: 'Ecosistema Vasees: cómo se conecta y cómo participar | Vasees', description: 'Soluciones, Observatorio, Escuela y La Chispa: cómo se relacionan las partes de Vasees y cómo puedes participar.' },
+  '/observatorio': { title: 'Observatorio de Envejecimiento, Vejez y Longevidad | Vasees', description: 'Preguntas, fuentes y lecturas sobre longevidad, trabajo, cuidado y diseño de servicios. Investigación en preparación.' },
   '/observatorio/vivir-mas': { title: 'Vivir más. ¿Estamos listos? | Observatorio Vasees', description: 'Una exploración editorial de muestra sobre trabajo, redes de cuidado y diseño para una sociedad más longeva.' },
-  '/escuela': { title: 'Escuela de Hijos y Nietos | Vasees', description: 'Aprender a vivir más, juntos. Con Mateo y Melissa, explora cursos de muestra sobre cuidado, generaciones, tecnología y proyecto de vida.' },
+  '/escuela': { title: 'Escuela de Familia y Longevidad | Vasees', description: 'Aprender para vivir más y mejor, en cualquier etapa. Rutas de aprendizaje para personas, familias, personas cuidadoras y organizaciones.' },
   '/ecosistema/kanna': { title: 'Kánna — Experiencia que abre posibilidades | Vasees', description: 'Conoce la iniciativa de Vasees en desarrollo para reconocer el talento senior y conectar trayectorias con oportunidades.' },
   '/la-chispa': { title: 'La Chispa — Podcast, revista y Cartografía de Pieles | Vasees', description: 'La Chispa es el medio editorial de Vasees: podcast y revista sobre vida, vejez, cultura y arte. Conoce nuestra última campaña, Cartografía de Pieles.' },
+  '/privacidad': { title: 'Política de tratamiento de datos personales | Vasees', description: 'Documento pendiente de revisión jurídica.' },
+  '/terminos': { title: 'Términos de uso del sitio | Vasees', description: 'Documento pendiente de revisión jurídica.' },
+  '/cookies': { title: 'Política de cookies | Vasees', description: 'Documento pendiente de revisión jurídica.' },
+  '/terminos-escuela': { title: 'Términos del servicio educativo | Vasees', description: 'Documento pendiente de revisión jurídica.' },
 };
 
 const portalTitles: Record<string, string> = {

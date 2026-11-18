@@ -38,13 +38,12 @@ try {
       await page.evaluate(() => document.fonts.ready);
       ok(await page.locator('h1').count() === 1 && await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), `${path} ${width}: unique H1 and no overflow`);
       if (path !== '/la-chispa/') {
-        const cards = page.locator('.ecosystem-grid');
+        const selector = path === '/' ? '.ecosystem-summary' : '.map-diagram';
+        const cards = page.locator(selector);
         await cards.scrollIntoViewIfNeeded();
-        for (const img of await cards.locator('img').all()) await img.evaluate(img => img.decode());
-        ok(await cards.locator('article').count() === 3, `${path} ${width}: three initiatives`);
-        const palette = await cards.locator('article').evaluateAll(items => items.map(item => getComputedStyle(item).backgroundColor));
-        ok(JSON.stringify(palette) === JSON.stringify(['rgb(244, 242, 236)', 'rgb(229, 87, 45)', 'rgb(7, 86, 216)']), `${path} ${width}: brand colors`);
-        if (width !== 768) await audit(page, `${path} cards ${width}`, '.ecosystem-grid');
+        ok(await cards.locator('a').count() === 6 && (await cards.innerText()).includes('La Chispa'), `${path} ${width}: three solutions and three platforms`);
+        ok((await cards.locator('a[href="/ecosistema/kanna"]').count()) === 0, `${path} ${width}: Kánna stays unpublished`);
+        if (width !== 768) await audit(page, `${path} ecosystem ${width}`, selector);
         if (path === '/') {
           await page.evaluate(() => document.activeElement?.blur());
           if (width === 390) await page.screenshot({ path: `.qa/brands/cards-${width}.png` });
@@ -101,7 +100,7 @@ try {
   offlinePage.on('pageerror', error => errors.push(error.message));
   offlinePage.on('request', req => { if (!req.isNavigationRequest() && req.url().startsWith('http')) requests.push(req.url()); });
   await offlinePage.goto(`http://127.0.0.1:${offlineServer.address().port}`, { waitUntil: 'networkidle' });
-  await offlinePage.locator('.initiative.chispa a').click();
+  await offlinePage.locator('.ecosystem-summary a[href$="la-chispa"]').click();
   await offlinePage.locator('.chispa-editorial').waitFor();
   await offlinePage.locator('.chispa-local-nav').getByRole('link', { name: 'La campaña', exact: true }).click();
   ok(offlinePage.url().includes('#/la-chispa?section=cartografia'), 'Offline anchors preserve the editorial page');

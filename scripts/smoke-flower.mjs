@@ -42,7 +42,7 @@ try {
     await video.evaluate(element => { element.currentTime = element.duration - 0.15; });
     await page.waitForFunction(() => { const video = document.querySelector('.hero-flower-video'); return video.currentTime < 1 && !video.paused; });
     ok(await page.locator('.hero-flower-visual').getAttribute('class').then(value => value.includes('is-ready')), `${width}: looping keeps the same media layer visible`);
-    await page.locator('#preguntas').scrollIntoViewIfNeeded();
+    await page.locator('#contacto').scrollIntoViewIfNeeded();
     await page.waitForFunction(() => document.querySelector('.hero-flower-video').paused);
     ok(await video.evaluate(element => element.paused), `${width}: offscreen media pauses`);
     await page.evaluate(() => scrollTo(0, 0));

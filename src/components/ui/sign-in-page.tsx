@@ -134,7 +134,7 @@ export function LoginPage({ path }: { path: string }) {
         </div>
         <div className="vp-auth-story">
           <p className="eyebrow">
-            {admin ? "Vasees · Administración" : "Escuela de Hijos y Nietos"}
+            {admin ? "Vasees · Administración" : "Escuela de Familia y Longevidad"}
           </p>
           <h2>
             {admin ? (
