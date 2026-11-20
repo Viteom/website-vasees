@@ -17,6 +17,7 @@ import './inner-pages.css';
 import './school.css';
 import './portal/portal.css';
 import './portal/learning.css';
+import './portal/community.css';
 import './brand-pages.css';
 import './chispa-podcast-hero.css';
 import './brief-v3.css';

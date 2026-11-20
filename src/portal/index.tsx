@@ -11,6 +11,13 @@ import {
 } from "./student";
 import { Welcome } from "./learning";
 import {
+  StudentEncuentros,
+  Community,
+  ThreadView,
+  AdminEncuentros,
+  Moderation,
+} from "./community";
+import {
   AdminDashboard,
   AdminCourses,
   CourseEditor,
@@ -48,6 +55,11 @@ export function Portal({ path }: { path: string }) {
     "/escuela/perfil": <StudentProfile />,
     "/escuela/pagos": <StudentPayments />,
     "/escuela/pago": <Checkout key={store.selectedCourse} />,
+    "/escuela/encuentros": <StudentEncuentros />,
+    "/escuela/comunidad": <Community />,
+    "/escuela/conversacion": <ThreadView key={store.selectedThread} />,
+    "/admin/encuentros": <AdminEncuentros />,
+    "/admin/comunidad": <Moderation />,
     "/admin": <AdminDashboard />,
     "/admin/cursos": <AdminCourses />,
     "/admin/curso": <CourseEditor key={store.selectedCourse} />,

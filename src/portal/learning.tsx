@@ -377,6 +377,7 @@ export function GoalPanel() {
               </span>
               <button
                 className="vp-table-action"
+                aria-label={`${owned ? "Ir al curso" : course.price ? "Ver inscripción" : "Empezar"}: ${course.title}`}
                 onClick={() => {
                   store.setSelectedCourse(course.id);
                   if (!owned && !course.price)
@@ -385,7 +386,6 @@ export function GoalPanel() {
                 }}
               >
                 {owned ? "Ir al curso" : course.price ? "Ver inscripción" : "Empezar"}
-                <span className="sr-only">: {course.title}</span>
                 <ArrowUpRight size={17} />
               </button>
             </li>

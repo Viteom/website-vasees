@@ -15,6 +15,7 @@ import {
   X,
   CheckCircle,
   WarningCircle,
+  ChatsCircle,
 } from "@phosphor-icons/react";
 import {
   BadgeEarned,
@@ -484,6 +485,17 @@ export function Classroom() {
             ))}
           </nav>
           <BadgeRules lessons={course.lessons.length} />
+          <button
+            className="vp-forum-link"
+            onClick={() => {
+              store.setForumFilter(course.id);
+              navigate("/escuela/comunidad");
+            }}
+          >
+            <ChatsCircle size={20} weight="light" />
+            Conversar en el foro del curso
+            <ArrowRight size={16} />
+          </button>
         </aside>
         <div className="vp-classroom-main">
           <div className="vp-lesson-poster">

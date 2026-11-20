@@ -8,6 +8,14 @@ import {
 import { schoolCourses, type SchoolCourse } from "../content/school";
 import { pageMeta } from "../content/pages";
 import type { LearnerPlan } from "../content/school-learning";
+import {
+  initialEncuentros,
+  initialReports,
+  initialThreads,
+  type Encuentro,
+  type ForumReport,
+  type ForumThread,
+} from "../content/community";
 
 export type CourseReview = {
   courseId: string;
@@ -89,6 +97,9 @@ export const portalPaths = [
   "/escuela/perfil",
   "/escuela/pagos",
   "/escuela/pago",
+  "/escuela/encuentros",
+  "/escuela/comunidad",
+  "/escuela/conversacion",
   "/admin",
   "/admin/cursos",
   "/admin/curso",
@@ -99,6 +110,8 @@ export const portalPaths = [
   "/admin/pagos",
   "/admin/mensajes",
   "/admin/ajustes",
+  "/admin/encuentros",
+  "/admin/comunidad",
 ];
 export const isPortalPath = (path: string) =>
   path.startsWith("/escuela/") || path === "/admin" || path.startsWith("/admin/");
@@ -199,6 +212,20 @@ type DemoStore = {
   setTests: React.Dispatch<React.SetStateAction<Record<string, number[]>>>;
   reviews: CourseReview[];
   setReviews: React.Dispatch<React.SetStateAction<CourseReview[]>>;
+  encuentros: Encuentro[];
+  setEncuentros: React.Dispatch<React.SetStateAction<Encuentro[]>>;
+  /** Encuentros the student signed up for. */
+  myEncuentros: string[];
+  setMyEncuentros: React.Dispatch<React.SetStateAction<string[]>>;
+  threads: ForumThread[];
+  setThreads: React.Dispatch<React.SetStateAction<ForumThread[]>>;
+  reports: ForumReport[];
+  setReports: React.Dispatch<React.SetStateAction<ForumReport[]>>;
+  selectedThread: string;
+  setSelectedThread: (value: string) => void;
+  /** Course filter for the community; "todos" or "" (general) or a course id. */
+  forumFilter: string;
+  setForumFilter: (value: string) => void;
 };
 const Context = createContext<DemoStore | null>(null);
 
@@ -364,6 +391,12 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   });
   const [plan, setPlan] = useState<LearnerPlan | null>(null);
   const [tests, setTests] = useState<Record<string, number[]>>({});
+  const [encuentros, setEncuentros] = useState(initialEncuentros);
+  const [myEncuentros, setMyEncuentros] = useState<string[]>([]);
+  const [threads, setThreads] = useState(initialThreads);
+  const [reports, setReports] = useState(initialReports);
+  const [selectedThread, setSelectedThread] = useState(initialThreads[0].id);
+  const [forumFilter, setForumFilter] = useState("todos");
   const [reviews, setReviews] = useState<CourseReview[]>([
     {
       courseId: schoolCourses[1].id,
@@ -432,6 +465,18 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         setTests,
         reviews,
         setReviews,
+        encuentros,
+        setEncuentros,
+        myEncuentros,
+        setMyEncuentros,
+        threads,
+        setThreads,
+        reports,
+        setReports,
+        selectedThread,
+        setSelectedThread,
+        forumFilter,
+        setForumFilter,
       }}
     >
       {children}

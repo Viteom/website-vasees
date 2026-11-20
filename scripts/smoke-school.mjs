@@ -371,6 +371,118 @@ try {
     "Receipt has a demo disclaimer",
   );
   await page.keyboard.press("Escape");
+  await link("Encuentros").click();
+  ok(
+    (await page.locator(".vp-encuentro").count()) === 3,
+    "Students see published encuentros only",
+  );
+  ok(
+    await page
+      .locator(".vp-encuentro")
+      .filter({ hasText: "Historias entre generaciones" })
+      .locator("button")
+      .evaluate((el) => el.disabled && el.textContent.startsWith("Sin cupos disponibles")),
+    "A full encuentro cannot take more registrations",
+  );
+  await page
+    .getByRole("button", { name: "Inscribirme: Conversación abierta: cuidar sin dejar de vivir" })
+    .click();
+  ok(
+    (await page.locator(".vp-encuentro").first().innerText()).includes(
+      "13 de 40 cupos",
+    ),
+    "Registration takes a seat",
+  );
+  await page.locator(".vp-calendar-menu summary").click();
+  const calendarLinks = await page
+    .locator(".vp-calendar-menu a")
+    .evaluateAll((links) => links.map((a) => a.href));
+  ok(
+    calendarLinks.length === 4 &&
+      calendarLinks[0].startsWith("https://calendar.google.com/") &&
+      calendarLinks[0].includes("dates=20261203T230000Z%2F20261204T003000Z") &&
+      calendarLinks[1].startsWith("https://outlook.live.com/calendar/0/deeplink/compose") &&
+      calendarLinks[1].includes("startdt=2026-12-03T23%3A00%3A00.000Z") &&
+      calendarLinks[2].startsWith("https://outlook.office.com/") &&
+      calendarLinks[3].startsWith("https://calendar.yahoo.com/") &&
+      calendarLinks[3].includes("st=20261203T230000Z"),
+    "Calendar links carry the encuentro time in UTC for Google, Outlook, Microsoft 365 and Yahoo",
+  );
+  ok(
+    await page
+      .locator(".vp-calendar-menu a")
+      .evaluateAll((links) =>
+        links.every((a) => a.target === "_blank" && a.rel.includes("noopener")),
+      ),
+    "Calendar links open safely in a new tab",
+  );
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    button("Descargar archivo .ics").click(),
+  ]);
+  const ics = await readFile(await download.path(), "utf8");
+  ok(
+    download.suggestedFilename() === "conversacion-abierta-cuidar-sin-dejar-de-vivir.ics" &&
+      ics.startsWith("BEGIN:VCALENDAR\r\n") &&
+      ics.includes("DTSTART:20261203T230000Z\r\n") &&
+      ics.includes("DTEND:20261204T003000Z\r\n") &&
+      ics.includes("SUMMARY:Conversación abierta: cuidar sin dejar de vivir") &&
+      ics.split("\r\n").every((line) => Buffer.byteLength(line) <= 75),
+    "The .ics file is a valid calendar event",
+  );
+  await audit("Encuentros", 1440);
+  await page.getByRole("button", { name: /^Mis encuentros/ }).click();
+  ok(
+    (await page.locator(".vp-encuentro").count()) === 1,
+    "My encuentros lists the registration",
+  );
+  await link("Comunidad").click();
+  ok(
+    (await page.locator(".vp-thread-list li").count()) === 3,
+    "Community lists the forum conversations",
+  );
+  await page.getByLabel("Foro", { exact: true }).selectOption("generaciones-que-se-encuentran");
+  ok(
+    (await page.locator(".vp-thread-list li").count()) === 1,
+    "Forum filter shows one course forum",
+  );
+  await page.getByLabel("Foro", { exact: true }).selectOption("todos");
+  await page.locator(".vp-heading-actions").getByRole("button", { name: "Abrir una conversación" }).click();
+  await button("Publicar conversación").click();
+  ok(
+    await page.locator("dialog[open] [role=alert]").isVisible(),
+    "A new conversation needs a title and a message",
+  );
+  await page.locator("dialog[open]").getByLabel("Título", { exact: true }).fill("¿Qué libro les ayudó a cuidar?");
+  await page.locator("dialog[open]").getByLabel("Tu mensaje", { exact: true }).fill("Busco lecturas cortas sobre cuidado compartido.");
+  await audit("Abrir conversación", 1440);
+  await button("Publicar conversación").click();
+  ok(
+    page.url().endsWith("/escuela/conversacion") &&
+      (await page.locator("h1").innerText()) === "¿Qué libro les ayudó a cuidar?",
+    "Publishing opens the new conversation",
+  );
+  await page.locator(".vp-back-link").click();
+  await page.getByRole("button", { name: /¿Cómo pedir ayuda sin sentir que fallo\?/ }).click();
+  await page.getByRole("button", { name: "Reportar la respuesta de Daniela R." }).click();
+  await button("Enviar reporte").click();
+  ok(
+    await page.locator("dialog[open] [role=alert]").isVisible(),
+    "A report needs a reason",
+  );
+  await page.getByLabel("Comparte datos personales de alguien", { exact: true }).check();
+  await button("Enviar reporte").click();
+  ok(
+    (await page.locator(".vp-message-reported").count()) === 1,
+    "The student sees their report was sent",
+  );
+  await page.getByLabel("Tu respuesta", { exact: true }).fill("A mí también me pasó.");
+  await button("Publicar respuesta").click();
+  ok(
+    (await page.locator(".vp-thread").innerText()).includes("A mí también me pasó."),
+    "Replies are published in the conversation",
+  );
+  await audit("Conversación", 1440);
   await page.evaluate(() => {
     history.pushState({}, "", "/admin");
     dispatchEvent(new PopStateEvent("popstate"));
@@ -391,6 +503,48 @@ try {
       !report.includes("Tecnología y vida cotidiana"),
     "Admin report shows only authorized reviews, never goals",
   );
+  await link("Moderación").click();
+  ok(
+    (await page.locator(".vp-moderation-list > li").count()) === 2,
+    "Moderation groups the reported messages",
+  );
+  await page
+    .locator(".vp-moderation-list > li")
+    .filter({ hasText: "Daniela R." })
+    .getByRole("button", { name: "Ocultar mensaje" })
+    .click();
+  ok(
+    (await page.locator(".vp-moderation-list > li").count()) === 1,
+    "Hiding a message resolves its reports",
+  );
+  await audit("Moderación", 1440);
+  await link("Encuentros").click();
+  await button("Crear encuentro").click();
+  await page.locator("dialog[open]").getByLabel("Título", { exact: true }).fill("Encuentro de prueba");
+  await page.getByLabel("Fecha", { exact: true }).fill("2027-03-04");
+  await page.getByLabel("Hora de inicio (Colombia)", { exact: true }).fill("18:00");
+  await page.getByLabel("Hora de cierre (Colombia)", { exact: true }).fill("17:00");
+  await button("Crear encuentro de muestra").click();
+  ok(
+    (await page.locator("dialog[open] [role=alert]").innerText()).includes(
+      "posterior",
+    ),
+    "Encuentro end must follow its start",
+  );
+  await page.getByLabel("Hora de cierre (Colombia)", { exact: true }).fill("19:30");
+  await page.getByLabel("Estado", { exact: true }).selectOption("Publicado");
+  await audit("Crear encuentro", 1440);
+  await button("Crear encuentro de muestra").click();
+  ok(
+    (await page.locator(".vp-table tbody tr").count()) === 5,
+    "Admin creates an encuentro",
+  );
+  await page.getByRole("button", { name: "Cancelar Historias entre generaciones" }).click();
+  ok(
+    (await page.locator(".vp-table tbody tr").filter({ hasText: "Historias entre generaciones" }).innerText()).includes("Cancelado"),
+    "Admin cancels an encuentro",
+  );
+  await audit("Encuentros admin", 1440);
   await shot("admin-1440");
   await link("Cursos").click();
   ok(
@@ -649,10 +803,14 @@ try {
     ["Mi inicio", "student-home"],
     ["Explorar cursos", "catalog"],
     ["Mis cursos", "library"],
+    ["Encuentros", "encuentros"],
+    ["Comunidad", "community"],
     ["Mi perfil", "profile"],
     ["Mis pagos", "student-payments"],
     ["Resumen", "admin-home"],
     ["Cursos", "courses"],
+    ["Encuentros", "admin-encuentros"],
+    ["Moderación", "moderation"],
     ["Páginas y contenido", "pages"],
     ["Biblioteca de medios", "media"],
     ["Personas y acceso", "users"],
@@ -674,7 +832,7 @@ try {
     await button("Vista estudiante").click();
     for (let i = 0; i < layouts.length; i++) {
       const [name, slug] = layouts[i];
-      if (i === 5) {
+      if (slug === "admin-home") {
         if (width <= 900) await button("Abrir menú de la plataforma").click();
         await button("Ver demo admin").click();
       }

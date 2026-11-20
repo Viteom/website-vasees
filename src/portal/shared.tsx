@@ -19,6 +19,8 @@ import {
   CheckCircle,
   Info,
   Plus,
+  CalendarBlank,
+  ChatsCircle,
 } from "@phosphor-icons/react";
 import { SiteLink, navigate } from "../navigation";
 import { useDemo } from "./demo-store";
@@ -138,12 +140,16 @@ const studentMenu = [
   { path: "/escuela/inicio", label: "Mi inicio", icon: House },
   { path: "/escuela/explorar", label: "Explorar cursos", icon: SquaresFour },
   { path: "/escuela/mis-cursos", label: "Mis cursos", icon: BookOpen },
+  { path: "/escuela/encuentros", label: "Encuentros", icon: CalendarBlank },
+  { path: "/escuela/comunidad", label: "Comunidad", icon: ChatsCircle },
   { path: "/escuela/perfil", label: "Mi perfil", icon: UserCircle },
   { path: "/escuela/pagos", label: "Mis pagos", icon: CreditCard },
 ];
 const adminMenu = [
   { path: "/admin", label: "Resumen", icon: SquaresFour },
   { path: "/admin/cursos", label: "Cursos", icon: BookOpen },
+  { path: "/admin/encuentros", label: "Encuentros", icon: CalendarBlank },
+  { path: "/admin/comunidad", label: "Moderación", icon: ChatsCircle },
   { path: "/admin/contenido", label: "Páginas y contenido", icon: Files },
   { path: "/admin/medios", label: "Biblioteca de medios", icon: Image },
   { path: "/admin/usuarios", label: "Personas y acceso", icon: Users },
@@ -185,6 +191,8 @@ export function PortalShell({
         ? "Editor de página"
         : path === "/escuela/bienvenida"
           ? "Bienvenida"
+          : path === "/escuela/conversacion"
+          ? "Conversación"
           : path === "/escuela/aula"
           ? "Aula de muestra"
           : path === "/escuela/pago"
