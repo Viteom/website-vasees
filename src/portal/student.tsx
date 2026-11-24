@@ -32,6 +32,8 @@ import {
   type ManagedCourse,
   type DemoOrder,
 } from "./demo-store";
+import { hasAccess } from "../content/membership";
+import { MembershipGate, MembershipNotice } from "./membership";
 import { SiteLink, navigate } from "../navigation";
 import { Badge, Empty, Modal, PageHeading } from "./shared";
 
@@ -84,7 +86,9 @@ function CourseTile({
                 : `${completed} de ${course.lessons.length} lecciones vistas`
               : enrolled
                 ? "En tu biblioteca"
-                : money(course.price)}
+                : hasAccess(store.membership)
+                  ? "Incluido en tu membresía"
+                  : "Requiere membresía"}
           </span>
           <button onClick={() => onSelect(course)}>
             {learning ? "Continuar" : "Ver curso"}
@@ -108,9 +112,12 @@ function CoursePreview({
     if (!course) return;
     store.setSelectedCourse(course.id);
     const owned = store.enrolled.includes(course.id);
-    if (!owned && !course.price)
-      store.setEnrolled((old) => [...new Set([...old, course.id])]);
-    navigate(owned || !course.price ? "/escuela/aula" : "/escuela/pago");
+    if (!owned && !hasAccess(store.membership)) {
+      navigate("/escuela/membresia");
+      return;
+    }
+    if (!owned) store.setEnrolled((old) => [...new Set([...old, course.id])]);
+    navigate("/escuela/aula");
   }
   return (
     <Modal
@@ -144,16 +151,20 @@ function CoursePreview({
               <span>
                 {store.enrolled.includes(course.id)
                   ? "Ya está en tus cursos de muestra"
-                  : "Valor de muestra · COP"}
+                  : "Acceso"}
               </span>
-              <strong>{money(course.price)}</strong>
+              <strong>
+                {hasAccess(store.membership)
+                  ? "Incluido en tu membresía"
+                  : "Requiere una membresía activa"}
+              </strong>
             </div>
             <button className="vp-btn vp-btn-primary" onClick={proceed}>
               {store.enrolled.includes(course.id)
                 ? "Continuar mi curso"
-                : !course.price
+                : hasAccess(store.membership)
                   ? "Añadir a mis cursos"
-                  : "Continuar al pago de prueba"}
+                  : "Ver planes de membresía"}
               <ArrowRight size={18} />
             </button>
             <p className="vp-small-note">
@@ -194,6 +205,7 @@ export function StudentDashboard() {
           </SiteLink>
         }
       />
+      <MembershipNotice />
       <GoalPanel />
       <section className="vp-student-welcome">
         <div>
@@ -401,18 +413,22 @@ export function Classroom() {
         }
       />
     );
+  if (!hasAccess(store.membership))
+    return <MembershipGate area="Las aulas de los cursos" />;
   if (!store.enrolled.includes(course.id))
     return (
       <>
         <PageHeading
           title="Este curso aún no está en tu biblioteca."
-          description="Puedes conocerlo y recorrer el pago de prueba antes de entrar al aula de muestra."
+          description="Está incluido en tu membresía. Añádelo para empezar."
         />
         <button
           className="vp-btn vp-btn-primary"
-          onClick={() => navigate("/escuela/pago")}
+          onClick={() =>
+            store.setEnrolled((old) => [...new Set([...old, course.id])])
+          }
         >
-          Ir al pago de prueba
+          Añadir a mis cursos
           <ArrowRight size={18} />
         </button>
       </>
@@ -828,234 +844,6 @@ export function StudentProfile() {
   );
 }
 
-export function Checkout() {
-  const store = useDemo();
-  const course =
-    store.courses.find((item) => item.id === store.selectedCourse) ??
-    store.courses[0];
-  const [method, setMethod] = useState("Tarjeta");
-  const [scenario, setScenario] = useState("Aprobado");
-  const [state, setState] = useState<"idle" | "loading" | "success" | "error">(
-    "idle",
-  );
-  const [consent, setConsent] = useState(false);
-  // Evaluated once on entry: returning to this view (for example with the
-  // browser's back button) must not offer a second payment for an owned course.
-  const [ownedOnEntry] = useState(() => store.enrolled.includes(course.id));
-  async function pay(event: React.SubmitEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!consent || state === "loading") return;
-    setState("loading");
-    await new Promise((resolve) => setTimeout(resolve, 650));
-    if (scenario === "Rechazado") {
-      setState("error");
-      return;
-    }
-    store.setOrders((old) => [
-      {
-        id: `DEMO-${Date.now().toString().slice(-6)}`,
-        userId: "student-demo",
-        name: store.session?.name ?? "Laura Gómez",
-        courseId: course.id,
-        amount: course.price,
-        status: "Simulado",
-        date: "Esta sesión",
-      },
-      ...old,
-    ]);
-    store.setEnrolled((old) => [...new Set([...old, course.id])]);
-    setState("success");
-  }
-  return (
-    <>
-      <SiteLink className="vp-back-link" href="/escuela/explorar">
-        <ArrowLeft size={17} />
-        Volver a los cursos
-      </SiteLink>
-      <PageHeading
-        eyebrow="Un siguiente paso para aprender"
-        title="Tu próximo aprendizaje."
-        description="Recorre una pasarela de pago de muestra. No se solicita una tarjeta real ni se realiza ningún cargo."
-      />
-      {ownedOnEntry ? (
-        <div className="vp-payment-success">
-          <CheckCircle size={58} weight="light" />
-          <Badge>Ya en tu biblioteca</Badge>
-          <h2>Este curso ya es parte de tu recorrido.</h2>
-          <p>
-            No hace falta repetir el pago de prueba. Puedes continuar donde te
-            quedaste o explorar otra conversación.
-          </p>
-          <div className="vp-payment-summary">
-            <span>{course.title}</span>
-            <strong>En tu biblioteca</strong>
-          </div>
-          <button
-            className="vp-btn vp-btn-primary"
-            onClick={() => navigate("/escuela/aula")}
-          >
-            Ir a mi curso
-            <ArrowRight size={18} />
-          </button>
-          <SiteLink href="/escuela/explorar" className="vp-text-button">
-            Explorar otros cursos
-          </SiteLink>
-        </div>
-      ) : state === "success" ? (
-        <div className="vp-payment-success">
-          <CheckCircle size={58} weight="light" />
-          <Badge>Operación simulada</Badge>
-          <h2>Tu curso ya está en la demo.</h2>
-          <p>
-            No se ha realizado ningún cobro. Añadimos el curso a tu biblioteca
-            de muestra para que puedas continuar el recorrido.
-          </p>
-          <div className="vp-payment-summary">
-            <span>{course.title}</span>
-            <strong>{money(course.price)}</strong>
-          </div>
-          <button
-            className="vp-btn vp-btn-primary"
-            onClick={() => navigate("/escuela/aula")}
-          >
-            Ir a mi curso
-            <ArrowRight size={18} />
-          </button>
-          <SiteLink href="/escuela/pagos" className="vp-text-button">
-            Ver el registro de prueba
-          </SiteLink>
-        </div>
-      ) : (
-        <div className="vp-checkout-layout">
-          <form className="vp-panel vp-panel-body vp-form" onSubmit={pay}>
-            <div className="vp-checkout-title">
-              <h2>Completa el recorrido.</h2>
-              <Badge tone="pending">Pago de prueba</Badge>
-            </div>
-            <div
-              className="vp-tab-bar"
-              role="group"
-              aria-label="Método de pago de prueba"
-            >
-              {["Tarjeta", "PSE"].map((item) => (
-                <button
-                  type="button"
-                  key={item}
-                  aria-pressed={method === item}
-                  onClick={() => setMethod(item)}
-                >
-                  {item === "Tarjeta" && <CreditCard size={18} />}
-                  {item}
-                </button>
-              ))}
-            </div>
-            {method === "Tarjeta" ? (
-              <>
-                <label className="vp-field">
-                  Número de tarjeta de prueba
-                  <input
-                    value="4242 4242 4242 4242"
-                    readOnly
-                    aria-describedby="vp-card-help"
-                  />
-                </label>
-                <div className="vp-form-grid">
-                  <label className="vp-field">
-                    Vencimiento
-                    <input value="12 / 30" readOnly />
-                  </label>
-                  <label className="vp-field">
-                    Código de prueba
-                    <input value="123" readOnly />
-                  </label>
-                </div>
-                <p id="vp-card-help" className="vp-small-note">
-                  Estos datos son ficticios y no se pueden sustituir por una
-                  tarjeta real.
-                </p>
-              </>
-            ) : (
-              <>
-                <label className="vp-field">
-                  Banco de demostración
-                  <select aria-label="Banco de demostración">
-                    <option>Banco de prueba · Persona natural</option>
-                    <option>Banco de prueba · Persona jurídica</option>
-                  </select>
-                </label>
-                <p className="vp-small-note">
-                  No se abrirá una entidad bancaria ni se realizará una
-                  transferencia.
-                </p>
-              </>
-            )}
-            <div className="vp-demo-scenario">
-              <span>Resultado de prueba</span>
-              <select
-                aria-label="Resultado de prueba"
-                value={scenario}
-                onChange={(event) => {
-                  setScenario(event.target.value);
-                  setState("idle");
-                }}
-              >
-                <option>Aprobado</option>
-                <option>Rechazado</option>
-              </select>
-            </div>
-            <label className="vp-checkbox">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(event) => setConsent(event.target.checked)}
-                required
-              />
-              Entiendo que este es un pago simulado.
-            </label>
-            {state === "error" && (
-              <div className="vp-form-error" role="alert">
-                <WarningCircle size={20} />
-                Pago de prueba rechazado. Puedes cambiar el resultado de prueba
-                y volver a intentarlo.
-              </div>
-            )}
-            <button
-              className="vp-btn vp-btn-primary"
-              type="submit"
-              disabled={!consent || state === "loading"}
-            >
-              {state === "loading" ? "Simulando operación…" : "Simular pago"}
-              <ArrowRight size={18} />
-            </button>
-            <p className="vp-small-note">
-              El resumen por correo y la pasarela real se conectarán en la fase
-              técnica.
-            </p>
-          </form>
-          <aside className="vp-order-summary">
-            <img src={course.image} alt={course.imageAlt} />
-            <div>
-              <Badge>{course.category}</Badge>
-              <h2>{course.title}</h2>
-              <p>
-                <BookOpen size={17} />
-                {course.lessons.length} lecciones de muestra
-              </p>
-              <div className="vp-order-total">
-                <span>Total de prueba</span>
-                <strong>{money(course.price)}</strong>
-              </div>
-              <span className="vp-small-note">
-                Valores ilustrativos en pesos colombianos. Sin cobro real.
-              </span>
-            </div>
-          </aside>
-        </div>
-      )}
-    </>
-  );
-}
-
 export function StudentPayments() {
   const store = useDemo();
   const [receipt, setReceipt] = useState<DemoOrder | null>(null);
@@ -1067,14 +855,14 @@ export function StudentPayments() {
       <PageHeading
         eyebrow="Todo en un mismo lugar"
         title="Mis pagos."
-        description="Un registro de muestra de tus cursos y operaciones simuladas."
+        description="Un registro de muestra de los cobros simulados de tu membresía."
       />
       <div className="vp-panel vp-table-wrap">
         <table className="vp-table">
           <thead>
             <tr>
               <th>Referencia</th>
-              <th>Curso</th>
+              <th>Concepto</th>
               <th>Valor de muestra</th>
               <th>Estado</th>
               <th>
@@ -1089,10 +877,7 @@ export function StudentPayments() {
                   <strong>{order.id}</strong>
                   <small>{order.date}</small>
                 </td>
-                <td>
-                  {store.courses.find((course) => course.id === order.courseId)
-                    ?.title ?? "Curso de muestra"}
-                </td>
+                <td>{order.concept}</td>
                 <td>{money(order.amount)}</td>
                 <td>
                   <Badge
@@ -1133,14 +918,8 @@ export function StudentPayments() {
                 <dd>{receipt.name}</dd>
               </div>
               <div>
-                <dt>Curso</dt>
-                <dd>
-                  {
-                    store.courses.find(
-                      (course) => course.id === receipt.courseId,
-                    )?.title
-                  }
-                </dd>
+                <dt>Concepto</dt>
+                <dd>{receipt.concept}</dd>
               </div>
               <div>
                 <dt>Estado</dt>

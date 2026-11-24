@@ -1,0 +1,233 @@
+/* Part 4: memberships. Text stays at 14px or more. */
+.vp-plan-grid,
+.vp-membership-includes,
+.vp-membership-card,
+.vp-membership-alert,
+.vp-demo-time,
+.vp-membership-gate,
+.vp-admin-plans {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.vp-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 22px 0;
+}
+.vp-plan {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  padding: 26px;
+  background: #fff;
+  border: 1px solid var(--vp-border);
+  border-radius: 16px;
+}
+.vp-plan h3 {
+  font-size: 22px;
+}
+.vp-plan-price {
+  font-size: 15px;
+  color: #3f5459;
+}
+.vp-plan-price strong {
+  font-size: 32px;
+  font-weight: 450;
+  letter-spacing: -1px;
+  color: var(--ink);
+}
+.vp-plan .vp-btn,
+.vp-membership-card .vp-btn,
+.vp-demo-time .vp-btn,
+.vp-membership-gate .vp-btn {
+  font-size: 14px;
+  min-height: 48px;
+}
+.vp-plan .vp-btn {
+  justify-self: start;
+  margin-top: 6px;
+}
+.vp-membership-includes {
+  margin-top: 24px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: #f5f7ef;
+  border: 1px solid #dce4d3;
+}
+.vp-membership-includes h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+.vp-membership-includes ul {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.vp-membership-includes li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.vp-membership-includes svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.vp-membership-includes .vp-small-note {
+  font-size: 14px;
+}
+.vp-membership-card {
+  display: grid;
+  gap: 18px;
+  padding: 26px;
+  background: #fff;
+  border: 1px solid var(--vp-border);
+  border-radius: 16px;
+  margin-top: 22px;
+}
+.vp-membership-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.vp-membership-head > div {
+  flex: 1;
+  min-width: 180px;
+}
+.vp-membership-head h2 {
+  font-size: 24px;
+}
+.vp-membership-head p {
+  color: #3f5459;
+}
+.vp-membership-head .vp-badge {
+  font-size: 14px;
+}
+.vp-membership-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+.vp-membership-facts div {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #f4f5f0;
+}
+.vp-membership-facts dt {
+  font-size: 14px;
+  color: var(--vp-muted);
+}
+.vp-membership-facts dd {
+  margin: 2px 0 0;
+}
+.vp-membership-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: #edf2e6;
+  color: #31583e;
+  margin-bottom: 18px;
+}
+.vp-membership-card .vp-membership-alert {
+  margin-bottom: 0;
+}
+.vp-membership-alert.danger {
+  background: #faeae5;
+  color: #813b2e;
+}
+.vp-membership-alert svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.vp-membership-alert p {
+  flex: 1;
+}
+.vp-membership-alert a {
+  font-weight: 550;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  min-height: 24px;
+  white-space: nowrap;
+}
+.vp-membership-card .vp-form-error {
+  font-size: 14px;
+}
+.vp-demo-time {
+  margin-top: 20px;
+  padding: 22px 24px;
+  border: 1px dashed #aeb576;
+  border-radius: 16px;
+  display: grid;
+  gap: 10px;
+}
+.vp-demo-time h2 {
+  font-size: 18px;
+}
+.vp-demo-time p {
+  color: #3f5459;
+}
+.vp-demo-time .vp-form-actions {
+  align-items: flex-end;
+}
+.vp-membership-gate {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  max-width: 620px;
+  padding: 34px;
+  margin-top: 30px;
+  background: #fff;
+  border: 1px solid var(--vp-border);
+  border-radius: 18px;
+}
+.vp-membership-gate h1 {
+  font-size: 32px;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+.vp-membership-gate p {
+  color: #3f5459;
+}
+.vp-plan-summary > div {
+  display: grid;
+  gap: 12px;
+}
+.vp-plan-summary .vp-tab-bar {
+  padding: 0;
+  border-bottom: 0;
+}
+.vp-admin-plans {
+  display: grid;
+  gap: 6px;
+}
+.vp-admin-plans .vp-small-note {
+  font-size: 14px;
+  margin-top: 6px;
+}
+.vp-members-table {
+  margin-top: 20px;
+}
+
+@media (max-width: 700px) {
+  .vp-plan-grid,
+  .vp-membership-facts {
+    grid-template-columns: 1fr;
+  }
+  .vp-membership-card,
+  .vp-plan,
+  .vp-membership-gate {
+    padding: 20px;
+  }
+  .vp-membership-gate h1 {
+    font-size: 26px;
+  }
+  .vp-membership-alert {
+    flex-wrap: wrap;
+  }
+}

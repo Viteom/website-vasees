@@ -6,9 +6,15 @@ import {
   StudentCatalog,
   Classroom,
   StudentProfile,
-  Checkout,
   StudentPayments,
 } from "./student";
+import {
+  MembershipPage,
+  MembershipCheckout,
+  MembershipGate,
+  AdminMemberships,
+} from "./membership";
+import { hasAccess } from "../content/membership";
 import { Welcome } from "./learning";
 import {
   StudentEncuentros,
@@ -46,6 +52,7 @@ export function Portal({ path }: { path: string }) {
   if (accessPaths.includes(path) || !store.session)
     return <LoginPage key={path} path={path} />;
   if (admin && store.session.role !== "admin") return <AccessPreview />;
+  const access = hasAccess(store.membership);
   const routes: Record<string, React.ReactNode> = {
     "/escuela/inicio": <StudentDashboard />,
     "/escuela/bienvenida": <Welcome />,
@@ -54,12 +61,26 @@ export function Portal({ path }: { path: string }) {
     "/escuela/aula": <Classroom key={store.selectedCourse} />,
     "/escuela/perfil": <StudentProfile />,
     "/escuela/pagos": <StudentPayments />,
-    "/escuela/pago": <Checkout key={store.selectedCourse} />,
-    "/escuela/encuentros": <StudentEncuentros />,
-    "/escuela/comunidad": <Community />,
-    "/escuela/conversacion": <ThreadView key={store.selectedThread} />,
+    "/escuela/pago": <MembershipCheckout />,
+    "/escuela/membresia": <MembershipPage />,
+    "/escuela/encuentros": access ? (
+      <StudentEncuentros />
+    ) : (
+      <MembershipGate area="Los encuentros" />
+    ),
+    "/escuela/comunidad": access ? (
+      <Community />
+    ) : (
+      <MembershipGate area="Los foros de la comunidad" />
+    ),
+    "/escuela/conversacion": access ? (
+      <ThreadView key={store.selectedThread} />
+    ) : (
+      <MembershipGate area="Los foros de la comunidad" />
+    ),
     "/admin/encuentros": <AdminEncuentros />,
     "/admin/comunidad": <Moderation />,
+    "/admin/membresias": <AdminMemberships />,
     "/admin": <AdminDashboard />,
     "/admin/cursos": <AdminCourses />,
     "/admin/curso": <CourseEditor key={store.selectedCourse} />,

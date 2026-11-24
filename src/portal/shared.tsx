@@ -21,6 +21,7 @@ import {
   Plus,
   CalendarBlank,
   ChatsCircle,
+  IdentificationCard,
 } from "@phosphor-icons/react";
 import { SiteLink, navigate } from "../navigation";
 import { useDemo } from "./demo-store";
@@ -142,6 +143,7 @@ const studentMenu = [
   { path: "/escuela/mis-cursos", label: "Mis cursos", icon: BookOpen },
   { path: "/escuela/encuentros", label: "Encuentros", icon: CalendarBlank },
   { path: "/escuela/comunidad", label: "Comunidad", icon: ChatsCircle },
+  { path: "/escuela/membresia", label: "Mi membresía", icon: IdentificationCard },
   { path: "/escuela/perfil", label: "Mi perfil", icon: UserCircle },
   { path: "/escuela/pagos", label: "Mis pagos", icon: CreditCard },
 ];
@@ -152,6 +154,7 @@ const adminMenu = [
   { path: "/admin/comunidad", label: "Moderación", icon: ChatsCircle },
   { path: "/admin/contenido", label: "Páginas y contenido", icon: Files },
   { path: "/admin/medios", label: "Biblioteca de medios", icon: Image },
+  { path: "/admin/membresias", label: "Membresías", icon: IdentificationCard },
   { path: "/admin/usuarios", label: "Personas y acceso", icon: Users },
   { path: "/admin/pagos", label: "Pagos de muestra", icon: CreditCard },
   { path: "/admin/mensajes", label: "Correos y códigos", icon: EnvelopeSimple },
@@ -196,7 +199,7 @@ export function PortalShell({
           : path === "/escuela/aula"
           ? "Aula de muestra"
           : path === "/escuela/pago"
-            ? "Pago de prueba"
+            ? "Activar membresía"
             : (menu.find((item) => item.path === path)?.label ?? "Escuela");
   function logout() {
     store.setSession(null);

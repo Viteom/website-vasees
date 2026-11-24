@@ -203,40 +203,16 @@ try {
       .evaluate((dialog) => dialog.contains(document.activeElement)),
     "Course modal contains keyboard focus",
   );
-  await button("Continuar al pago de prueba").click();
   ok(
-    (await label("Número de tarjeta de prueba").getAttribute("readonly")) !==
-      null,
-    "Checkout cannot collect real card data",
-  );
-  await button("PSE").click();
-  ok(
-    await label("Banco de demostración").isVisible(),
-    "PSE has a demo bank selector",
-  );
-  await button("Tarjeta").click();
-  await label("Resultado de prueba").selectOption("Rechazado");
-  await label("Entiendo que este es un pago simulado.").check();
-  await button("Simular pago").click();
-  await page.getByRole("alert").waitFor();
-  ok(
-    (await page.getByRole("alert").innerText()).includes("rechazado"),
-    "Rejected sample payment can be retried",
-  );
-  await label("Resultado de prueba").selectOption("Aprobado");
-  await shot("checkout-1440");
-  await button("Simular pago").click();
-  await page.locator(".vp-payment-success").waitFor();
-  ok(
-    (await page.locator(".vp-payment-success").innerText()).includes(
-      "No se ha realizado ningún cobro",
+    (await page.locator("dialog[open] .vp-preview-price").innerText()).includes(
+      "Incluido en tu membresía",
     ),
-    "Success discloses no real charge",
+    "Courses are included in the membership, with no per-course price",
   );
-  await button("Ir a mi curso").click();
+  await button("Añadir a mis cursos").click();
   ok(
     (await page.locator(".vp-lesson-sidebar").innerText()).includes("0 de 3"),
-    "Checkout enrolls the course in the demo",
+    "A member adds a course straight to the classroom",
   );
   for (let i = 0; i < 3; i++) {
     await button("Marcar como completada").click();
@@ -358,10 +334,126 @@ try {
     ),
     "Account security is marked pending",
   );
+  await link("Mi membresía").click();
+  const card = page.locator(".vp-membership-card");
+  ok(
+    (await card.innerText()).includes("Activa") &&
+      (await card.innerText()).includes("Se renueva el"),
+    "Membership shows plan, status and renewal date",
+  );
+  await audit("Mi membresía", 1440);
+  await button("Cambiar al plan anual desde el próximo periodo").click();
+  ok(
+    (await card.innerText()).includes("490.000 (plan anual)"),
+    "A plan change applies from the next period",
+  );
+  await button("Simular fin del periodo").click();
+  ok(
+    (await card.locator("h2").innerText()) === "Plan anual",
+    "Approved renewal starts the new period with the new plan",
+  );
+  await page.getByLabel("Resultado del próximo cobro", { exact: true }).selectOption("Rechazado");
+  await button("Simular fin del periodo").click();
+  ok(
+    (await card.innerText()).includes("No pudimos cobrar la renovación") &&
+      (await card.innerText()).includes("Pago pendiente"),
+    "A rejected renewal leaves the payment pending with access",
+  );
+  await audit("Pago pendiente", 1440);
+  await button("Reintentar el pago").click();
+  ok(
+    (await card.locator(".vp-form-error").innerText()).includes("rechazado otra vez"),
+    "A failed retry explains what happened",
+  );
+  await page.getByLabel("Resultado del próximo cobro", { exact: true }).selectOption("Aprobado");
+  await button("Reintentar el pago").click();
+  ok(
+    (await card.locator(".vp-badge").innerText()) === "Activa",
+    "A successful retry reactivates the membership",
+  );
+  await button("Cancelar la renovación").click();
+  await page.getByLabel("No tengo tiempo para aprovecharla", { exact: true }).check();
+  await audit("Cancelar renovación", 1440);
+  await button("Confirmar cancelación").click();
+  ok(
+    (await card.innerText()).includes("Mantienes el acceso hasta el"),
+    "Cancelling the renewal keeps access until the end of the period",
+  );
+  await button("Reactivar la renovación").click();
+  ok(
+    (await card.locator(".vp-badge").innerText()) === "Activa",
+    "The renewal can be reactivated before the period ends",
+  );
+  await button("Cancelar la renovación").click();
+  await button("Confirmar cancelación").click();
+  await button("Simular fin del periodo").click();
+  ok(
+    (await page.locator("h1").innerText()) === "Vuelve cuando quieras." &&
+      (await page.locator(".vp-membership-alert").innerText()).includes("venció"),
+    "The membership expires after a cancelled period",
+  );
+  await audit("Membresía vencida", 1440);
+  for (const area of ["Encuentros", "Comunidad"]) {
+    await link(area).click();
+    ok(
+      (await page.locator(".vp-membership-gate h1").innerText()) === "Tu membresía venció.",
+      `${area} is limited after expiry`,
+    );
+  }
+  await link("Mis cursos").click();
+  await page.locator(".vp-course-card").first().getByRole("button", { name: "Continuar" }).click();
+  ok(
+    await page.locator(".vp-membership-gate").isVisible(),
+    "The classroom is limited after expiry",
+  );
+  await audit("Acceso limitado", 1440);
+  await link("Mi perfil").click();
+  ok(
+    await label("Nombre completo").isVisible(),
+    "The profile stays available after expiry",
+  );
+  await link("Mi membresía").click();
+  await button("Elegir plan mensual").click();
+  ok(
+    (await label("Número de tarjeta de prueba").getAttribute("readonly")) !==
+      null,
+    "Checkout cannot collect real card data",
+  );
+  await button("PSE").click();
+  ok(
+    await label("Banco de demostración").isVisible(),
+    "PSE has a demo bank selector",
+  );
+  await button("Tarjeta").click();
+  await label("Resultado de prueba").selectOption("Rechazado");
+  await label("Entiendo que este es un pago simulado.").check();
+  await button("Simular pago").click();
+  await page.getByRole("alert").waitFor();
+  ok(
+    (await page.getByRole("alert").innerText()).includes("rechazado"),
+    "Rejected sample payment can be retried",
+  );
+  await label("Resultado de prueba").selectOption("Aprobado");
+  await shot("checkout-1440");
+  await audit("Pago de membresía", 1440);
+  await button("Simular pago").click();
+  await page.locator(".vp-payment-success").waitFor();
+  ok(
+    (await page.locator(".vp-payment-success").innerText()).includes(
+      "No se ha realizado ningún cobro",
+    ),
+    "Success discloses no real charge",
+  );
+  await link("Encuentros").click();
+  ok(
+    (await page.locator(".vp-encuentro").count()) === 3,
+    "Reactivation restores encuentros",
+  );
   await link("Mis pagos").click();
   ok(
-    (await page.locator(".vp-table tbody tr").count()) === 2,
-    "Payment history includes sample checkout",
+    (await page.locator(".vp-table tbody tr").count()) === 7 &&
+      (await page.locator(".vp-table tbody").innerText()).includes("Plan anual"),
+    "Payment history lists every simulated membership charge",
   );
   await page.locator(".vp-table-action").first().click();
   ok(
@@ -518,6 +610,15 @@ try {
     "Hiding a message resolves its reports",
   );
   await audit("Moderación", 1440);
+  await link("Membresías").click();
+  const members = await page.locator(".vp-members-table").innerText();
+  ok(
+    (await page.locator(".vp-members-table tbody tr").count()) === 3 &&
+      members.includes("El precio no me funciona ahora") &&
+      members.includes("Vencida"),
+    "Admin sees membership status and cancellation reasons",
+  );
+  await audit("Membresías admin", 1440);
   await link("Encuentros").click();
   await button("Crear encuentro").click();
   await page.locator("dialog[open]").getByLabel("Título", { exact: true }).fill("Encuentro de prueba");
@@ -556,7 +657,6 @@ try {
   await label("Descripción").fill(
     "Un curso de muestra para aprender a escuchar entre generaciones.",
   );
-  await label("Valor de muestra en COP").fill("45000");
   await button("Lecciones").click();
   await button("Añadir lección").click();
   await label("Título de la lección 2").fill("Escuchar de otra manera");
@@ -689,8 +789,8 @@ try {
   await link("Pagos de muestra").click();
   await label("Estado").selectOption("Rechazado");
   ok(
-    (await page.locator(".vp-table tbody tr").count()) === 1,
-    "Admin can filter rejected payments",
+    (await page.locator(".vp-table tbody tr").count()) === 4,
+    "Admin can filter rejected payments, including rejected membership charges",
   );
   await link("Correos y códigos").click();
   await label("Asunto del correo").fill("Una nueva pregunta, {nombre}");
@@ -805,6 +905,7 @@ try {
     ["Mis cursos", "library"],
     ["Encuentros", "encuentros"],
     ["Comunidad", "community"],
+    ["Mi membresía", "membership"],
     ["Mi perfil", "profile"],
     ["Mis pagos", "student-payments"],
     ["Resumen", "admin-home"],
@@ -813,6 +914,7 @@ try {
     ["Moderación", "moderation"],
     ["Páginas y contenido", "pages"],
     ["Biblioteca de medios", "media"],
+    ["Membresías", "admin-memberships"],
     ["Personas y acceso", "users"],
     ["Pagos de muestra", "payments"],
     ["Correos y códigos", "messages"],
@@ -935,7 +1037,12 @@ try {
       .getByRole("button", { name: "Ver curso" })
       .click();
     if (width !== 768) await audit("Ficha de curso", width);
-    await button("Continuar al pago de prueba").click();
+    await page.keyboard.press("Escape");
+    await openWorkspace("Mi membresía");
+    await button("Cancelar la renovación").click();
+    await button("Confirmar cancelación").click();
+    await button("Simular fin del periodo").click();
+    await button("Elegir plan mensual").click();
     await shot(`checkout-${width}`);
     ok(
       await page.evaluate(
@@ -965,7 +1072,7 @@ try {
   await button('Entrar a mi Escuela').click();
   await label('Código de 6 dígitos').fill('123456');
   await button('Confirmar y continuar').click();
-  ok(page.url().endsWith('/escuela/pago') && (await page.locator('.vp-order-summary').innerText()).includes('Tecnología que nos acerca'), 'Login continues to the selected public course');
+  ok(page.url().endsWith('/escuela/aula') && (await page.locator('h1').innerText()) === 'Tecnología que nos acerca', 'Login continues to the selected public course in the classroom');
   await page.evaluate(() => { history.pushState({}, '', '/escuela'); dispatchEvent(new PopStateEvent('popstate')); });
   ok(await page.locator('.school-landing-hero').isVisible(), 'Landing stays public for signed-in demo visitors');
   await page.locator('.header-cta').click();

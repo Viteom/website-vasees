@@ -9,6 +9,12 @@ import { schoolCourses, type SchoolCourse } from "../content/school";
 import { pageMeta } from "../content/pages";
 import type { LearnerPlan } from "../content/school-learning";
 import {
+  addMonths,
+  type Membership,
+  type MembershipStatus,
+  type PlanId,
+} from "../content/membership";
+import {
   initialEncuentros,
   initialReports,
   initialThreads,
@@ -56,7 +62,8 @@ export type DemoOrder = {
   id: string;
   userId: string;
   name: string;
-  courseId: string;
+  /** What was charged, e.g. "Plan mensual". Courses are included in the membership. */
+  concept: string;
   amount: number;
   status: "Simulado" | "Rechazado";
   date: string;
@@ -97,6 +104,7 @@ export const portalPaths = [
   "/escuela/perfil",
   "/escuela/pagos",
   "/escuela/pago",
+  "/escuela/membresia",
   "/escuela/encuentros",
   "/escuela/comunidad",
   "/escuela/conversacion",
@@ -112,6 +120,7 @@ export const portalPaths = [
   "/admin/ajustes",
   "/admin/encuentros",
   "/admin/comunidad",
+  "/admin/membresias",
 ];
 export const isPortalPath = (path: string) =>
   path.startsWith("/escuela/") || path === "/admin" || path.startsWith("/admin/");
@@ -226,6 +235,18 @@ type DemoStore = {
   /** Course filter for the community; "todos" or "" (general) or a course id. */
   forumFilter: string;
   setForumFilter: (value: string) => void;
+  membership: Membership;
+  setMembership: React.Dispatch<React.SetStateAction<Membership>>;
+  /** Plan selected for the membership checkout. */
+  checkoutPlan: PlanId;
+  setCheckoutPlan: (value: PlanId) => void;
+  sampleMembers: {
+    name: string;
+    plan: PlanId;
+    status: MembershipStatus;
+    periodEnd: string;
+    cancelReason: string;
+  }[];
 };
 const Context = createContext<DemoStore | null>(null);
 
@@ -280,8 +301,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       id: "DEMO-1001",
       userId: "student-demo",
       name: "Laura Gómez",
-      courseId: schoolCourses[0].id,
-      amount: 89000,
+      concept: "Plan mensual",
+      amount: 49000,
       status: "Simulado",
       date: "Ejemplo inicial",
     },
@@ -289,8 +310,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       id: "DEMO-1002",
       userId: "other-2",
       name: "Andrés Pérez",
-      courseId: schoolCourses[1].id,
-      amount: 119000,
+      concept: "Plan anual",
+      amount: 490000,
       status: "Simulado",
       date: "Ejemplo inicial",
     },
@@ -298,8 +319,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       id: "DEMO-1003",
       userId: "other-3",
       name: "Daniela Ruiz",
-      courseId: schoolCourses[3].id,
-      amount: 99000,
+      concept: "Plan mensual",
+      amount: 49000,
       status: "Rechazado",
       date: "Ejemplo inicial",
     },
@@ -397,6 +418,22 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [reports, setReports] = useState(initialReports);
   const [selectedThread, setSelectedThread] = useState(initialThreads[0].id);
   const [forumFilter, setForumFilter] = useState("todos");
+  // The demo student starts with an active monthly membership renewing in 26 days.
+  const [membership, setMembership] = useState<Membership>(() => ({
+    plan: "mensual",
+    status: "activa",
+    periodEnd: new Date(Date.now() + 26 * 86400000).toISOString(),
+    nextPlan: null,
+    cancelReason: "",
+  }));
+  const [checkoutPlan, setCheckoutPlan] = useState<PlanId>("mensual");
+  const [sampleMembers] = useState(() => {
+    const now = new Date().toISOString();
+    return [
+      { name: "Andrés Pérez", plan: "anual" as const, status: "activa" as const, periodEnd: addMonths(now, 9), cancelReason: "" },
+      { name: "Daniela Ruiz", plan: "mensual" as const, status: "vencida" as const, periodEnd: addMonths(now, -1), cancelReason: "El precio no me funciona ahora" },
+    ];
+  });
   const [reviews, setReviews] = useState<CourseReview[]>([
     {
       courseId: schoolCourses[1].id,
@@ -477,6 +514,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         setSelectedThread,
         forumFilter,
         setForumFilter,
+        membership,
+        setMembership,
+        checkoutPlan,
+        setCheckoutPlan,
+        sampleMembers,
       }}
     >
       {children}

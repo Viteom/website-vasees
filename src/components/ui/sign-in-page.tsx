@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { SiteLink, navigate } from "../../navigation";
 import { portalPaths, useDemo } from "../../portal/demo-store";
+import { hasAccess, noMembership } from "../../content/membership";
 
 const accessRoutes = [
   "/escuela/ingresar",
@@ -59,13 +60,15 @@ export function LoginPage({ path }: { path: string }) {
           ? requested
           : store.authDestination;
     const course = store.courses.find(item => item.id === store.selectedCourse);
-    if (role === "student" && destination === "/escuela/aula" && course?.price === 0) {
+    if (role === "student" && destination === "/escuela/aula" && course && hasAccess(store.membership)) {
       store.setEnrolled(old => [...new Set([...old, course.id])]);
     }
     store.setAuthDestination("/escuela/inicio");
     // A new profile starts with the short welcome: goal, interests and availability.
     if (role === "student" && store.authIntent === "register" && destination === "/escuela/inicio") {
       store.setPlan(null);
+      // A new profile has no membership yet.
+      store.setMembership(noMembership);
       navigate("/escuela/bienvenida");
       return;
     }

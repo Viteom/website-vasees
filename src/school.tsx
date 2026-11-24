@@ -3,7 +3,8 @@ import { ArrowUpRight, ArrowRight, ArrowDown, BookOpen, MagnifyingGlass, X, Play
 import { schoolRoutes, schoolAudience, type SchoolCourse } from './content/school';
 import { schoolName } from './content/home';
 import { SiteLink, navigate } from './navigation';
-import { useDemo, money, type ManagedCourse } from './portal/demo-store';
+import { useDemo, type ManagedCourse } from './portal/demo-store';
+import { hasAccess } from './content/membership';
 
 const Arrow = () => <ArrowUpRight size={21} aria-hidden="true" />;
 const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
@@ -46,12 +47,13 @@ export function SchoolPage() {
   function startCourse() {
     if (!course) return;
     store.setSelectedCourse(course.id);
-    const destination = store.enrolled.includes(course.id) || course.price === 0 ? '/escuela/aula' : '/escuela/pago';
+    // Courses are included in the membership: signed-in members go straight to the classroom.
     if (store.session) {
-      if (course.price === 0) store.setEnrolled(old => [...new Set([...old, course.id])]);
-      navigate(destination);
+      if (!hasAccess(store.membership)) { navigate('/escuela/membresia'); return; }
+      store.setEnrolled(old => [...new Set([...old, course.id])]);
+      navigate('/escuela/aula');
     } else {
-      store.setAuthDestination(destination);
+      store.setAuthDestination('/escuela/aula');
       navigate('/escuela/ingresar');
     }
   }
@@ -92,7 +94,7 @@ export function SchoolPage() {
 
     <dialog className="school-course-dialog" ref={dialog} aria-labelledby="school-course-title" onCancel={closeCourse} onClick={event => { if (event.target === event.currentTarget) closeCourse(); }}>
       <button className="school-dialog-close" aria-label="Cerrar curso" onClick={closeCourse}><X size={23} /></button>
-      {course && <><div className="school-trailer-player">{course.trailer ? <video key={course.id} controls playsInline preload="none" poster={course.image} aria-label={`Avance visual de muestra: ${course.title}`} aria-describedby="school-trailer-description"><source src={course.trailer} type="video/mp4" />{course.trailerCaptions && <track kind="captions" src={course.trailerCaptions} srcLang="es" label="Español" />}Tu navegador no puede reproducir este avance. Puedes leer su contenido a continuación.</video> : <div className="school-trailer-pending"><img src={course.image} alt={course.imageAlt} /><span>Avance en preparación</span></div>}</div><div className="school-dialog-body"><p className="eyebrow">{course.category} · {schoolName}</p><h2 id="school-course-title">{course.title}</h2><p className="school-dialog-description">{course.description}</p><p className="school-trailer-description" id="school-trailer-description">{course.trailer ? 'Avance visual de demostración, sin audio. Presenta el tema y el recorrido del curso.' : 'Conoce el recorrido de este curso de muestra. Su tráiler se incorporará más adelante.'}</p><div className="school-public-preview"><div><h3>Una primera mirada.</h3><ol>{course.lessons.map((item, index) => <li key={`${index}-${item.title}`}><span>0{index + 1}</span>{item.title}</li>)}</ol></div><aside><span>{course.lessons.length} lecciones de muestra</span><strong>{money(course.price)}</strong><p>Entra a Mi Escuela para acceder al aula o continuar con una inscripción de muestra.</p><button className="button button-dark" onClick={startCourse}>{store.session ? store.enrolled.includes(course.id) || course.price === 0 ? 'Entrar al aula' : 'Continuar inscripción' : 'Ingresar para continuar'}<ArrowRight size={18} /></button><span className="school-dialog-note">Cuenta, inscripción y pagos de demostración.</span></aside></div></div></>}
+      {course && <><div className="school-trailer-player">{course.trailer ? <video key={course.id} controls playsInline preload="none" poster={course.image} aria-label={`Avance visual de muestra: ${course.title}`} aria-describedby="school-trailer-description"><source src={course.trailer} type="video/mp4" />{course.trailerCaptions && <track kind="captions" src={course.trailerCaptions} srcLang="es" label="Español" />}Tu navegador no puede reproducir este avance. Puedes leer su contenido a continuación.</video> : <div className="school-trailer-pending"><img src={course.image} alt={course.imageAlt} /><span>Avance en preparación</span></div>}</div><div className="school-dialog-body"><p className="eyebrow">{course.category} · {schoolName}</p><h2 id="school-course-title">{course.title}</h2><p className="school-dialog-description">{course.description}</p><p className="school-trailer-description" id="school-trailer-description">{course.trailer ? 'Avance visual de demostración, sin audio. Presenta el tema y el recorrido del curso.' : 'Conoce el recorrido de este curso de muestra. Su tráiler se incorporará más adelante.'}</p><div className="school-public-preview"><div><h3>Una primera mirada.</h3><ol>{course.lessons.map((item, index) => <li key={`${index}-${item.title}`}><span>0{index + 1}</span>{item.title}</li>)}</ol></div><aside><span>{course.lessons.length} lecciones de muestra</span><strong>Incluido en la membresía</strong><p>Entra a Mi Escuela para acceder al aula con una membresía de muestra.</p><button className="button button-dark" onClick={startCourse}>{store.session ? hasAccess(store.membership) ? 'Entrar al aula' : 'Ver planes de membresía' : 'Ingresar para continuar'}<ArrowRight size={18} /></button><span className="school-dialog-note">Cuenta, membresía y pagos de demostración.</span></aside></div></div></>}
 
     </dialog>
   </>;

@@ -13,6 +13,7 @@ import {
   WarningCircle,
 } from "@phosphor-icons/react";
 import { useDemo, hasBadge, type ManagedCourse } from "./demo-store";
+import { hasAccess } from "../content/membership";
 import { SiteLink, navigate } from "../navigation";
 import { Badge, Empty, PageHeading } from "./shared";
 import {
@@ -358,6 +359,8 @@ export function GoalPanel() {
             course.lessons.length,
           );
           const owned = store.enrolled.includes(course.id);
+          const access = hasAccess(store.membership);
+          const label = owned ? "Ir al curso" : access ? "Empezar" : "Ver membresía";
           return (
             <li key={course.id}>
               <span className="vp-goal-chart-label">
@@ -377,15 +380,19 @@ export function GoalPanel() {
               </span>
               <button
                 className="vp-table-action"
-                aria-label={`${owned ? "Ir al curso" : course.price ? "Ver inscripción" : "Empezar"}: ${course.title}`}
+                aria-label={`${label}: ${course.title}`}
                 onClick={() => {
                   store.setSelectedCourse(course.id);
-                  if (!owned && !course.price)
+                  if (!owned && !access) {
+                    navigate("/escuela/membresia");
+                    return;
+                  }
+                  if (!owned)
                     store.setEnrolled((old) => [...new Set([...old, course.id])]);
-                  navigate(owned || !course.price ? "/escuela/aula" : "/escuela/pago");
+                  navigate("/escuela/aula");
                 }}
               >
-                {owned ? "Ir al curso" : course.price ? "Ver inscripción" : "Empezar"}
+                {label}
                 <ArrowUpRight size={17} />
               </button>
             </li>
