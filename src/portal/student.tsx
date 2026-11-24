@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -395,12 +395,66 @@ export function StudentCatalog({ mine = false }: { mine?: boolean }) {
   );
 }
 
+/** Private notes saved from the classroom, one per lesson. */
+function MyNotes() {
+  const store = useDemo();
+  const entries = Object.entries(store.lessonNotes)
+    .map(([key, text]) => {
+      const [courseId, index] = key.split("::");
+      const course = store.courses.find((item) => item.id === courseId);
+      return { key, text, course, index: Number(index) };
+    })
+    .filter((entry) => entry.course);
+  if (!entries.length)
+    return (
+      <p className="vp-muted">
+        Aún no tienes notas. En el aula, abre la pestaña «Mis notas» de
+        cualquier lección para escribir una.
+      </p>
+    );
+  return (
+    <ul className="vp-notes-list">
+      {entries.map(({ key, text, course, index }) => (
+        <li key={key}>
+          <span>
+            {course!.title} · Lección {index + 1}:{" "}
+            {course!.lessons[index]?.title}
+          </span>
+          <p>{text}</p>
+          <button
+            className="vp-table-action"
+            aria-label={`Abrir la lección ${index + 1} de ${course!.title}`}
+            onClick={() => {
+              store.setSelectedCourse(course!.id);
+              store.setSelectedLesson(index);
+              navigate("/escuela/aula");
+            }}
+          >
+            Abrir la lección
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function Classroom() {
   const store = useDemo();
   const course = store.courses.find((item) => item.id === store.selectedCourse);
-  const [lesson, setLesson] = useState(0);
+  const [lesson, setLesson] = useState(store.selectedLesson);
   const [tab, setTab] = useState("Lección");
-  const [notes, setNotes] = useState("");
+  const noteKey = `${store.selectedCourse}::${lesson}`;
+  const [notes, setNotes] = useState(store.lessonNotes[noteKey] ?? "");
+  useEffect(() => {
+    store.setSelectedLesson(0);
+    // Only once per classroom visit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    setNotes(store.lessonNotes[noteKey] ?? "");
+    // Load the saved note when the lesson changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteKey]);
   if (!course)
     return (
       <Empty
@@ -593,9 +647,9 @@ export function Classroom() {
               <>
                 <h2>Tus ideas también cuentan.</h2>
                 <label className="vp-field">
-                  Mis notas de esta vista
+                  Mi nota de esta lección
                   <textarea
-                    aria-label="Mis notas de esta vista"
+                    aria-label="Mi nota de esta lección"
                     rows={6}
                     value={notes}
                     onChange={(event) => setNotes(event.target.value)}
@@ -605,17 +659,26 @@ export function Classroom() {
                 </label>
                 <button
                   className="vp-btn vp-btn-primary"
-                  onClick={() =>
+                  onClick={() => {
+                    store.setLessonNotes((old) => {
+                      const next = { ...old };
+                      if (notes.trim()) next[noteKey] = notes.trim();
+                      else delete next[noteKey];
+                      return next;
+                    });
                     store.setNotice(
-                      "Nota de muestra guardada en esta vista del aula.",
-                    )
-                  }
+                      notes.trim()
+                        ? "Nota guardada. La encuentras también en Mi perfil."
+                        : "Nota borrada.",
+                    );
+                  }}
                 >
-                  Guardar nota de muestra
+                  Guardar nota
                 </button>
                 <p className="vp-small-note">
-                  Tus notas son privadas: no aparecen en reportes. En esta
-                  demo se conservan mientras permanezcas en esta vista.
+                  Tus notas son privadas: no aparecen en el CRM ni en los
+                  informes para empresas. En esta demo se conservan hasta
+                  recargar la página.
                 </p>
               </>
             )}
@@ -704,7 +767,7 @@ export function StudentProfile() {
             role="group"
             aria-label="Secciones del perfil"
           >
-            {["Mis datos", "Mis insignias", "Preferencias", "Acceso"].map((item) => (
+            {["Mis datos", "Mis insignias", "Mis notas", "Preferencias", "Acceso"].map((item) => (
               <button
                 key={item}
                 aria-pressed={tab === item}
@@ -761,6 +824,11 @@ export function StudentProfile() {
             <div className="vp-panel-body">
               <h2>Mis insignias.</h2>
               <MyBadges />
+            </div>
+          ) : tab === "Mis notas" ? (
+            <div className="vp-panel-body">
+              <h2>Mis notas.</h2>
+              <MyNotes />
             </div>
           ) : tab === "Preferencias" ? (
             <div className="vp-panel-body vp-form">

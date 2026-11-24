@@ -3,6 +3,8 @@ import {
   ArrowLeft,
   ArrowRight,
   CalendarPlus,
+  CaretLeft,
+  CaretRight,
   ChatCircle,
   CheckCircle,
   DownloadSimple,
@@ -62,26 +64,33 @@ function endTime(iso: string) {
 }
 
 /** Google, Outlook, Microsoft 365 and Yahoo links, plus a real .ics download. */
+const toEvent = (item: Encuentro) => ({
+  id: item.id,
+  title: item.title,
+  description: item.description,
+  location: item.location,
+  start: item.start,
+  end: item.end,
+});
+
+/** Downloads a calendar file built in the browser; nothing is uploaded. */
+function downloadIcs(content: string, name: string) {
+  const url = URL.createObjectURL(
+    new Blob([content], { type: "text/calendar;charset=utf-8" }),
+  );
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function AddToCalendar({ item }: { item: Encuentro }) {
-  const event = {
-    id: item.id,
-    title: item.title,
-    description: item.description,
-    location: item.location,
-    start: item.start,
-    end: item.end,
-  };
+  const event = toEvent(item);
   function download() {
-    const url = URL.createObjectURL(
-      new Blob([icsFile(event)], { type: "text/calendar;charset=utf-8" }),
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = icsFileName(event);
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    downloadIcs(icsFile(event), icsFileName(event));
   }
   const links = [
     ["Google Calendar", googleCalendarUrl(event)],
@@ -217,6 +226,137 @@ function EncuentroCard({ item }: { item: Encuentro }) {
   );
 }
 
+const weekdays = ["lun", "mar", "mié", "jue", "vie", "sáb", "dom"];
+const weekdayNames = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"];
+
+/** Monthly view in Bogotá time. Registered encuentros can be downloaded together. */
+function MonthCalendar({ items }: { items: Encuentro[] }) {
+  const store = useDemo();
+  const firstUpcoming = items.find((item) => !isPast(item)) ?? items[0];
+  const [month, setMonth] = useState(() =>
+    (firstUpcoming ? bogotaParts(firstUpcoming.start).date : new Date().toISOString()).slice(0, 7),
+  );
+  const [year, monthIndex] = month.split("-").map(Number);
+  const label = new Intl.DateTimeFormat("es-CO", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, monthIndex - 1, 1)));
+  const days = new Date(Date.UTC(year, monthIndex, 0)).getUTCDate();
+  const lead = (new Date(Date.UTC(year, monthIndex - 1, 1)).getUTCDay() + 6) % 7;
+  const inMonth = items.filter((item) => bogotaParts(item.start).date.startsWith(month));
+  const mine = inMonth.filter((item) => store.myEncuentros.includes(item.id));
+  const cells: (number | null)[] = [
+    ...Array.from({ length: lead }, () => null),
+    ...Array.from({ length: days }, (_, i) => i + 1),
+  ];
+  while (cells.length % 7) cells.push(null);
+  const weeks = Array.from({ length: cells.length / 7 }, (_, i) => cells.slice(i * 7, i * 7 + 7));
+  const onDay = (day: number) =>
+    inMonth.filter(
+      (item) => bogotaParts(item.start).date === `${month}-${String(day).padStart(2, "0")}`,
+    );
+  function shift(delta: number) {
+    const next = new Date(Date.UTC(year, monthIndex - 1 + delta, 1));
+    setMonth(next.toISOString().slice(0, 7));
+  }
+  return (
+    <section className="vp-month" aria-labelledby="vp-month-title">
+      <div className="vp-month-head">
+        <button type="button" className="vp-icon-button" aria-label="Mes anterior" onClick={() => shift(-1)}>
+          <CaretLeft size={20} />
+        </button>
+        <h2 id="vp-month-title" aria-live="polite">
+          {label}
+        </h2>
+        <button type="button" className="vp-icon-button" aria-label="Mes siguiente" onClick={() => shift(1)}>
+          <CaretRight size={20} />
+        </button>
+      </div>
+      <table className="vp-month-grid">
+        <caption className="sr-only">Encuentros de {label}, hora de Bogotá</caption>
+        <thead>
+          <tr>
+            {weekdays.map((day, i) => (
+              <th key={day} scope="col">
+                <abbr title={weekdayNames[i]}>{day}</abbr>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {weeks.map((week, w) => (
+            <tr key={w}>
+              {week.map((day, d) => {
+                const events = day ? onDay(day) : [];
+                return (
+                  <td key={d} className={events.length ? "has-event" : undefined}>
+                    {day && (
+                      <>
+                        <span className="vp-month-day">{day}</span>
+                        {events.map((item) => (
+                          <span
+                            key={item.id}
+                            className={`vp-month-event${store.myEncuentros.includes(item.id) ? " mine" : ""}`}
+                          >
+                            <span className="vp-month-event-title">{item.title}</span>
+                            {store.myEncuentros.includes(item.id) && (
+                              <span className="sr-only"> (inscrito)</span>
+                            )}
+                          </span>
+                        ))}
+                      </>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <h3 className="vp-month-list-title">
+        {inMonth.length === 1 ? "1 encuentro este mes" : `${inMonth.length} encuentros este mes`}
+      </h3>
+      {inMonth.length ? (
+        <ul className="vp-month-list">
+          {inMonth.map((item) => (
+            <li key={item.id}>
+              <strong>{item.title}</strong>
+              <span>{formatBogota(item.start)}</span>
+              {store.myEncuentros.includes(item.id) ? (
+                <Badge tone="success">Inscrito</Badge>
+              ) : (
+                <Badge>{item.status === "Cancelado" ? "Cancelado" : item.others >= item.capacity ? "Cupo completo" : "Sin inscripción"}</Badge>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="vp-muted">No hay encuentros publicados en este mes.</p>
+      )}
+      <div className="vp-month-actions">
+        <button
+          type="button"
+          className="vp-btn vp-btn-secondary"
+          disabled={!mine.length}
+          onClick={() =>
+            downloadIcs(icsFile(mine.map(toEvent)), `encuentros-vasees-${month}.ics`)
+          }
+        >
+          <DownloadSimple size={18} />
+          Descargar mis encuentros del mes (.ics)
+        </button>
+        <small>
+          {mine.length
+            ? `Incluye ${mine.length === 1 ? "1 encuentro" : `${mine.length} encuentros`} en los que te inscribiste.`
+            : "Inscríbete en un encuentro de este mes para descargarlo."}{" "}
+          Es un archivo para importar: tu calendario no se sincroniza solo.
+        </small>
+      </div>
+    </section>
+  );
+}
+
 export function StudentEncuentros() {
   const store = useDemo();
   const [tab, setTab] = useState("Próximos");
@@ -224,7 +364,9 @@ export function StudentEncuentros() {
     .filter((item) => item.status !== "Borrador")
     .sort((a, b) => a.start.localeCompare(b.start));
   const shown = visible.filter((item) =>
-    tab === "Mis encuentros"
+    tab === "Calendario"
+      ? false
+      : tab === "Mis encuentros"
       ? store.myEncuentros.includes(item.id)
       : tab === "Anteriores"
         ? isPast(item)
@@ -238,7 +380,7 @@ export function StudentEncuentros() {
         description="Conversaciones en vivo y presenciales de la Escuela. Inscríbete y agrégalas a tu calendario."
       />
       <div className="vp-tab-bar" role="group" aria-label="Filtrar encuentros">
-        {["Próximos", "Mis encuentros", "Anteriores"].map((item) => (
+        {["Próximos", "Mis encuentros", "Calendario", "Anteriores"].map((item) => (
           <button
             key={item}
             aria-pressed={tab === item}
@@ -251,8 +393,10 @@ export function StudentEncuentros() {
           </button>
         ))}
       </div>
-      <h2 className="sr-only">{tab}</h2>
-      {shown.length ? (
+      {tab !== "Calendario" && <h2 className="sr-only">{tab}</h2>}
+      {tab === "Calendario" ? (
+        <MonthCalendar items={visible} />
+      ) : shown.length ? (
         <div className="vp-encuentro-list">
           {shown.map((item) => (
             <EncuentroCard item={item} key={item.id} />

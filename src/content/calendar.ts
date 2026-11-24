@@ -68,22 +68,26 @@ function fold(line: string) {
   return out.join('\r\n ');
 }
 
-export function icsFile(event: CalendarEvent, now = new Date()) {
+/** One calendar file with one or more events (a single encuentro or a whole month). */
+export function icsFile(events: CalendarEvent | CalendarEvent[], now = new Date()) {
+  const list = Array.isArray(events) ? events : [events];
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//Vasees//Escuela de Familia y Longevidad//ES',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'BEGIN:VEVENT',
-    `UID:${event.id}@escuela.vasees.co`,
-    `DTSTAMP:${compactUtc(now.toISOString())}`,
-    `DTSTART:${compactUtc(event.start)}`,
-    `DTEND:${compactUtc(event.end)}`,
-    `SUMMARY:${escapeText(event.title)}`,
-    `DESCRIPTION:${escapeText(event.description)}`,
-    `LOCATION:${escapeText(event.location)}`,
-    'END:VEVENT',
+    ...list.flatMap((event) => [
+      'BEGIN:VEVENT',
+      `UID:${event.id}@escuela.vasees.co`,
+      `DTSTAMP:${compactUtc(now.toISOString())}`,
+      `DTSTART:${compactUtc(event.start)}`,
+      `DTEND:${compactUtc(event.end)}`,
+      `SUMMARY:${escapeText(event.title)}`,
+      `DESCRIPTION:${escapeText(event.description)}`,
+      `LOCATION:${escapeText(event.location)}`,
+      'END:VEVENT',
+    ]),
     'END:VCALENDAR',
   ];
   return lines.map(fold).join('\r\n') + '\r\n';

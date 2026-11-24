@@ -4,6 +4,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   Certificate,
+  ChartLineUp,
   CheckCircle,
   LockSimple,
   PencilSimple,
@@ -15,14 +16,16 @@ import {
 import { useDemo, hasBadge, type ManagedCourse } from "./demo-store";
 import { hasAccess } from "../content/membership";
 import { SiteLink, navigate } from "../navigation";
-import { Badge, Empty, PageHeading } from "./shared";
+import { Badge, Empty, Modal, PageHeading } from "./shared";
 import {
   availabilityOptions,
   badgeRules,
   goalOptions,
+  goalProgress,
   quizFor,
   suggestRoute,
   type AvailabilityId,
+  type GoalMeasure,
 } from "../content/school-learning";
 
 const steps = ["Tu objetivo", "Tus intereses", "Tu tiempo"] as const;
@@ -69,6 +72,7 @@ export function Welcome() {
       interests,
       availability: availability as AvailabilityId,
       weeksDone: old?.weeksDone ?? 0,
+      measure: old?.measure,
     }));
     setDone(true);
   }
@@ -305,7 +309,6 @@ export function GoalPanel() {
       sum + Math.min((store.tests[course.id] ?? []).length, course.lessons.length),
     0,
   );
-  const percent = total ? Math.round((passed / total) * 100) : 0;
   return (
     <section className="vp-goal" aria-labelledby="vp-goal-title">
       <div className="vp-goal-head">
@@ -319,16 +322,7 @@ export function GoalPanel() {
         </SiteLink>
       </div>
       <div className="vp-goal-grid">
-        <div className="vp-goal-progress">
-          <span>Avance hacia tu meta</span>
-          <strong>{percent}%</strong>
-          <small>
-            {passed} de {total} tests aprobados en tu ruta
-          </small>
-          <div className="vp-goal-ring" aria-hidden="true">
-            <span style={{ width: `${percent}%` }} />
-          </div>
-        </div>
+        <GoalMeasurePanel />
         <div className="vp-goal-week">
           <span>Tu acción de la semana · {time?.label}</span>
           <p>{time?.action}</p>
@@ -352,6 +346,10 @@ export function GoalPanel() {
         </div>
       </div>
       <h3 className="vp-goal-chart-title">Tu ruta sugerida</h3>
+      <p className="vp-goal-route-note">
+        {passed} de {total} tests aprobados en tu ruta. Este avance mide tus
+        cursos; tu meta se mide con tus propios registros.
+      </p>
       <ol className="vp-goal-chart">
         {route.map((course) => {
           const done = Math.min(
@@ -400,6 +398,248 @@ export function GoalPanel() {
         })}
       </ol>
     </section>
+  );
+}
+
+const todayIso = () => new Date().toISOString().slice(0, 10);
+const formatDate = (date: string) =>
+  new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(
+    new Date(`${date}T00:00:00Z`),
+  );
+const plainNumber = (value: number) => new Intl.NumberFormat("es-CO").format(value);
+
+/** The learner's own measure: statement, unit, starting point, target, deadline and weekly logs. */
+function GoalMeasurePanel() {
+  const store = useDemo();
+  const measure = store.plan?.measure;
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState("");
+  const [action, setAction] = useState("");
+  const [error, setError] = useState("");
+  function log(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const number = Number(value.replace(",", "."));
+    if (value.trim() === "" || !Number.isFinite(number) || number < 0) {
+      setError("Escribe un número igual o mayor que 0.");
+      return;
+    }
+    store.setPlan((old) =>
+      old?.measure
+        ? {
+            ...old,
+            measure: {
+              ...old.measure,
+              logs: [...old.measure.logs, { date: todayIso(), value: number, action: action.trim() }],
+            },
+          }
+        : old,
+    );
+    setValue("");
+    setAction("");
+    setError("");
+    store.setNotice("Avance registrado en tu meta de muestra.");
+  }
+  if (!measure)
+    return (
+      <div className="vp-goal-progress vp-goal-empty">
+        <span>Avance hacia tu meta</span>
+        <p>
+          Todavía no mostramos un porcentaje. Primero define cómo vas a medir
+          lo que quieres lograr.
+        </p>
+        <button className="vp-btn vp-btn-primary" onClick={() => setEditing(true)}>
+          <ChartLineUp size={18} />
+          Definir cómo mediré mi meta
+        </button>
+        <GoalMeasureForm open={editing} onClose={() => setEditing(false)} />
+      </div>
+    );
+  const percent = goalProgress(measure);
+  const latest = measure.logs.at(-1)?.value ?? measure.start;
+  const max = Math.max(measure.start, measure.target, ...measure.logs.map((item) => item.value), 1);
+  return (
+    <div className="vp-goal-progress">
+      <span>Avance hacia tu meta</span>
+      <p className="vp-goal-statement">«{measure.statement}»</p>
+      <strong>{percent}%</strong>
+      <small>
+        Hoy: {plainNumber(latest)} {measure.unit}. Empezaste en{" "}
+        {plainNumber(measure.start)} y tu meta es {plainNumber(measure.target)} antes del{" "}
+        {formatDate(measure.deadline)}.
+      </small>
+      <div className="vp-goal-ring" aria-hidden="true">
+        <span style={{ width: `${percent}%` }} />
+      </div>
+      <h3 className="vp-goal-log-title">Tus registros</h3>
+      <ol className="vp-goal-log">
+        <li>
+          <span>Punto de partida</span>
+          <span className="vp-goal-bar" aria-hidden="true">
+            <span style={{ width: `${(measure.start / max) * 100}%` }} />
+          </span>
+          <strong>{plainNumber(measure.start)}</strong>
+        </li>
+        {measure.logs.map((item, index) => (
+          <li key={index}>
+            <span>
+              {formatDate(item.date)}
+              {item.action && <small>{item.action}</small>}
+            </span>
+            <span className="vp-goal-bar" aria-hidden="true">
+              <span style={{ width: `${(item.value / max) * 100}%` }} />
+            </span>
+            <strong>{plainNumber(item.value)}</strong>
+          </li>
+        ))}
+        <li className="vp-goal-target">
+          <span>Meta</span>
+          <span className="vp-goal-bar" aria-hidden="true">
+            <span style={{ width: `${(measure.target / max) * 100}%` }} />
+          </span>
+          <strong>{plainNumber(measure.target)}</strong>
+        </li>
+      </ol>
+      <form className="vp-form vp-goal-log-form" onSubmit={log} noValidate>
+        <label className="vp-field">
+          Valor de esta semana ({measure.unit})
+          <input inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} />
+        </label>
+        <label className="vp-field">
+          Qué hiciste (opcional)
+          <input value={action} maxLength={140} onChange={(e) => setAction(e.target.value)} />
+        </label>
+        {error && (
+          <div className="vp-form-error" role="alert">
+            <WarningCircle size={20} />
+            {error}
+          </div>
+        )}
+        <div className="vp-form-actions">
+          <button className="vp-btn vp-btn-primary" type="submit">
+            Registrar mi avance
+          </button>
+          <button className="vp-text-button" type="button" onClick={() => setEditing(true)}>
+            Cambiar mi medida
+          </button>
+        </div>
+      </form>
+      <GoalMeasureForm open={editing} onClose={() => setEditing(false)} current={measure} />
+    </div>
+  );
+}
+
+function GoalMeasureForm({
+  open,
+  onClose,
+  current,
+}: {
+  open: boolean;
+  onClose: () => void;
+  current?: GoalMeasure;
+}) {
+  const store = useDemo();
+  const [statement, setStatement] = useState(current?.statement ?? "");
+  const [unit, setUnit] = useState(current?.unit ?? "");
+  const [start, setStart] = useState(current ? String(current.start) : "");
+  const [target, setTarget] = useState(current ? String(current.target) : "");
+  const [deadline, setDeadline] = useState(current?.deadline ?? "");
+  const [error, setError] = useState("");
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (error) errorRef.current?.focus();
+  }, [error]);
+  function save(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const from = Number(start.replace(",", "."));
+    const to = Number(target.replace(",", "."));
+    const problem =
+      statement.trim().length < 5
+        ? "Cuéntanos en una frase qué quieres lograr."
+        : unit.trim().length < 3
+          ? "Escribe qué vas a contar o medir."
+          : start.trim() === "" || !Number.isFinite(from) || from < 0
+            ? "El punto de partida debe ser un número igual o mayor que 0."
+            : target.trim() === "" || !Number.isFinite(to) || to < 0
+              ? "La meta debe ser un número igual o mayor que 0."
+              : from === to
+                ? "La meta debe ser distinta de tu punto de partida."
+                : !/^\d{4}-\d{2}-\d{2}$/.test(deadline) || deadline <= todayIso()
+                  ? "Elige un plazo posterior a hoy."
+                  : "";
+    if (problem) {
+      setError(problem);
+      return;
+    }
+    store.setPlan((old) =>
+      old
+        ? {
+            ...old,
+            measure: {
+              statement: statement.trim(),
+              unit: unit.trim(),
+              start: from,
+              target: to,
+              deadline,
+              logs: current && current.start === from ? current.logs : [],
+            },
+          }
+        : old,
+    );
+    setError("");
+    onClose();
+    store.setNotice("Tu medida quedó guardada en esta demo.");
+  }
+  return (
+    <Modal open={open} title="Cómo mediré mi meta" onClose={onClose} wide>
+      <form className="vp-form vp-panel-body" onSubmit={save} noValidate>
+        {error && (
+          <div className="vp-form-error" role="alert" ref={errorRef} tabIndex={-1}>
+            <WarningCircle size={20} />
+            {error}
+          </div>
+        )}
+        <label className="vp-field">
+          ¿Qué quieres lograr, en tus palabras?
+          <textarea
+            rows={2}
+            maxLength={200}
+            value={statement}
+            onChange={(e) => setStatement(e.target.value)}
+            placeholder="Por ejemplo: hablar más seguido con mis nietos por videollamada"
+          />
+        </label>
+        <label className="vp-field">
+          ¿Qué vas a contar o medir?
+          <input
+            maxLength={80}
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+            placeholder="videollamadas por semana"
+          />
+        </label>
+        <div className="vp-form-grid">
+          <label className="vp-field">
+            Punto de partida
+            <input inputMode="decimal" value={start} onChange={(e) => setStart(e.target.value)} />
+          </label>
+          <label className="vp-field">
+            Meta
+            <input inputMode="decimal" value={target} onChange={(e) => setTarget(e.target.value)} />
+          </label>
+          <label className="vp-field">
+            Plazo
+            <input type="date" value={deadline} min={todayIso()} onChange={(e) => setDeadline(e.target.value)} />
+          </label>
+        </div>
+        <p className="vp-small-note">
+          Tu meta es privada: no aparece en el CRM ni en los informes para
+          empresas.
+        </p>
+        <button className="vp-btn vp-btn-primary" type="submit">
+          Guardar mi medida
+        </button>
+      </form>
+    </Modal>
   );
 }
 

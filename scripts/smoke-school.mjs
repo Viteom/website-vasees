@@ -274,10 +274,10 @@ try {
   await button("Enviar valoración de muestra").click();
   await audit("Valoración", 1440);
   await button("Mis notas").click();
-  await label("Mis notas de esta vista").fill(
+  await label("Mi nota de esta lección").fill(
     "Una conversación para compartir.",
   );
-  await button("Guardar nota de muestra").click();
+  await button("Guardar nota").click();
   await shot("classroom-1440");
   await link("Mis cursos").click();
   ok(
@@ -301,6 +301,20 @@ try {
     (await page.locator(".vp-badge-list li").count()) === 1,
     "Profile lists the earned badge",
   );
+  await page.locator(".vp-tab-bar").getByRole("button", { name: "Mis notas", exact: true }).click();
+  ok(
+    (await page.locator(".vp-notes-list li").count()) === 1 &&
+      (await page.locator(".vp-notes-list").innerText()).includes("Una conversación para compartir."),
+    "Profile lists the private lesson notes",
+  );
+  await audit("Mis notas", 1440);
+  await page.locator(".vp-notes-list").getByRole("button", { name: /^Abrir la lección/ }).click();
+  await button("Mis notas").click();
+  ok(
+    (await label("Mi nota de esta lección").inputValue()) === "Una conversación para compartir.",
+    "A note opens its lesson with the saved text",
+  );
+  await link("Mi perfil").click();
   await button("Mis datos").click();
   await label("Nombre completo").fill("Laura de la Escuela");
   await label("Ciudad").fill("Bogotá");
@@ -527,6 +541,31 @@ try {
   ok(
     (await page.locator(".vp-encuentro").count()) === 1,
     "My encuentros lists the registration",
+  );
+  await page.locator(".vp-tab-bar").getByRole("button", { name: "Calendario", exact: true }).click();
+  ok(
+    (await page.locator("#vp-month-title").innerText()).toLowerCase().includes("diciembre de 2026") &&
+      (await page.locator(".vp-month-grid .vp-month-event").count()) === 2 &&
+      (await page.locator(".vp-month-grid .vp-month-event.mine").count()) === 1,
+    "Monthly calendar shows the month's encuentros and the registration",
+  );
+  const [monthDownload] = await Promise.all([
+    page.waitForEvent("download"),
+    button("Descargar mis encuentros del mes (.ics)").click(),
+  ]);
+  const monthIcs = await readFile(await monthDownload.path(), "utf8");
+  ok(
+    monthDownload.suggestedFilename() === "encuentros-vasees-2026-12.ics" &&
+      monthIcs.split("BEGIN:VEVENT").length === 2 &&
+      monthIcs.includes("DTSTART:20261203T230000Z"),
+    "Monthly .ics includes only the registered encuentros of the month",
+  );
+  await audit("Calendario mensual", 1440);
+  await button("Mes siguiente").click();
+  ok(
+    (await page.locator("#vp-month-title").innerText()).toLowerCase().includes("enero de 2027") &&
+      (await button("Descargar mis encuentros del mes (.ics)").isDisabled()),
+    "Months without registrations have nothing to download",
   );
   await link("Comunidad").click();
   ok(
@@ -1017,8 +1056,42 @@ try {
   await button("Ir a mi inicio").click();
   const goalText = await page.locator(".vp-goal").innerText();
   ok(
-    goalText.includes("Tecnología y vida cotidiana") && goalText.includes("50%"),
-    "Dashboard charts progress toward the goal from passed tests",
+    goalText.includes("Tecnología y vida cotidiana") &&
+      goalText.includes("Todavía no mostramos un porcentaje") &&
+      goalText.includes("tests aprobados en tu ruta"),
+    "Goal shows no percentage before a measure; course progress is separate",
+  );
+  await button("Definir cómo mediré mi meta").click();
+  const measureForm = page.locator("dialog[open]");
+  await measureForm.getByRole("button", { name: "Guardar mi medida" }).click();
+  ok(
+    (await measureForm.getByRole("alert").innerText()).includes("qué quieres lograr"),
+    "Measure form asks for the goal in the learner's words",
+  );
+  await measureForm.getByLabel("¿Qué quieres lograr, en tus palabras?", { exact: true }).fill("Hablar más seguido con mis nietos");
+  await measureForm.getByLabel("¿Qué vas a contar o medir?", { exact: true }).fill("videollamadas por semana");
+  await measureForm.getByLabel("Punto de partida", { exact: true }).fill("1");
+  await measureForm.getByLabel("Meta", { exact: true }).fill("1");
+  await measureForm.getByLabel("Plazo", { exact: true }).fill("2030-06-30");
+  await measureForm.getByRole("button", { name: "Guardar mi medida" }).click();
+  ok(
+    (await measureForm.getByRole("alert").innerText()).includes("distinta de tu punto de partida"),
+    "Measure target must differ from the starting point",
+  );
+  await measureForm.getByLabel("Meta", { exact: true }).fill("5");
+  await audit("Medida de la meta", 1440);
+  await measureForm.getByRole("button", { name: "Guardar mi medida" }).click();
+  ok(
+    (await page.locator(".vp-goal-progress strong").first().innerText()) === "0%",
+    "A new measure starts at 0%",
+  );
+  await label("Valor de esta semana (videollamadas por semana)").fill("3");
+  await label("Qué hiciste (opcional)").fill("Llamé el domingo");
+  await button("Registrar mi avance").click();
+  const measured = await page.locator(".vp-goal-progress").innerText();
+  ok(
+    measured.includes("50%") && measured.includes("Llamé el domingo"),
+    "Weekly logs move the goal from its starting point toward the target",
   );
   await button("La cumplí esta semana").click();
   ok(
@@ -1061,8 +1134,8 @@ try {
     ["Correos y códigos", "messages"],
     ["Configuración", "settings"],
   ];
-  for (const width of [1440, 768, 390]) {
-    await page.setViewportSize({ width, height: width === 390 ? 844 : 1000 });
+  for (const width of [1440, 768, 390, 320]) {
+    await page.setViewportSize({ width, height: width <= 390 ? 844 : 1000 });
     await page.goto(`${base}/escuela/ingresar`, { waitUntil: "networkidle" });
     await shot(`login-${width}`);
     await audit("Login", width);

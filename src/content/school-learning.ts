@@ -72,7 +72,30 @@ export type LearnerPlan = {
   interests: string[];
   availability: AvailabilityId;
   weeksDone: number;
+  /** How the learner measures the goal. No percentage is shown until it exists. */
+  measure?: GoalMeasure;
 };
+
+export type GoalLog = { date: string; value: number; action: string };
+export type GoalMeasure = {
+  /** The goal in the learner's own words. */
+  statement: string;
+  /** What is counted, e.g. "conversaciones con mi familia por semana". */
+  unit: string;
+  start: number;
+  target: number;
+  /** Deadline as YYYY-MM-DD. */
+  deadline: string;
+  logs: GoalLog[];
+};
+
+/** Share of the way from the starting point to the target, 0–100. Works for goals that go down too. */
+export function goalProgress(measure: GoalMeasure) {
+  const latest = measure.logs.at(-1)?.value ?? measure.start;
+  const span = measure.target - measure.start;
+  if (!span) return 0;
+  return Math.max(0, Math.min(100, Math.round(((latest - measure.start) / span) * 100)));
+}
 
 /** Suggested route: courses from the goal's categories first, then the interests', at most three. */
 export function suggestRoute<T extends { id: string; category: string; status: string }>(plan: Pick<LearnerPlan, 'goal' | 'interests'>, courses: T[]) {

@@ -268,6 +268,12 @@ type DemoStore = {
   setSelectedCompany: (value: string) => void;
   selectedInvite: string;
   setSelectedInvite: (value: string) => void;
+  /** Private lesson notes, keyed by "courseId::lessonIndex". */
+  lessonNotes: Record<string, string>;
+  setLessonNotes: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  /** Lesson to open next time the classroom mounts. */
+  selectedLesson: number;
+  setSelectedLesson: (value: number) => void;
 };
 const Context = createContext<DemoStore | null>(null);
 
@@ -460,6 +466,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const [crmPeople] = useState(initialCrmPeople);
   const [selectedCompany, setSelectedCompany] = useState(initialCompanies[0].id);
   const [selectedInvite, setSelectedInvite] = useState("");
+  const [lessonNotes, setLessonNotes] = useState<Record<string, string>>({});
+  const [selectedLesson, setSelectedLesson] = useState(0);
   const [reviews, setReviews] = useState<CourseReview[]>([
     {
       courseId: schoolCourses[1].id,
@@ -554,6 +562,10 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         setSelectedCompany,
         selectedInvite,
         setSelectedInvite,
+        lessonNotes,
+        setLessonNotes,
+        selectedLesson,
+        setSelectedLesson,
       }}
     >
       {children}

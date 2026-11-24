@@ -411,3 +411,165 @@
     transition: none;
   }
 }
+
+/* Part 6: monthly calendar of encuentros (Bogotá time). */
+.vp-month {
+  font-size: 15px;
+  line-height: 1.5;
+}
+.vp-month-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 8px 0 14px;
+}
+.vp-month-head h2 {
+  font-size: 24px;
+  text-align: center;
+}
+.vp-month-head h2::first-letter,
+.vp-month-list li span:not(.vp-badge)::first-letter {
+  text-transform: uppercase;
+}
+.vp-month-head button {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--vp-border);
+  background: #fff;
+  color: inherit;
+  cursor: pointer;
+}
+.vp-month-head button:hover {
+  background: #f4f5f0;
+}
+.vp-month-grid {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 4px;
+}
+.vp-month-grid th {
+  font-size: 14px;
+  font-weight: 500;
+  color: #3f5459;
+  padding: 4px 0;
+}
+.vp-month-grid abbr {
+  text-decoration: none;
+}
+.vp-month-grid td {
+  vertical-align: top;
+  height: 92px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--vp-border);
+}
+.vp-month-grid td:empty {
+  background: transparent;
+  border-color: transparent;
+}
+.vp-month-grid td.has-event {
+  border-color: #a7b98c;
+}
+.vp-month-day {
+  display: block;
+  font-size: 14px;
+  color: #3f5459;
+}
+.vp-month-event {
+  display: block;
+  margin-top: 4px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: #eef3f3;
+  font-size: 14px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+.vp-month-event.mine {
+  background: #dfe8cf;
+  font-weight: 500;
+}
+.vp-month-list-title {
+  font-size: 18px;
+  margin: 22px 0 10px;
+}
+.vp-month-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.vp-month-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid var(--vp-border);
+}
+.vp-month-list li span:not(.vp-badge) {
+  grid-column: 1;
+  font-size: 14px;
+  color: #3f5459;
+}
+.vp-month-list .vp-badge {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+.vp-month-actions {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  margin: 20px 0 8px;
+}
+.vp-month-actions small {
+  font-size: 14px;
+  color: #3f5459;
+}
+@media (max-width: 700px) {
+  .vp-month-grid {
+    border-spacing: 2px;
+  }
+  .vp-month-grid td {
+    height: 48px;
+    padding: 4px;
+    text-align: center;
+  }
+  /* On small screens the grid shows only the day and a dot; the list below carries the detail. */
+  .vp-month-event {
+    width: 10px;
+    height: 10px;
+    margin: 4px auto 0;
+    padding: 0;
+    border-radius: 50%;
+    background: #6f8a8e;
+  }
+  .vp-month-event.mine {
+    background: #5e7a3a;
+  }
+  .vp-month-event-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .vp-month-list li {
+    grid-template-columns: 1fr;
+  }
+  .vp-month-list .vp-badge {
+    grid-column: 1;
+    grid-row: auto;
+    justify-self: start;
+  }
+}
