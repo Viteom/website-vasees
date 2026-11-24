@@ -15,6 +15,7 @@ import {
   AdminMemberships,
 } from "./membership";
 import { hasAccess } from "../content/membership";
+import { AdminCompanies, AdminCrm, CompanyDetail, InvitationPage } from "./companies";
 import { Welcome } from "./learning";
 import {
   StudentEncuentros,
@@ -81,6 +82,10 @@ export function Portal({ path }: { path: string }) {
     "/admin/encuentros": <AdminEncuentros />,
     "/admin/comunidad": <Moderation />,
     "/admin/membresias": <AdminMemberships />,
+    "/admin/empresas": <AdminCompanies />,
+    "/admin/empresa": <CompanyDetail key={store.selectedCompany} />,
+    "/admin/crm": <AdminCrm />,
+    "/escuela/invitacion": <InvitationPage key={store.selectedInvite} />,
     "/admin": <AdminDashboard />,
     "/admin/cursos": <AdminCourses />,
     "/admin/curso": <CourseEditor key={store.selectedCourse} />,

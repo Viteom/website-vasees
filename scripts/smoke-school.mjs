@@ -619,6 +619,112 @@ try {
     "Admin sees membership status and cancellation reasons",
   );
   await audit("Membresías admin", 1440);
+  await link("Empresas").click();
+  await page.getByRole("heading", { name: "Empresas.", exact: true }).waitFor();
+  ok(
+    (await page.locator(".vp-table tbody tr").count()) === 3 &&
+      (await page.locator(".vp-table tbody").innerText()).includes("(ejemplo)"),
+    "Companies list shows fictitious sample companies",
+  );
+  await audit("Empresas", 1440);
+  await button("Registrar empresa").click();
+  const companyForm = page.locator("dialog[open]");
+  await companyForm.getByRole("button", { name: "Registrar empresa de muestra" }).click();
+  ok(
+    (await companyForm.getByRole("alert").innerText()).includes("nombre de la empresa"),
+    "Company form requires a name",
+  );
+  await companyForm.getByLabel("Nombre de la empresa", { exact: true }).fill("Empresa de prueba");
+  await companyForm.getByLabel("Financiación de la empresa (%)", { exact: true }).fill("150");
+  await companyForm.getByRole("button", { name: "Registrar empresa de muestra" }).click();
+  ok(
+    (await companyForm.getByRole("alert").innerText()).includes("entre 0 y 100"),
+    "Company funding must be between 0 and 100",
+  );
+  await companyForm.getByLabel("Financiación de la empresa (%)", { exact: true }).fill("80");
+  await companyForm.getByLabel("Cupos", { exact: true }).fill("2");
+  await companyForm.getByLabel("Cuidar sin dejar de vivir").check();
+  await audit("Registrar empresa", 1440);
+  await companyForm.getByRole("button", { name: "Registrar empresa de muestra" }).click();
+  ok(
+    (await page.locator("h1").innerText()) === "Empresa de prueba",
+    "A new company opens its detail",
+  );
+  await label("Nombre").fill("Ana Prueba");
+  await label("Correo").fill("ana@prueba");
+  await button("Crear invitación").click();
+  ok(
+    (await page.locator(".vp-company-tools .vp-form-error").innerText()).includes("Correo no válido"),
+    "Single invitation validates the email",
+  );
+  await label("Correo").fill("ana@prueba.com");
+  await button("Crear invitación").click();
+  ok(
+    (await page.getByRole("status").first().innerText()).includes("No se envió ningún correo") &&
+      (await page.locator(".vp-table tbody").innerText()).includes("Invitación pendiente"),
+    "A single invitation is created without sending email",
+  );
+  await label("Pega la lista").fill(
+    "nombre,correo\nBeto Prueba,beto@prueba.com\nCarla Prueba,carla@prueba.com\nAna Prueba,ana@prueba.com\nMal Dato,mal-correo",
+  );
+  await button("Revisar la lista").click();
+  const csvRows = await page.locator(".vp-csv-preview li").allInnerTexts();
+  ok(
+    csvRows.length === 4 &&
+      csvRows[0].includes("Lista") &&
+      csvRows[1].includes("Sin cupo disponible") &&
+      csvRows[2].includes("Ya está en esta empresa") &&
+      csvRows[3].includes("Correo no válido"),
+    "CSV preview flags seats, duplicates and invalid emails",
+  );
+  await audit("Importar CSV", 1440);
+  await button("Invitar a 1 persona").click();
+  ok(
+    (await page.locator(".vp-table tbody tr").count()) === 2 &&
+      (await button("Sin cupos disponibles").isDisabled()),
+    "Only valid CSV rows are invited and seats are enforced",
+  );
+  await page.getByRole("button", { name: "Revocar la invitación de Beto Prueba", exact: true }).click();
+  ok(
+    (await page.locator(".vp-table tbody").innerText()).includes("Revocada") &&
+      (await button("Crear invitación").isEnabled()),
+    "Revoking a pending invitation frees its seat",
+  );
+  await audit("Detalle de empresa", 1440);
+  await page.locator(".vp-back-link").click();
+  await page.getByRole("button", { name: "Ver empresa: Alimentos del Valle (ejemplo)", exact: true }).click();
+  await button("Ver informe mensual").click();
+  const companyReport = await page.locator("dialog[open]").innerText();
+  ok(
+    companyReport.includes("9 colaboradores activos de 12 cupos") &&
+      companyReport.includes("Ejemplo de opinión autorizada") &&
+      companyReport.includes("no incluye metas personales"),
+    "Monthly company report shows activity, progress and authorized opinions only",
+  );
+  await audit("Informe mensual", 1440);
+  await page.keyboard.press("Escape");
+  await link("CRM de personas").click();
+  ok(
+    (await page.locator(".vp-crm-table tbody").innerText()).includes("Laura") &&
+      (await page.locator(".vp-crm-table tbody").innerText()).includes("El precio no me funciona ahora"),
+    "CRM lists individual members with their status and cancellation reason",
+  );
+  await page.getByLabel("Origen de la membresía", { exact: true }).selectOption("Empresa");
+  ok(
+    !(await page.locator(".vp-crm-table tbody").innerText()).includes("Laura") &&
+      (await page.locator(".vp-crm-table tbody").innerText()).includes("Alimentos del Valle"),
+    "CRM filters company-funded members",
+  );
+  await page.getByLabel("Origen de la membresía", { exact: true }).selectOption("Todos");
+  await audit("CRM", 1440);
+  await button("Previsualizar mensaje de Pagos rechazados").click();
+  const mail = await page.locator("dialog[open]").innerText();
+  ok(
+    mail.includes("Mariana Toro") && mail.includes("no se envía ningún correo"),
+    "Segment preview names who matches and sends nothing",
+  );
+  await audit("Vista previa de segmento", 1440);
+  await page.keyboard.press("Escape");
   await link("Encuentros").click();
   await button("Crear encuentro").click();
   await page.locator("dialog[open]").getByLabel("Título", { exact: true }).fill("Encuentro de prueba");
@@ -825,6 +931,39 @@ try {
     (await page.locator(".vp-integration-list .vp-badge").count()) === 4,
     "Settings lists pending integrations",
   );
+  await link("Empresas").click();
+  await page.getByRole("button", { name: "Ver empresa: Alimentos del Valle (ejemplo)", exact: true }).click();
+  const invitee = page.locator(".vp-table tbody tr").filter({ hasText: "Invitación pendiente" }).first();
+  const inviteeEmail = await invitee.locator("td small").first().innerText();
+  await invitee.getByRole("button", { name: /^Abrir la invitación/ }).click();
+  ok(
+    (await page.getByRole("alert").innerText()).includes("Estás en la vista de administración") &&
+      (await page.getByRole("button", { name: "Aceptar invitación" }).count()) === 0,
+    "An invitation for another email never switches the account silently",
+  );
+  await audit("Invitación de otra cuenta", 1440);
+  await button(`Cerrar esta sesión e ingresar como ${inviteeEmail}`).click();
+  ok(
+    (await page.locator('.vp-auth-form input[type="email"]').inputValue()) === inviteeEmail,
+    "Switching accounts prefills the invited email",
+  );
+  await label("Contraseña de muestra").fill("demo-1234");
+  await button("Entrar a mi Escuela").click();
+  await label("Código de 6 dígitos").fill("123456");
+  await button("Confirmar y continuar").click();
+  ok(
+    (await page.locator("h1").innerText()).includes("te invita a la Escuela"),
+    "Login returns to the invitation",
+  );
+  await audit("Invitación", 1440);
+  await button("Aceptar invitación").click();
+  await link("Mi membresía").click();
+  ok(
+    (await page.locator(".vp-membership-card").innerText()).includes(
+      "Financiado por Alimentos del Valle (ejemplo) (100 %)",
+    ),
+    "Accepting the invitation activates a company-funded membership",
+  );
   await button("Cerrar sesión de demostración").click();
   await page.getByRole("link", { name: "Olvidé mi contraseña" }).click();
   await button("Ver paso de recuperación").click();
@@ -915,6 +1054,8 @@ try {
     ["Páginas y contenido", "pages"],
     ["Biblioteca de medios", "media"],
     ["Membresías", "admin-memberships"],
+    ["Empresas", "companies"],
+    ["CRM de personas", "crm"],
     ["Personas y acceso", "users"],
     ["Pagos de muestra", "payments"],
     ["Correos y códigos", "messages"],

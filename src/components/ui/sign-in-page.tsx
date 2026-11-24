@@ -36,9 +36,9 @@ export function LoginPage({ path }: { path: string }) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [name, setName] = useState("Laura Gómez");
+  const [name, setName] = useState(store.authName || "Laura Gómez");
   const [email, setEmail] = useState(
-    admin ? "admin@example.com" : "laura@ejemplo.com",
+    admin ? "admin@example.com" : store.authEmail || "laura@ejemplo.com",
   );
 
   function demo(role: "student" | "admin") {

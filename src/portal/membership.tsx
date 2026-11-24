@@ -191,7 +191,9 @@ export function MembershipPage() {
           <div>
             <h2 id="vp-plan-title">{plan?.name}</h2>
             <p>
-              {money(plan?.price ?? 0)} {plan?.cadence} · valor de muestra
+              {m.sponsor
+                ? `Financiado por ${m.sponsor.company} (${m.sponsor.funding} %)`
+                : `${money(plan?.price ?? 0)} ${plan?.cadence} · valor de muestra`}
             </p>
           </div>
           <Badge tone={statusTone[m.status]}>{statusLabel[m.status]}</Badge>

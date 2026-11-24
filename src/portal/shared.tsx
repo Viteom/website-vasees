@@ -22,6 +22,8 @@ import {
   CalendarBlank,
   ChatsCircle,
   IdentificationCard,
+  Buildings,
+  AddressBook,
 } from "@phosphor-icons/react";
 import { SiteLink, navigate } from "../navigation";
 import { useDemo } from "./demo-store";
@@ -155,6 +157,8 @@ const adminMenu = [
   { path: "/admin/contenido", label: "Páginas y contenido", icon: Files },
   { path: "/admin/medios", label: "Biblioteca de medios", icon: Image },
   { path: "/admin/membresias", label: "Membresías", icon: IdentificationCard },
+  { path: "/admin/empresas", label: "Empresas", icon: Buildings },
+  { path: "/admin/crm", label: "CRM de personas", icon: AddressBook },
   { path: "/admin/usuarios", label: "Personas y acceso", icon: Users },
   { path: "/admin/pagos", label: "Pagos de muestra", icon: CreditCard },
   { path: "/admin/mensajes", label: "Correos y códigos", icon: EnvelopeSimple },
@@ -192,7 +196,11 @@ export function PortalShell({
       ? "Editor de curso"
       : path === "/admin/pagina"
         ? "Editor de página"
-        : path === "/escuela/bienvenida"
+        : path === "/admin/empresa"
+          ? "Detalle de empresa"
+          : path === "/escuela/invitacion"
+          ? "Invitación de empresa"
+          : path === "/escuela/bienvenida"
           ? "Bienvenida"
           : path === "/escuela/conversacion"
           ? "Conversación"

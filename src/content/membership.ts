@@ -10,6 +10,8 @@ export type Membership = {
   /** Plan chosen for the next period, if it changes. */
   nextPlan: PlanId | null;
   cancelReason: string;
+  /** Company that funds part or all of the membership (B2B). */
+  sponsor?: { company: string; funding: number };
 };
 
 export const plans = [

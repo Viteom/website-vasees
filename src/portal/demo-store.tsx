@@ -22,6 +22,14 @@ import {
   type ForumReport,
   type ForumThread,
 } from "../content/community";
+import {
+  initialCollaborators,
+  initialCompanies,
+  initialCrmPeople,
+  type Collaborator,
+  type Company,
+  type CrmPerson,
+} from "../content/companies";
 
 export type CourseReview = {
   courseId: string;
@@ -121,6 +129,10 @@ export const portalPaths = [
   "/admin/encuentros",
   "/admin/comunidad",
   "/admin/membresias",
+  "/admin/empresas",
+  "/admin/empresa",
+  "/admin/crm",
+  "/escuela/invitacion",
 ];
 export const isPortalPath = (path: string) =>
   path.startsWith("/escuela/") || path === "/admin" || path.startsWith("/admin/");
@@ -247,6 +259,15 @@ type DemoStore = {
     periodEnd: string;
     cancelReason: string;
   }[];
+  companies: Company[];
+  setCompanies: React.Dispatch<React.SetStateAction<Company[]>>;
+  collaborators: Collaborator[];
+  setCollaborators: React.Dispatch<React.SetStateAction<Collaborator[]>>;
+  crmPeople: CrmPerson[];
+  selectedCompany: string;
+  setSelectedCompany: (value: string) => void;
+  selectedInvite: string;
+  setSelectedInvite: (value: string) => void;
 };
 const Context = createContext<DemoStore | null>(null);
 
@@ -434,6 +455,11 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       { name: "Daniela Ruiz", plan: "mensual" as const, status: "vencida" as const, periodEnd: addMonths(now, -1), cancelReason: "El precio no me funciona ahora" },
     ];
   });
+  const [companies, setCompanies] = useState(initialCompanies);
+  const [collaborators, setCollaborators] = useState(initialCollaborators);
+  const [crmPeople] = useState(initialCrmPeople);
+  const [selectedCompany, setSelectedCompany] = useState(initialCompanies[0].id);
+  const [selectedInvite, setSelectedInvite] = useState("");
   const [reviews, setReviews] = useState<CourseReview[]>([
     {
       courseId: schoolCourses[1].id,
@@ -519,6 +545,15 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         checkoutPlan,
         setCheckoutPlan,
         sampleMembers,
+        companies,
+        setCompanies,
+        collaborators,
+        setCollaborators,
+        crmPeople,
+        selectedCompany,
+        setSelectedCompany,
+        selectedInvite,
+        setSelectedInvite,
       }}
     >
       {children}
