@@ -2,13 +2,13 @@
   "duration": 12,
   "seamMax": 0,
   "seamMean": 0,
-  "movingPixels": 270430,
+  "movingPixels": 304532,
   "backgroundMeanDifference": 0,
   "stemMeanDifference": 0,
   "sha256": {
     "public/images/hero-flower.png": "ccc430dd4fe4b4b8d43f55bea40ea569cb444c5132e1a643399a924ee5dd9a03",
-    "src/flower-wind.ts": "03a9ce62c002ca4c2e9babeb924376f31fc7f1659ca1e6e1192c3a2e17cdc4bd",
-    "public/videos/hero-flower-breeze.mp4": "0c0baaf38a03aadeb6fa16400d8dca8aa8e5d14925b271ea3cd86a7dd84affed",
-    "public/images/hero-flower-breeze.gif": "72932a50da2a8803e9219de875e3475cc3d51a64f3c0bbb0b85ed7701e7bfcac"
+    "src/flower-wind.ts": "6289f6f47c4a684265d62b1d866eb26a0c0f6f4cd1c5722ed0325b4e145d4992",
+    "public/videos/hero-flower-breeze.mp4": "4946dd4fd0cc00cf7cd287f870b482f222f443bfffea2e75075ba6da84cacd42",
+    "public/images/hero-flower-breeze.gif": "ef5a91e7b791cb4fecb74f01ca09cf854d2d99057a390a33de32869875d97cc5"
   }
 }

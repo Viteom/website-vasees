@@ -7,7 +7,7 @@ import { FlowerMotion } from './flower-motion';
 import { SiteLink, usePath } from './navigation';
 import { pageMeta } from './content/pages';
 import { ArrowUpRight, ArrowDown, List, X } from '@phosphor-icons/react';
-import { site, schoolName, statColombia, context, vision, observatory, organizations, initiativeConfig, experience } from './content/home';
+import { site, schoolName, statColombia, context, vision, observatory, organizations, featuredCase, initiativeConfig, experience } from './content/home';
 import { solutions } from './content/solutions';
 import { legalPages } from './content/legal';
 import { chispa } from './content/chispa';
@@ -131,11 +131,27 @@ function Home({ onNewsletter }: { onNewsletter: () => void }) {
         <p className="hero-description">Diseñamos marcas, culturas organizacionales y tecnología para una sociedad que vive más.</p>
         <div className="hero-actions"><SiteLink className="button button-lime" href="/#soluciones">Explora nuestras soluciones <ArrowDown size={21} aria-hidden="true" /></SiteLink></div>
       </div>
-    </section>
-
-    <section className="organizations section-wrap" aria-labelledby="organizations-heading">
-      <h2 id="organizations-heading">Organizaciones con las que hemos trabajado</h2>
-      <ul>{organizations.map(item => <li key={item.name}>{item.name}</li>)}</ul>
+      <div className="hero-bottom">
+        <section className="client-module" aria-labelledby="organizations-heading">
+          <h2 className="clients-heading" id="organizations-heading">Organizaciones con las que hemos trabajado</h2>
+          {/* The names drift slowly; the second copy only closes the loop and is hidden from assistive technology. */}
+          <div className="client-viewport">
+            <div className="client-track">
+              <ul className="client-row">{organizations.map(item => <li className="client-name" key={item.name}>{item.name}</li>)}</ul>
+              <ul className="client-row" aria-hidden="true">{organizations.map(item => <li className="client-name" key={item.name}>{item.name}</li>)}</ul>
+            </div>
+          </div>
+        </section>
+        <SiteLink className="hero-case" href={featuredCase.href}>
+          <span className="hero-case-media"><img src={featuredCase.image} width="240" height="280" alt="" />{featuredCase.imageIsConceptual && <span className="hero-case-note">Imagen conceptual</span>}</span>
+          <span className="hero-case-content">
+            <span className="hero-case-tag">{featuredCase.tag}</span>
+            <strong>{featuredCase.client}</strong>
+            <span className="hero-case-text">{featuredCase.text}</span>
+            <span className="hero-case-link">{featuredCase.cta}<ArrowUpRight size={18} aria-hidden="true" /></span>
+          </span>
+        </SiteLink>
+      </div>
     </section>
 
     <section className="chapter-context section-wrap" id="nosotros" aria-labelledby="context-heading">
