@@ -8,3 +8,35 @@
 .inner-page summary:focus-visible{outline:3px solid #78863c;outline-offset:5px;border-radius:5px}
 /* Very small phones (≤360px): long words in display headings must fit their column. */
 @media(max-width:360px){.kanna-feature h2{font-size:35px;letter-spacing:-1.5px}.inner-closing h2{font-size:34px;letter-spacing:-1.5px}.kanna-word h3{font-size:64px;letter-spacing:-3px}.tech-steps h3{font-size:42px;letter-spacing:-1.8px}}
+
+/* Full-screen inner heroes, framed like the home hero: 16 px margin, 35 px radius, the nav floating over the photo.
+   No breadcrumb, eyebrow or numbering above the title. */
+.inner-page.with-hero{padding-top:0}
+.page-hero{position:relative;isolation:isolate;overflow:hidden;margin:16px;min-height:max(640px,calc(100svh - 32px));border-radius:35px;background:var(--night);color:#fff;display:flex;flex-direction:column;justify-content:flex-end;padding:150px 48px 56px}
+.page-hero-image{position:absolute;inset:0;z-index:-2;width:100%;height:100%;max-width:none;object-fit:cover}
+.page-hero-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#061f2b66 0%,#061f2b1a 28%,#061f2b80 58%,#061f2beb 100%)}
+.page-hero-content{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:48px;align-items:end}
+.page-hero-copy{max-width:1040px;min-width:0}
+.page-hero h1{white-space:pre-line;font-size:clamp(46px,5.4vw,90px);line-height:1.03;letter-spacing:-.055em;font-weight:440;color:#fff;max-width:1040px}
+.page-hero h1 em{font-family:Georgia,serif;font-weight:400}
+.inner-page .page-hero-description{font-size:clamp(18px,1.45vw,22px);line-height:1.45;max-width:640px;margin-top:24px;color:#ffffffeb}
+.page-hero-actions{margin-top:32px}
+.page-hero .anchor-nav{margin-top:0}
+.page-hero .anchor-nav a{color:#fff;border-color:#ffffff73;background:#061f2b4d;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.page-hero .anchor-nav a:hover{background:#fff;color:var(--ink)}
+.page-hero a:focus-visible{outline:3px solid #d9ff5a;outline-offset:3px}
+.page-hero-card{width:380px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:24px;border-radius:24px;background:#f6f5ee;color:var(--ink);text-decoration:none;box-shadow:0 18px 50px #061f2b33;transition:transform .25s ease}
+.page-hero-card:hover{transform:translateY(-4px)}
+.page-hero-card-tag{display:inline-block;padding:5px 11px;border-radius:20px;background:var(--ink);color:#fff;font-size:14px!important;line-height:1.4}
+.page-hero-card strong{font-size:24px;line-height:1.15;font-weight:500;letter-spacing:-.6px}
+.page-hero-card-text{font-size:16px;line-height:1.45;color:#2d4a57}
+.page-hero-card-link{margin-top:6px;display:flex;align-items:center;gap:8px;font-size:16px;font-weight:550}
+.page-escuela.with-hero .school-landing-hero{margin:16px;border-radius:35px;min-height:max(720px,calc(100svh - 32px))}
+.page-escuela.with-hero .school-hero-copy{padding-top:118px}
+.page-la-chispa.with-hero .chispa-podcast-hero{margin:16px;border-radius:35px;min-height:max(720px,calc(100svh - 32px));padding-top:118px;display:flex;flex-direction:column;justify-content:center}
+@media(max-width:1100px){.page-hero{padding:140px 35px 48px}.page-hero-card{width:330px}}
+@media(max-width:800px){.page-hero{margin:12px;border-radius:28px;padding:130px 32px 40px;min-height:max(600px,calc(100svh - 24px))}.page-hero-content{grid-template-columns:minmax(0,1fr);gap:32px}.page-hero-card{width:auto;max-width:460px}.page-escuela.with-hero .school-landing-hero,.page-la-chispa.with-hero .chispa-podcast-hero{margin:12px;border-radius:28px}.page-escuela.with-hero .school-hero-copy,.page-la-chispa.with-hero .chispa-podcast-hero{padding-top:108px}}
+@media(max-width:580px){.page-hero{margin:10px;border-radius:25px;padding:118px 22px 28px;min-height:max(560px,calc(100svh - 20px))}.page-hero h1{font-size:clamp(36px,10.4vw,46px);letter-spacing:-.045em}.page-hero-card{max-width:none;padding:20px}.page-hero-card strong{font-size:21px}.page-escuela.with-hero .school-landing-hero,.page-la-chispa.with-hero .chispa-podcast-hero{margin:10px;border-radius:25px;min-height:0}.page-escuela.with-hero .school-hero-copy,.page-la-chispa.with-hero .chispa-podcast-hero{padding-top:100px}}
+@media(prefers-reduced-motion:reduce){.page-hero-card{transition:none}.page-hero-card:hover{transform:none}}
+.page-hero-solutions h1{font-size:clamp(38px,4.3vw,68px);max-width:760px}
+@media(max-width:360px){.page-la-chispa.with-hero .chispa-podcast-intro h1{font-size:38px;letter-spacing:-1.6px}}

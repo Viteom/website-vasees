@@ -1,10 +1,11 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdir, mkdtemp, rm, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { tmpdir } from 'node:os';
 import { chromium } from 'playwright-core';
 import { createHash } from 'node:crypto';
 
-const temporary = await mkdtemp('/tmp/vasees-flower-');
+const temporary = await mkdtemp(path.join(tmpdir(), 'vasees-flower-'));
 const port = 5182;
 const server = spawn(process.execPath, ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', `${port}`, '--strictPort'], { stdio: ['ignore', 'pipe', 'pipe'] });
 let logs = '', browser;
@@ -14,8 +15,10 @@ const encode = args => {
   if (result.status !== 0) throw new Error(result.stderr || 'Flower media encoding failed.');
 };
 try {
-  for (let i = 0; i < 100 && !logs.includes('Local:'); i++) { if (server.exitCode !== null) throw new Error(logs); await new Promise(resolve => setTimeout(resolve, 100)); }
-  if (!logs.includes('Local:')) throw new Error('Local flower renderer did not start.');
+  // Vite colours its banner; strip ANSI codes before looking for the local URL.
+  const started = () => logs.replace(/\x1b\[[0-9;]*m/g, '').includes('Local:');
+  for (let i = 0; i < 300 && !started(); i++) { if (server.exitCode !== null) throw new Error(logs); await new Promise(resolve => setTimeout(resolve, 100)); }
+  if (!started()) throw new Error('Local flower renderer did not start.');
   browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium', args: ['--no-sandbox', '--disable-dev-shm-usage', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
   const page = await browser.newPage({ viewport: { width: 1296, height: 864 }, deviceScaleFactor: 1 });
   await page.goto(`http://127.0.0.1:${port}`, { waitUntil: 'networkidle' });

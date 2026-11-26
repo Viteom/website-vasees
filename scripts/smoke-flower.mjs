@@ -26,19 +26,15 @@ try {
     ok(await video.evaluate(element => element.loop && element.muted && element.playsInline && Math.abs(element.duration - 12) < 0.1), `${width}: silent inline looping media plays`);
     ok(await page.locator('.hero-image').count() === 1, `${width}: original image and alternative text retained`);
     const before = await page.locator('.hero-copy').evaluate(element => { const rect = element.getBoundingClientRect(); return { x: rect.x, y: rect.y + scrollY, width: rect.width }; });
-    await page.getByRole('button', { name: 'Pausar animación de la flor', exact: true }).click();
-    await page.waitForFunction(() => document.querySelector('.hero-flower-video').paused);
-    const pausedAt = await video.evaluate(element => element.currentTime);
-    await page.waitForTimeout(300);
-    ok(Math.abs(await video.evaluate(element => element.currentTime) - pausedAt) < 0.03, `${width}: pause freezes the current frame`);
+    ok(await page.getByRole('button', { name: /animación de la flor/ }).count() === 0, `${width}: the flower plays without an on-screen pause button`);
+    const startedAt = await video.evaluate(element => element.currentTime);
+    await page.waitForTimeout(400);
+    ok(await video.evaluate(element => element.currentTime) > startedAt + 0.2, `${width}: petals keep moving`);
     await page.screenshot({ path: `.qa/flower-home-${width}.png` });
     const after = await page.locator('.hero-copy').evaluate(element => { const rect = element.getBoundingClientRect(); return { x: rect.x, y: rect.y + scrollY, width: rect.width }; });
     ok(before.x === after.x && before.y === after.y && before.width === after.width, `${width}: motion leaves the hero text layout fixed`);
     ok(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), `${width}: no document overflow`);
     ok(await video.evaluate(element => getComputedStyle(element).objectPosition) === await page.locator('.hero-image').evaluate(element => getComputedStyle(element).objectPosition), `${width}: original framing preserved`);
-    await page.getByRole('button', { name: 'Reanudar animación de la flor', exact: true }).click();
-    await page.waitForFunction(previous => document.querySelector('.hero-flower-video').currentTime > previous + 0.1, pausedAt);
-    ok(await video.evaluate(element => !element.paused), `${width}: resume continues playback`);
     await video.evaluate(element => { element.currentTime = element.duration - 0.15; });
     await page.waitForFunction(() => { const video = document.querySelector('.hero-flower-video'); return video.currentTime < 1 && !video.paused; });
     ok(await page.locator('.hero-flower-visual').getAttribute('class').then(value => value.includes('is-ready')), `${width}: looping keeps the same media layer visible`);
@@ -55,7 +51,9 @@ try {
   }
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await video.waitFor({ state: 'detached' });
-  ok(await page.getByRole('button', { name: /animación de la flor/ }).count() === 0, 'Changing reduced motion removes video and its control');
+  ok(await page.locator('.hero-flower-video').count() === 0, 'Changing reduced motion removes the video');
+  ok(await page.locator('.client-row[aria-hidden="true"]').evaluate(element => getComputedStyle(element).display === 'none') &&
+    await page.locator('.client-track').evaluate(element => getComputedStyle(element).animationName === 'none'), 'Reduced motion stops the organizations marquee and shows each name once');
   ok(Number(await page.locator('.hero-image').evaluate(element => getComputedStyle(element).opacity)) > 0, 'Reduced motion displays the original photograph');
   const reduced = await browser.newContext({ reducedMotion: 'reduce' });
   const reducedPage = await reduced.newPage(); const mediaRequests = [];

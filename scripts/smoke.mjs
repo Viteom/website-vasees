@@ -30,18 +30,25 @@ try {
   ok((await page.locator('h1').count()) === 1 && (await page.title()).includes('Vasees'), 'Unique heading and document title');
   const heroActions = await page.locator('.hero-copy a, .hero-copy button').evaluateAll(items => items.map(item => item.getAttribute('href')));
   ok(heroActions.length === 1 && heroActions[0] === '/#soluciones', 'Hero has a single action to the solutions');
-  ok((await page.locator('.hero .client-module, .hero .hero-research, .section-index').count()) === 0, 'Hero has no logos, Observatorio card or decorative numbering');
+  // Hero in the reference style: organizations drift on the left, the verified case card sits on the right.
+  ok((await page.locator('.hero .hero-research, .section-index').count()) === 0, 'Hero has no Observatorio card or decorative numbering');
+  ok(await page.locator('.hero .client-module h2').innerText() === 'Organizaciones con las que hemos trabajado' &&
+    (await page.locator('.hero .client-row:not([aria-hidden]) li').count()) === 4 &&
+    (await page.locator('.hero .client-row[aria-hidden="true"]').count()) === 1, 'Organizations drift inside the hero; the loop copy is hidden from assistive technology');
+  ok(await page.locator('.hero-case').getAttribute('href') === '/soluciones#marca' &&
+    (await page.locator('.hero-case').innerText()).includes('Fundación Provida Colombia') &&
+    !/\d+\s?%/.test(await page.locator('.hero-case').innerText()), 'Case card shows the verified client with no invented metrics');
+  ok((await page.getByRole('button', { name: /animación|movimiento/ }).count()) === 0, 'Hero has no pause buttons');
   ok(await page.locator('.image-note').evaluateAll(notes => notes.every(note => getComputedStyle(note).display === 'none')), '"Imagen conceptual" badges are hidden');
-  ok(await page.locator('.hero + .organizations h2').innerText() === 'Organizaciones con las que hemos trabajado', 'Organizations sit right below the hero');
   ok((await page.locator('#diagnostico').count()) === 0, 'The starting-point questionnaire is gone');
   const order = await page.locator('main > section').evaluateAll(sections => sections.map(section => section.id || section.className.split(' ')[0]));
-  ok(JSON.stringify(order) === JSON.stringify(['inicio', 'organizations', 'nosotros', 'soluciones', 'ecosistema', 'school-teaser', 'insights', 'experience', 'contacto', 'closing']), `Home follows the brief order: ${order.join(', ')}`);
+  ok(JSON.stringify(order) === JSON.stringify(['inicio', 'nosotros', 'soluciones', 'ecosistema', 'school-teaser', 'insights', 'experience', 'contacto', 'closing']), `Home follows the brief order: ${order.join(', ')}`);
   ok((await page.locator('.closing').innerText()).replace(/\s+/g, ' ').trim() === 'Más vida. Más futuro.', 'Brand signature closes the home');
   const cardTops = await page.locator('.solution-card').evaluateAll(cards => cards.map(card => Math.round(card.getBoundingClientRect().top)));
   ok(cardTops.length === 3 && new Set(cardTops).size === 1, 'Desktop shows the three solutions side by side');
   for (const [name, anchor] of [['Studio', 'marca'], ['Consulting', 'cultura'], ['Tech', 'tech']]) {
     await page.getByRole('link', { name: `Conocer ${name}` }).click();
-    await page.locator('.solutions-hero').waitFor();
+    await page.locator('.page-hero-solutions').waitFor();
     ok(page.url().endsWith(`/soluciones#${anchor}`) && (await page.locator('h1').count()) === 1, `${name} card opens its /soluciones section`);
     await page.getByRole('link', { name: 'Vasees, inicio' }).click();
     await page.locator('.hero').waitFor();
@@ -90,8 +97,8 @@ try {
     await page.goto(base + old, { waitUntil: 'networkidle' });
     // A cold dev server can take several seconds to transform the page before the redirect runs.
     await page.waitForURL(url => url.href.endsWith(target), { timeout: 15000 }).catch(() => {});
-    await page.locator('.solutions-hero').waitFor({ timeout: 15000 }).catch(() => {});
-    ok(page.url().endsWith(target) && await page.locator('.solutions-hero').isVisible(), `${old} moves to ${target} (now ${page.url()})`);
+    await page.locator('.page-hero-solutions').waitFor({ timeout: 15000 }).catch(() => {});
+    ok(page.url().endsWith(target) && await page.locator('.page-hero-solutions').isVisible(), `${old} moves to ${target} (now ${page.url()})`);
   }
   ok(await page.evaluate(() => [...document.querySelectorAll('a')].every(link => link.getAttribute('href') !== '#' && !link.getAttribute('href')?.startsWith('javascript:'))), 'No empty or script links');
   for (const [name, width, height] of [['desktop', 1440, 1000], ['tablet', 768, 1024], ['mobile', 390, 844]]) {

@@ -44,6 +44,20 @@ export const organizations = [
   { name: 'Comfama', relation: 'por confirmar' },
 ] as const;
 
+/**
+ * Case on the hero card. Only verified work: the text repeats what the site already states about Provida.
+ * No metrics until there are approved results. The image is conceptual until a real piece is authorized.
+ */
+export const featuredCase = {
+  tag: 'Caso · Vasees Studio y Consulting',
+  client: 'Fundación Provida Colombia',
+  text: 'Marca, brandbook, comunicación, campañas y procesos de cultura.',
+  image: '/images/studio.webp',
+  imageIsConceptual: true,
+  href: '/soluciones#marca',
+  cta: 'Ver cómo trabajamos',
+};
+
 export type InitiativeConfig = {
   slug: string; displayName: string; kind: 'servicio' | 'plataforma' | 'impacto';
   status: 'active' | 'pilot' | 'planned'; publicEnabled: boolean; route: string;
