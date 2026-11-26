@@ -27,8 +27,9 @@ export function createFlowerWindRenderer(canvas: HTMLCanvasElement, photo: HTMLI
       float flutter = sin(phase * 2.0);
       float ripple = sin(phase * 3.0);
       vec2 wind;
-      wind.x = (7.0 * breeze + 1.8 * flutter * cos(relative.y * 11.0)) * flexible;
-      wind.y = (3.2 * breeze * sin(relative.x * 8.0) + 1.1 * ripple * cos(relative.y * 9.0)) * flexible;
+      // Visible but gentle: about 2% of the frame width at the petal tips.
+      wind.x = (24.0 * breeze + 6.0 * flutter * cos(relative.y * 11.0)) * flexible;
+      wind.y = (11.0 * breeze * sin(relative.x * 8.0) + 4.0 * ripple * cos(relative.y * 9.0)) * flexible;
       vec2 offset = wind / pixels;
       vec3 moved = texture2D(photo, clamp(uv + offset, 0.0, 1.0)).rgb;
       float petal = max(coral(original), coral(moved));
