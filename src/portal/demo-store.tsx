@@ -7,6 +7,38 @@ import {
 } from "react";
 import { schoolCourses, type SchoolCourse } from "../content/school";
 import { pageMeta } from "../content/pages";
+import type { LearnerPlan } from "../content/school-learning";
+import {
+  addMonths,
+  type Membership,
+  type MembershipStatus,
+  type PlanId,
+} from "../content/membership";
+import {
+  initialEncuentros,
+  initialReports,
+  initialThreads,
+  type Encuentro,
+  type ForumReport,
+  type ForumThread,
+} from "../content/community";
+import {
+  initialCollaborators,
+  initialCompanies,
+  initialCrmPeople,
+  type Collaborator,
+  type Company,
+  type CrmPerson,
+} from "../content/companies";
+
+export type CourseReview = {
+  courseId: string;
+  name: string;
+  stars: number;
+  comment: string;
+  suggestion: string;
+  shareable: boolean;
+};
 
 export type DemoRole = "student" | "admin";
 export type DemoSession = { role: DemoRole; name: string; email: string };
@@ -38,7 +70,8 @@ export type DemoOrder = {
   id: string;
   userId: string;
   name: string;
-  courseId: string;
+  /** What was charged, e.g. "Plan mensual". Courses are included in the membership. */
+  concept: string;
   amount: number;
   status: "Simulado" | "Rechazado";
   date: string;
@@ -67,6 +100,7 @@ export const money = (value: number) =>
       }).format(value);
 export const portalPaths = [
   "/escuela/inicio",
+  "/escuela/bienvenida",
   "/escuela/ingresar",
   "/escuela/registro",
   "/escuela/verificar",
@@ -78,6 +112,10 @@ export const portalPaths = [
   "/escuela/perfil",
   "/escuela/pagos",
   "/escuela/pago",
+  "/escuela/membresia",
+  "/escuela/encuentros",
+  "/escuela/comunidad",
+  "/escuela/conversacion",
   "/admin",
   "/admin/cursos",
   "/admin/curso",
@@ -88,6 +126,13 @@ export const portalPaths = [
   "/admin/pagos",
   "/admin/mensajes",
   "/admin/ajustes",
+  "/admin/encuentros",
+  "/admin/comunidad",
+  "/admin/membresias",
+  "/admin/empresas",
+  "/admin/empresa",
+  "/admin/crm",
+  "/escuela/invitacion",
 ];
 export const isPortalPath = (path: string) =>
   path.startsWith("/escuela/") || path === "/admin" || path.startsWith("/admin/");
@@ -180,6 +225,55 @@ type DemoStore = {
   setAuthIntent: (value: "login" | "register" | "reset") => void;
   profile: { city: string; notifications: boolean; newsletter: boolean };
   setProfile: React.Dispatch<React.SetStateAction<DemoStore["profile"]>>;
+  /** Personal goal from the welcome flow. Private: never shown in admin reports. */
+  plan: LearnerPlan | null;
+  setPlan: React.Dispatch<React.SetStateAction<LearnerPlan | null>>;
+  /** Lesson tests passed per course, by lesson index. Sequential: a badge needs all of them. */
+  tests: Record<string, number[]>;
+  setTests: React.Dispatch<React.SetStateAction<Record<string, number[]>>>;
+  reviews: CourseReview[];
+  setReviews: React.Dispatch<React.SetStateAction<CourseReview[]>>;
+  encuentros: Encuentro[];
+  setEncuentros: React.Dispatch<React.SetStateAction<Encuentro[]>>;
+  /** Encuentros the student signed up for. */
+  myEncuentros: string[];
+  setMyEncuentros: React.Dispatch<React.SetStateAction<string[]>>;
+  threads: ForumThread[];
+  setThreads: React.Dispatch<React.SetStateAction<ForumThread[]>>;
+  reports: ForumReport[];
+  setReports: React.Dispatch<React.SetStateAction<ForumReport[]>>;
+  selectedThread: string;
+  setSelectedThread: (value: string) => void;
+  /** Course filter for the community; "todos" or "" (general) or a course id. */
+  forumFilter: string;
+  setForumFilter: (value: string) => void;
+  membership: Membership;
+  setMembership: React.Dispatch<React.SetStateAction<Membership>>;
+  /** Plan selected for the membership checkout. */
+  checkoutPlan: PlanId;
+  setCheckoutPlan: (value: PlanId) => void;
+  sampleMembers: {
+    name: string;
+    plan: PlanId;
+    status: MembershipStatus;
+    periodEnd: string;
+    cancelReason: string;
+  }[];
+  companies: Company[];
+  setCompanies: React.Dispatch<React.SetStateAction<Company[]>>;
+  collaborators: Collaborator[];
+  setCollaborators: React.Dispatch<React.SetStateAction<Collaborator[]>>;
+  crmPeople: CrmPerson[];
+  selectedCompany: string;
+  setSelectedCompany: (value: string) => void;
+  selectedInvite: string;
+  setSelectedInvite: (value: string) => void;
+  /** Private lesson notes, keyed by "courseId::lessonIndex". */
+  lessonNotes: Record<string, string>;
+  setLessonNotes: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  /** Lesson to open next time the classroom mounts. */
+  selectedLesson: number;
+  setSelectedLesson: (value: number) => void;
 };
 const Context = createContext<DemoStore | null>(null);
 
@@ -234,8 +328,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       id: "DEMO-1001",
       userId: "student-demo",
       name: "Laura Gómez",
-      courseId: schoolCourses[0].id,
-      amount: 89000,
+      concept: "Plan mensual",
+      amount: 49000,
       status: "Simulado",
       date: "Ejemplo inicial",
     },
@@ -243,8 +337,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       id: "DEMO-1002",
       userId: "other-2",
       name: "Andrés Pérez",
-      courseId: schoolCourses[1].id,
-      amount: 119000,
+      concept: "Plan anual",
+      amount: 490000,
       status: "Simulado",
       date: "Ejemplo inicial",
     },
@@ -252,8 +346,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
       id: "DEMO-1003",
       userId: "other-3",
       name: "Daniela Ruiz",
-      courseId: schoolCourses[3].id,
-      amount: 99000,
+      concept: "Plan mensual",
+      amount: 49000,
       status: "Rechazado",
       date: "Ejemplo inicial",
     },
@@ -343,6 +437,55 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     notifications: true,
     newsletter: false,
   });
+  const [plan, setPlan] = useState<LearnerPlan | null>(null);
+  const [tests, setTests] = useState<Record<string, number[]>>({});
+  const [encuentros, setEncuentros] = useState(initialEncuentros);
+  const [myEncuentros, setMyEncuentros] = useState<string[]>([]);
+  const [threads, setThreads] = useState(initialThreads);
+  const [reports, setReports] = useState(initialReports);
+  const [selectedThread, setSelectedThread] = useState(initialThreads[0].id);
+  const [forumFilter, setForumFilter] = useState("todos");
+  // The demo student starts with an active monthly membership renewing in 26 days.
+  const [membership, setMembership] = useState<Membership>(() => ({
+    plan: "mensual",
+    status: "activa",
+    periodEnd: new Date(Date.now() + 26 * 86400000).toISOString(),
+    nextPlan: null,
+    cancelReason: "",
+  }));
+  const [checkoutPlan, setCheckoutPlan] = useState<PlanId>("mensual");
+  const [sampleMembers] = useState(() => {
+    const now = new Date().toISOString();
+    return [
+      { name: "Andrés Pérez", plan: "anual" as const, status: "activa" as const, periodEnd: addMonths(now, 9), cancelReason: "" },
+      { name: "Daniela Ruiz", plan: "mensual" as const, status: "vencida" as const, periodEnd: addMonths(now, -1), cancelReason: "El precio no me funciona ahora" },
+    ];
+  });
+  const [companies, setCompanies] = useState(initialCompanies);
+  const [collaborators, setCollaborators] = useState(initialCollaborators);
+  const [crmPeople] = useState(initialCrmPeople);
+  const [selectedCompany, setSelectedCompany] = useState(initialCompanies[0].id);
+  const [selectedInvite, setSelectedInvite] = useState("");
+  const [lessonNotes, setLessonNotes] = useState<Record<string, string>>({});
+  const [selectedLesson, setSelectedLesson] = useState(0);
+  const [reviews, setReviews] = useState<CourseReview[]>([
+    {
+      courseId: schoolCourses[1].id,
+      name: "Andrés Pérez",
+      stars: 5,
+      comment: "Ejemplo de opinión autorizada para mostrar cómo se verá el reporte.",
+      suggestion: "",
+      shareable: true,
+    },
+    {
+      courseId: schoolCourses[0].id,
+      name: "Daniela Ruiz",
+      stars: 4,
+      comment: "Ejemplo de opinión no autorizada: no debe aparecer en reportes.",
+      suggestion: "Más ejemplos cotidianos.",
+      shareable: false,
+    },
+  ]);
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 8000);
@@ -387,12 +530,56 @@ export function DemoProvider({ children }: { children: ReactNode }) {
         setAuthIntent,
         profile,
         setProfile,
+        plan,
+        setPlan,
+        tests,
+        setTests,
+        reviews,
+        setReviews,
+        encuentros,
+        setEncuentros,
+        myEncuentros,
+        setMyEncuentros,
+        threads,
+        setThreads,
+        reports,
+        setReports,
+        selectedThread,
+        setSelectedThread,
+        forumFilter,
+        setForumFilter,
+        membership,
+        setMembership,
+        checkoutPlan,
+        setCheckoutPlan,
+        sampleMembers,
+        companies,
+        setCompanies,
+        collaborators,
+        setCollaborators,
+        crmPeople,
+        selectedCompany,
+        setSelectedCompany,
+        selectedInvite,
+        setSelectedInvite,
+        lessonNotes,
+        setLessonNotes,
+        selectedLesson,
+        setSelectedLesson,
       }}
     >
       {children}
     </Context.Provider>
   );
 }
+
+/** A badge is earned when every lesson test of the course has been passed. */
+export const hasBadge = (
+  tests: Record<string, number[]>,
+  course: { id: string; lessons: unknown[] },
+) =>
+  course.lessons.length > 0 &&
+  (tests[course.id] ?? []).length >= course.lessons.length;
 
 export function useDemo() {
   const value = useContext(Context);

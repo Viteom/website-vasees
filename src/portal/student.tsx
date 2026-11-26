@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowUpRight,
   ArrowRight,
@@ -15,13 +15,25 @@ import {
   X,
   CheckCircle,
   WarningCircle,
+  ChatsCircle,
 } from "@phosphor-icons/react";
 import {
+  BadgeEarned,
+  BadgeRules,
+  CourseReviewForm,
+  GoalPanel,
+  LessonTest,
+  MyBadges,
+} from "./learning";
+import {
   useDemo,
+  hasBadge,
   money,
   type ManagedCourse,
   type DemoOrder,
 } from "./demo-store";
+import { hasAccess } from "../content/membership";
+import { MembershipGate, MembershipNotice } from "./membership";
 import { SiteLink, navigate } from "../navigation";
 import { Badge, Empty, Modal, PageHeading } from "./shared";
 
@@ -69,10 +81,14 @@ function CourseTile({
         <div className="vp-course-card-bottom">
           <span>
             {learning
-              ? `${completed} de ${course.lessons.length} lecciones`
+              ? hasBadge(store.tests, course)
+                ? "Insignia obtenida"
+                : `${completed} de ${course.lessons.length} lecciones vistas`
               : enrolled
                 ? "En tu biblioteca"
-                : money(course.price)}
+                : hasAccess(store.membership)
+                  ? "Incluido en tu membresía"
+                  : "Requiere membresía"}
           </span>
           <button onClick={() => onSelect(course)}>
             {learning ? "Continuar" : "Ver curso"}
@@ -96,9 +112,12 @@ function CoursePreview({
     if (!course) return;
     store.setSelectedCourse(course.id);
     const owned = store.enrolled.includes(course.id);
-    if (!owned && !course.price)
-      store.setEnrolled((old) => [...new Set([...old, course.id])]);
-    navigate(owned || !course.price ? "/escuela/aula" : "/escuela/pago");
+    if (!owned && !hasAccess(store.membership)) {
+      navigate("/escuela/membresia");
+      return;
+    }
+    if (!owned) store.setEnrolled((old) => [...new Set([...old, course.id])]);
+    navigate("/escuela/aula");
   }
   return (
     <Modal
@@ -127,20 +146,25 @@ function CoursePreview({
                 <li key={lesson.title}>{lesson.title}</li>
               ))}
             </ol>
+            <BadgeRules lessons={course.lessons.length} />
             <div className="vp-preview-price">
               <span>
                 {store.enrolled.includes(course.id)
                   ? "Ya está en tus cursos de muestra"
-                  : "Valor de muestra · COP"}
+                  : "Acceso"}
               </span>
-              <strong>{money(course.price)}</strong>
+              <strong>
+                {hasAccess(store.membership)
+                  ? "Incluido en tu membresía"
+                  : "Requiere una membresía activa"}
+              </strong>
             </div>
             <button className="vp-btn vp-btn-primary" onClick={proceed}>
               {store.enrolled.includes(course.id)
                 ? "Continuar mi curso"
-                : !course.price
+                : hasAccess(store.membership)
                   ? "Añadir a mis cursos"
-                  : "Continuar al pago de prueba"}
+                  : "Ver planes de membresía"}
               <ArrowRight size={18} />
             </button>
             <p className="vp-small-note">
@@ -160,10 +184,7 @@ export function StudentDashboard() {
   const mine = store.courses.filter((course) =>
     store.enrolled.includes(course.id),
   );
-  const completed = mine.filter(
-    (course) =>
-      (store.progress[course.id] ?? []).length >= course.lessons.length,
-  ).length;
+  const badges = mine.filter((course) => hasBadge(store.tests, course)).length;
   function learn(course: ManagedCourse) {
     store.setSelectedCourse(course.id);
     navigate("/escuela/aula");
@@ -184,6 +205,8 @@ export function StudentDashboard() {
           </SiteLink>
         }
       />
+      <MembershipNotice />
+      <GoalPanel />
       <section className="vp-student-welcome">
         <div>
           <Badge tone="ivory">Escuela de Familia y Longevidad</Badge>
@@ -220,9 +243,9 @@ export function StudentDashboard() {
           <small>Un paso a la vez</small>
         </div>
         <div>
-          <span>Recorridos completados</span>
-          <strong>{completed}</strong>
-          <small>Siempre hay algo por descubrir</small>
+          <span>Insignias obtenidas</span>
+          <strong>{badges}</strong>
+          <small>Se obtienen al aprobar los tests</small>
         </div>
       </div>
       <div className="vp-section-heading">
@@ -372,12 +395,66 @@ export function StudentCatalog({ mine = false }: { mine?: boolean }) {
   );
 }
 
+/** Private notes saved from the classroom, one per lesson. */
+function MyNotes() {
+  const store = useDemo();
+  const entries = Object.entries(store.lessonNotes)
+    .map(([key, text]) => {
+      const [courseId, index] = key.split("::");
+      const course = store.courses.find((item) => item.id === courseId);
+      return { key, text, course, index: Number(index) };
+    })
+    .filter((entry) => entry.course);
+  if (!entries.length)
+    return (
+      <p className="vp-muted">
+        Aún no tienes notas. En el aula, abre la pestaña «Mis notas» de
+        cualquier lección para escribir una.
+      </p>
+    );
+  return (
+    <ul className="vp-notes-list">
+      {entries.map(({ key, text, course, index }) => (
+        <li key={key}>
+          <span>
+            {course!.title} · Lección {index + 1}:{" "}
+            {course!.lessons[index]?.title}
+          </span>
+          <p>{text}</p>
+          <button
+            className="vp-table-action"
+            aria-label={`Abrir la lección ${index + 1} de ${course!.title}`}
+            onClick={() => {
+              store.setSelectedCourse(course!.id);
+              store.setSelectedLesson(index);
+              navigate("/escuela/aula");
+            }}
+          >
+            Abrir la lección
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function Classroom() {
   const store = useDemo();
   const course = store.courses.find((item) => item.id === store.selectedCourse);
-  const [lesson, setLesson] = useState(0);
+  const [lesson, setLesson] = useState(store.selectedLesson);
   const [tab, setTab] = useState("Lección");
-  const [notes, setNotes] = useState("");
+  const noteKey = `${store.selectedCourse}::${lesson}`;
+  const [notes, setNotes] = useState(store.lessonNotes[noteKey] ?? "");
+  useEffect(() => {
+    store.setSelectedLesson(0);
+    // Only once per classroom visit.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    setNotes(store.lessonNotes[noteKey] ?? "");
+    // Load the saved note when the lesson changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [noteKey]);
   if (!course)
     return (
       <Empty
@@ -390,24 +467,34 @@ export function Classroom() {
         }
       />
     );
+  if (!hasAccess(store.membership))
+    return <MembershipGate area="Las aulas de los cursos" />;
   if (!store.enrolled.includes(course.id))
     return (
       <>
         <PageHeading
           title="Este curso aún no está en tu biblioteca."
-          description="Puedes conocerlo y recorrer el pago de prueba antes de entrar al aula de muestra."
+          description="Está incluido en tu membresía. Añádelo para empezar."
         />
         <button
           className="vp-btn vp-btn-primary"
-          onClick={() => navigate("/escuela/pago")}
+          onClick={() =>
+            store.setEnrolled((old) => [...new Set([...old, course.id])])
+          }
         >
-          Ir al pago de prueba
+          Añadir a mis cursos
           <ArrowRight size={18} />
         </button>
       </>
     );
   const current = course.lessons[Math.min(lesson, course.lessons.length - 1)];
   const read = store.progress[course.id] ?? [];
+  const passed = store.tests[course.id] ?? [];
+  const badge = hasBadge(store.tests, course);
+  function goToTest(index: number) {
+    setLesson(index);
+    setTab("Test");
+  }
   function mark() {
     if (!course) return;
     store.setProgress((old) => ({
@@ -432,9 +519,14 @@ export function Classroom() {
           <div>
             <h2>Tu recorrido</h2>
             <span>
-              {read.length} de {course.lessons.length} lecciones
+              {read.length} de {course.lessons.length} lecciones vistas
             </span>
             <progress value={read.length} max={course.lessons.length} />
+            <span>
+              {badge
+                ? "Insignia obtenida"
+                : `${passed.length} de ${course.lessons.length} tests aprobados`}
+            </span>
           </div>
           <nav aria-label="Lecciones del curso">
             {course.lessons.map((item, index) => (
@@ -449,14 +541,31 @@ export function Classroom() {
                 <span className={read.includes(index) ? "complete" : ""}>
                   {read.includes(index) ? <Check size={15} /> : `0${index + 1}`}
                 </span>
-                <span>{item.title}</span>
+                <span>
+                  {item.title}
+                  <small>
+                    {passed.includes(index)
+                      ? "Test aprobado"
+                      : index === 0 || passed.includes(index - 1)
+                        ? "Test disponible"
+                        : "Test en espera"}
+                  </small>
+                </span>
               </button>
             ))}
           </nav>
-          <p>
-            <BookOpen size={16} />
-            Cada conversación cuenta.
-          </p>
+          <BadgeRules lessons={course.lessons.length} />
+          <button
+            className="vp-forum-link"
+            onClick={() => {
+              store.setForumFilter(course.id);
+              navigate("/escuela/comunidad");
+            }}
+          >
+            <ChatsCircle size={20} weight="light" />
+            Conversar en el foro del curso
+            <ArrowRight size={16} />
+          </button>
         </aside>
         <div className="vp-classroom-main">
           <div className="vp-lesson-poster">
@@ -474,7 +583,7 @@ export function Classroom() {
             role="group"
             aria-label="Contenido de la lección"
           >
-            {["Lección", "Recursos", "Mis notas"].map((item) => (
+            {["Lección", "Test", "Recursos", "Mis notas", "Valorar"].map((item) => (
               <button
                 key={item}
                 aria-pressed={tab === item}
@@ -503,7 +612,25 @@ export function Classroom() {
                     ? "Lección completada"
                     : "Marcar como completada"}
                 </button>
+                <button
+                  className="vp-text-button vp-test-link"
+                  onClick={() => setTab("Test")}
+                >
+                  {passed.includes(lesson)
+                    ? "Test aprobado · Repasar"
+                    : "Responder el test de esta lección"}
+                  <ArrowRight size={16} />
+                </button>
               </>
+            ) : tab === "Test" ? (
+              <LessonTest
+                key={lesson}
+                course={course}
+                lesson={lesson}
+                onGo={goToTest}
+              />
+            ) : tab === "Valorar" ? (
+              <CourseReviewForm course={course} />
             ) : tab === "Recursos" ? (
               <>
                 <h2>Una idea para llevar contigo.</h2>
@@ -520,9 +647,9 @@ export function Classroom() {
               <>
                 <h2>Tus ideas también cuentan.</h2>
                 <label className="vp-field">
-                  Mis notas de esta vista
+                  Mi nota de esta lección
                   <textarea
-                    aria-label="Mis notas de esta vista"
+                    aria-label="Mi nota de esta lección"
                     rows={6}
                     value={notes}
                     onChange={(event) => setNotes(event.target.value)}
@@ -532,16 +659,26 @@ export function Classroom() {
                 </label>
                 <button
                   className="vp-btn vp-btn-primary"
-                  onClick={() =>
+                  onClick={() => {
+                    store.setLessonNotes((old) => {
+                      const next = { ...old };
+                      if (notes.trim()) next[noteKey] = notes.trim();
+                      else delete next[noteKey];
+                      return next;
+                    });
                     store.setNotice(
-                      "Nota de muestra guardada en esta vista del aula.",
-                    )
-                  }
+                      notes.trim()
+                        ? "Nota guardada. La encuentras también en Mi perfil."
+                        : "Nota borrada.",
+                    );
+                  }}
                 >
-                  Guardar nota de muestra
+                  Guardar nota
                 </button>
                 <p className="vp-small-note">
-                  Las notas se conservan mientras permanezcas en esta vista.
+                  Tus notas son privadas: no aparecen en el CRM ni en los
+                  informes para empresas. En esta demo se conservan hasta
+                  recargar la página.
                 </p>
               </>
             )}
@@ -563,13 +700,15 @@ export function Classroom() {
                 <ArrowRight size={18} />
               </button>
             </div>
-            {read.length >= course.lessons.length && (
+            {badge ? (
+              <BadgeEarned course={course} />
+            ) : read.length >= course.lessons.length ? (
               <div className="vp-feedback">
                 <CheckCircle size={20} />
-                Completaste este recorrido de muestra. Siempre hay una nueva
-                pregunta por explorar.
+                Viste todas las lecciones. Cuando quieras la insignia, responde
+                los tests en orden.
               </div>
-            )}
+            ) : null}
           </section>
         </div>
       </div>
@@ -628,7 +767,7 @@ export function StudentProfile() {
             role="group"
             aria-label="Secciones del perfil"
           >
-            {["Mis datos", "Preferencias", "Acceso"].map((item) => (
+            {["Mis datos", "Mis insignias", "Mis notas", "Preferencias", "Acceso"].map((item) => (
               <button
                 key={item}
                 aria-pressed={tab === item}
@@ -681,6 +820,16 @@ export function StudentProfile() {
                 <Check size={17} />
               </button>
             </form>
+          ) : tab === "Mis insignias" ? (
+            <div className="vp-panel-body">
+              <h2>Mis insignias.</h2>
+              <MyBadges />
+            </div>
+          ) : tab === "Mis notas" ? (
+            <div className="vp-panel-body">
+              <h2>Mis notas.</h2>
+              <MyNotes />
+            </div>
           ) : tab === "Preferencias" ? (
             <div className="vp-panel-body vp-form">
               <h2>Sigamos conversando.</h2>
@@ -763,234 +912,6 @@ export function StudentProfile() {
   );
 }
 
-export function Checkout() {
-  const store = useDemo();
-  const course =
-    store.courses.find((item) => item.id === store.selectedCourse) ??
-    store.courses[0];
-  const [method, setMethod] = useState("Tarjeta");
-  const [scenario, setScenario] = useState("Aprobado");
-  const [state, setState] = useState<"idle" | "loading" | "success" | "error">(
-    "idle",
-  );
-  const [consent, setConsent] = useState(false);
-  // Evaluated once on entry: returning to this view (for example with the
-  // browser's back button) must not offer a second payment for an owned course.
-  const [ownedOnEntry] = useState(() => store.enrolled.includes(course.id));
-  async function pay(event: React.SubmitEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!consent || state === "loading") return;
-    setState("loading");
-    await new Promise((resolve) => setTimeout(resolve, 650));
-    if (scenario === "Rechazado") {
-      setState("error");
-      return;
-    }
-    store.setOrders((old) => [
-      {
-        id: `DEMO-${Date.now().toString().slice(-6)}`,
-        userId: "student-demo",
-        name: store.session?.name ?? "Laura Gómez",
-        courseId: course.id,
-        amount: course.price,
-        status: "Simulado",
-        date: "Esta sesión",
-      },
-      ...old,
-    ]);
-    store.setEnrolled((old) => [...new Set([...old, course.id])]);
-    setState("success");
-  }
-  return (
-    <>
-      <SiteLink className="vp-back-link" href="/escuela/explorar">
-        <ArrowLeft size={17} />
-        Volver a los cursos
-      </SiteLink>
-      <PageHeading
-        eyebrow="Un siguiente paso para aprender"
-        title="Tu próximo aprendizaje."
-        description="Recorre una pasarela de pago de muestra. No se solicita una tarjeta real ni se realiza ningún cargo."
-      />
-      {ownedOnEntry ? (
-        <div className="vp-payment-success">
-          <CheckCircle size={58} weight="light" />
-          <Badge>Ya en tu biblioteca</Badge>
-          <h2>Este curso ya es parte de tu recorrido.</h2>
-          <p>
-            No hace falta repetir el pago de prueba. Puedes continuar donde te
-            quedaste o explorar otra conversación.
-          </p>
-          <div className="vp-payment-summary">
-            <span>{course.title}</span>
-            <strong>En tu biblioteca</strong>
-          </div>
-          <button
-            className="vp-btn vp-btn-primary"
-            onClick={() => navigate("/escuela/aula")}
-          >
-            Ir a mi curso
-            <ArrowRight size={18} />
-          </button>
-          <SiteLink href="/escuela/explorar" className="vp-text-button">
-            Explorar otros cursos
-          </SiteLink>
-        </div>
-      ) : state === "success" ? (
-        <div className="vp-payment-success">
-          <CheckCircle size={58} weight="light" />
-          <Badge>Operación simulada</Badge>
-          <h2>Tu curso ya está en la demo.</h2>
-          <p>
-            No se ha realizado ningún cobro. Añadimos el curso a tu biblioteca
-            de muestra para que puedas continuar el recorrido.
-          </p>
-          <div className="vp-payment-summary">
-            <span>{course.title}</span>
-            <strong>{money(course.price)}</strong>
-          </div>
-          <button
-            className="vp-btn vp-btn-primary"
-            onClick={() => navigate("/escuela/aula")}
-          >
-            Ir a mi curso
-            <ArrowRight size={18} />
-          </button>
-          <SiteLink href="/escuela/pagos" className="vp-text-button">
-            Ver el registro de prueba
-          </SiteLink>
-        </div>
-      ) : (
-        <div className="vp-checkout-layout">
-          <form className="vp-panel vp-panel-body vp-form" onSubmit={pay}>
-            <div className="vp-checkout-title">
-              <h2>Completa el recorrido.</h2>
-              <Badge tone="pending">Pago de prueba</Badge>
-            </div>
-            <div
-              className="vp-tab-bar"
-              role="group"
-              aria-label="Método de pago de prueba"
-            >
-              {["Tarjeta", "PSE"].map((item) => (
-                <button
-                  type="button"
-                  key={item}
-                  aria-pressed={method === item}
-                  onClick={() => setMethod(item)}
-                >
-                  {item === "Tarjeta" && <CreditCard size={18} />}
-                  {item}
-                </button>
-              ))}
-            </div>
-            {method === "Tarjeta" ? (
-              <>
-                <label className="vp-field">
-                  Número de tarjeta de prueba
-                  <input
-                    value="4242 4242 4242 4242"
-                    readOnly
-                    aria-describedby="vp-card-help"
-                  />
-                </label>
-                <div className="vp-form-grid">
-                  <label className="vp-field">
-                    Vencimiento
-                    <input value="12 / 30" readOnly />
-                  </label>
-                  <label className="vp-field">
-                    Código de prueba
-                    <input value="123" readOnly />
-                  </label>
-                </div>
-                <p id="vp-card-help" className="vp-small-note">
-                  Estos datos son ficticios y no se pueden sustituir por una
-                  tarjeta real.
-                </p>
-              </>
-            ) : (
-              <>
-                <label className="vp-field">
-                  Banco de demostración
-                  <select aria-label="Banco de demostración">
-                    <option>Banco de prueba · Persona natural</option>
-                    <option>Banco de prueba · Persona jurídica</option>
-                  </select>
-                </label>
-                <p className="vp-small-note">
-                  No se abrirá una entidad bancaria ni se realizará una
-                  transferencia.
-                </p>
-              </>
-            )}
-            <div className="vp-demo-scenario">
-              <span>Resultado de prueba</span>
-              <select
-                aria-label="Resultado de prueba"
-                value={scenario}
-                onChange={(event) => {
-                  setScenario(event.target.value);
-                  setState("idle");
-                }}
-              >
-                <option>Aprobado</option>
-                <option>Rechazado</option>
-              </select>
-            </div>
-            <label className="vp-checkbox">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(event) => setConsent(event.target.checked)}
-                required
-              />
-              Entiendo que este es un pago simulado.
-            </label>
-            {state === "error" && (
-              <div className="vp-form-error" role="alert">
-                <WarningCircle size={20} />
-                Pago de prueba rechazado. Puedes cambiar el resultado de prueba
-                y volver a intentarlo.
-              </div>
-            )}
-            <button
-              className="vp-btn vp-btn-primary"
-              type="submit"
-              disabled={!consent || state === "loading"}
-            >
-              {state === "loading" ? "Simulando operación…" : "Simular pago"}
-              <ArrowRight size={18} />
-            </button>
-            <p className="vp-small-note">
-              El resumen por correo y la pasarela real se conectarán en la fase
-              técnica.
-            </p>
-          </form>
-          <aside className="vp-order-summary">
-            <img src={course.image} alt={course.imageAlt} />
-            <div>
-              <Badge>{course.category}</Badge>
-              <h2>{course.title}</h2>
-              <p>
-                <BookOpen size={17} />
-                {course.lessons.length} lecciones de muestra
-              </p>
-              <div className="vp-order-total">
-                <span>Total de prueba</span>
-                <strong>{money(course.price)}</strong>
-              </div>
-              <span className="vp-small-note">
-                Valores ilustrativos en pesos colombianos. Sin cobro real.
-              </span>
-            </div>
-          </aside>
-        </div>
-      )}
-    </>
-  );
-}
-
 export function StudentPayments() {
   const store = useDemo();
   const [receipt, setReceipt] = useState<DemoOrder | null>(null);
@@ -1002,14 +923,14 @@ export function StudentPayments() {
       <PageHeading
         eyebrow="Todo en un mismo lugar"
         title="Mis pagos."
-        description="Un registro de muestra de tus cursos y operaciones simuladas."
+        description="Un registro de muestra de los cobros simulados de tu membresía."
       />
       <div className="vp-panel vp-table-wrap">
         <table className="vp-table">
           <thead>
             <tr>
               <th>Referencia</th>
-              <th>Curso</th>
+              <th>Concepto</th>
               <th>Valor de muestra</th>
               <th>Estado</th>
               <th>
@@ -1024,10 +945,7 @@ export function StudentPayments() {
                   <strong>{order.id}</strong>
                   <small>{order.date}</small>
                 </td>
-                <td>
-                  {store.courses.find((course) => course.id === order.courseId)
-                    ?.title ?? "Curso de muestra"}
-                </td>
+                <td>{order.concept}</td>
                 <td>{money(order.amount)}</td>
                 <td>
                   <Badge
@@ -1068,14 +986,8 @@ export function StudentPayments() {
                 <dd>{receipt.name}</dd>
               </div>
               <div>
-                <dt>Curso</dt>
-                <dd>
-                  {
-                    store.courses.find(
-                      (course) => course.id === receipt.courseId,
-                    )?.title
-                  }
-                </dd>
+                <dt>Concepto</dt>
+                <dd>{receipt.concept}</dd>
               </div>
               <div>
                 <dt>Estado</dt>

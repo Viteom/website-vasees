@@ -95,8 +95,9 @@ try {
   }
   for (const [old, target] of [['/studio', '/soluciones#marca'], ['/consulting', '/soluciones#cultura'], ['/tech', '/soluciones#tech']]) {
     await page.goto(base + old, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(200);
-    await page.locator('.page-hero-solutions').waitFor({ timeout: 4000 }).catch(() => {});
+    // A cold dev server can take several seconds to transform the page before the redirect runs.
+    await page.waitForURL(url => url.href.endsWith(target), { timeout: 15000 }).catch(() => {});
+    await page.locator('.page-hero-solutions').waitFor({ timeout: 15000 }).catch(() => {});
     ok(page.url().endsWith(target) && await page.locator('.page-hero-solutions').isVisible(), `${old} moves to ${target} (now ${page.url()})`);
   }
   ok(await page.evaluate(() => [...document.querySelectorAll('a')].every(link => link.getAttribute('href') !== '#' && !link.getAttribute('href')?.startsWith('javascript:'))), 'No empty or script links');

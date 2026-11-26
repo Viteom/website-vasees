@@ -1,0 +1,218 @@
+/* Part 5: companies (B2B) and the School CRM. Text stays at 14px or more. */
+.vp-crm-segments,
+.vp-crm-filters,
+.vp-crm-preview,
+.vp-company-tools,
+.vp-company-report,
+.vp-invite-card,
+.vp-crm-courses {
+  font-size: 15px;
+  line-height: 1.6;
+}
+.vp-crm-segments {
+  margin: 28px 0 24px;
+}
+.vp-crm-segments h2,
+.vp-company-subtitle {
+  font-size: 22px;
+  margin-bottom: 14px;
+}
+.vp-company-subtitle {
+  margin-top: 32px;
+}
+.vp-crm-segments ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.vp-crm-segments li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: start;
+  gap: 6px 12px;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid var(--vp-border);
+  border-radius: 14px;
+}
+.vp-crm-segments li p,
+.vp-crm-segments li .vp-text-button {
+  grid-column: 1 / -1;
+}
+.vp-crm-segments li p {
+  color: #3f5459;
+}
+.vp-crm-segments li .vp-text-button {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 14px;
+}
+.vp-crm-count {
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 450;
+}
+.vp-crm-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.vp-crm-filters .vp-muted {
+  padding-bottom: 12px;
+}
+.vp-b2b-table .vp-table {
+  font-size: 14px;
+}
+.vp-b2b-table .vp-table th {
+  font-size: 14px;
+}
+.vp-b2b-table .vp-table td > strong {
+  display: block;
+  font-size: 15px;
+}
+.vp-b2b-table .vp-table small {
+  display: block;
+  font-size: 14px;
+  color: #4d6166;
+}
+.vp-b2b-table .vp-table-action {
+  font-size: 14px;
+  min-height: 44px;
+}
+.vp-crm-courses {
+  margin: 0;
+  padding-left: 18px;
+}
+.vp-crm-rule {
+  color: #3f5459;
+}
+.vp-mail-preview {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: #f5f7ef;
+  border: 1px solid #dce4d3;
+}
+.vp-mail-preview span {
+  font-size: 14px;
+  color: #4d6166;
+}
+.vp-mail-preview p {
+  white-space: pre-line;
+}
+.vp-company-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.vp-company-tools h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 20px;
+}
+.vp-company-tools textarea {
+  font-family: inherit;
+  font-size: 15px;
+}
+.vp-csv-preview {
+  display: grid;
+  gap: 12px;
+}
+.vp-csv-preview ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.vp-csv-preview li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #f5f7ef;
+}
+.vp-csv-preview li.problem {
+  background: #faeae5;
+}
+.vp-csv-preview li span {
+  display: grid;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.vp-csv-preview small {
+  font-size: 14px;
+  color: #4d6166;
+}
+.vp-invite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.vp-company-report {
+  display: grid;
+  gap: 10px;
+}
+.vp-company-report .vp-badge {
+  justify-self: start;
+}
+.vp-company-report h3 {
+  font-size: 24px;
+}
+.vp-company-report h4 {
+  font-size: 17px;
+  margin-top: 10px;
+}
+.vp-company-report ul {
+  margin: 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 6px;
+}
+.vp-report-lead {
+  font-size: 18px;
+}
+.vp-report-excluded {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #eef3f3;
+  color: #2d4448;
+}
+.vp-report-excluded svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.vp-invite-card {
+  display: grid;
+  gap: 18px;
+}
+.vp-invite-subtitle {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+.vp-invite-card .vp-membership-alert .vp-btn {
+  margin-top: 12px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 900px) {
+  .vp-company-tools {
+    grid-template-columns: 1fr;
+  }
+}

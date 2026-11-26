@@ -38,6 +38,7 @@ import {
 } from "./demo-store";
 import { SiteLink, navigate } from "../navigation";
 import { Badge, Empty, Modal, PageHeading } from "./shared";
+import { AuthorizedReviews } from "./learning";
 
 const normalized = (text: string) =>
   text
@@ -217,6 +218,7 @@ export function AdminDashboard() {
           </div>
         </section>
       </div>
+      <AuthorizedReviews />
       <div className="vp-integration-note">
         <ShieldCheck size={24} weight="light" />
         <div>
@@ -341,7 +343,7 @@ export function AdminCourses() {
                   </Badge>
                 </td>
                 <td>{course.lessons.length} lecciones</td>
-                <td>{money(course.price)}</td>
+                <td>Incluido en la membresía</td>
                 <td>
                   <div className="vp-row-actions">
                     <button
@@ -581,19 +583,9 @@ export function CourseEditor() {
                     </select>
                   </label>
                 </div>
-                <label className="vp-field">
-                  Valor de muestra en COP
-                  <input
-                    type="number"
-                    min="0"
-                    max="10000000"
-                    step="1000"
-                    value={draft.price}
-                    onChange={(e) => patch({ price: Number(e.target.value) })}
-                  />
-                </label>
                 <span className="vp-small-note">
-                  Usa 0 para un curso gratuito de muestra.
+                  Los cursos no tienen precio propio: se incluyen en la
+                  membresía de la Escuela.
                 </span>
               </>
             ) : tab === "Lecciones" ? (
@@ -744,7 +736,7 @@ export function CourseEditor() {
                   </p>
                   <p>
                     <CreditCard size={18} />
-                    {money(draft.price)} · Valor de muestra
+                    Incluido en la membresía
                   </p>
                 </div>
                 <div className="vp-callout">
@@ -800,7 +792,7 @@ export function CourseEditor() {
           <div className="vp-editor-save vp-panel">
             <Badge tone={statusTone(draft.status)}>{draft.status}</Badge>
             <span>
-              {draft.lessons.length} lecciones · {money(draft.price)}
+              {draft.lessons.length} lecciones · Incluido en la membresía
             </span>
             <button
               className="vp-btn vp-btn-primary"
@@ -845,7 +837,7 @@ export function CourseEditor() {
                 <li key={i}>{lesson.title || "Lección sin título"}</li>
               ))}
             </ol>
-            <strong>{money(draft.price)}</strong>
+            <strong>Incluido en la membresía</strong>
             <p className="vp-small-note">
               Vista de muestra. No realiza inscripciones.
             </p>
@@ -1677,7 +1669,7 @@ export function AdminPayments() {
             <tr>
               <th>Referencia</th>
               <th>Participante</th>
-              <th>Curso</th>
+              <th>Concepto</th>
               <th>Valor de muestra</th>
               <th>Estado</th>
               <th>Acciones</th>
@@ -1691,10 +1683,7 @@ export function AdminPayments() {
                   <small>{order.date}</small>
                 </td>
                 <td>{order.name}</td>
-                <td>
-                  {store.courses.find((course) => course.id === order.courseId)
-                    ?.title ?? "Curso de muestra"}
-                </td>
+                <td>{order.concept}</td>
                 <td>{money(order.amount)}</td>
                 <td>
                   <Badge tone={statusTone(order.status)}>{order.status}</Badge>
@@ -1734,14 +1723,8 @@ export function AdminPayments() {
                 <dd>{receipt.name}</dd>
               </div>
               <div>
-                <dt>Curso</dt>
-                <dd>
-                  {
-                    store.courses.find(
-                      (course) => course.id === receipt.courseId,
-                    )?.title
-                  }
-                </dd>
+                <dt>Concepto</dt>
+                <dd>{receipt.concept}</dd>
               </div>
               <div>
                 <dt>Valor ilustrativo</dt>
