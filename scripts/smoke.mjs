@@ -41,7 +41,7 @@ try {
   ok(cardTops.length === 3 && new Set(cardTops).size === 1, 'Desktop shows the three solutions side by side');
   for (const [name, anchor] of [['Studio', 'marca'], ['Consulting', 'cultura'], ['Tech', 'tech']]) {
     await page.getByRole('link', { name: `Conocer ${name}` }).click();
-    await page.locator('.solutions-hero').waitFor();
+    await page.locator('.page-hero-solutions').waitFor();
     ok(page.url().endsWith(`/soluciones#${anchor}`) && (await page.locator('h1').count()) === 1, `${name} card opens its /soluciones section`);
     await page.getByRole('link', { name: 'Vasees, inicio' }).click();
     await page.locator('.hero').waitFor();
@@ -89,8 +89,8 @@ try {
   for (const [old, target] of [['/studio', '/soluciones#marca'], ['/consulting', '/soluciones#cultura'], ['/tech', '/soluciones#tech']]) {
     await page.goto(base + old, { waitUntil: 'networkidle' });
     await page.waitForTimeout(200);
-    await page.locator('.solutions-hero').waitFor({ timeout: 4000 }).catch(() => {});
-    ok(page.url().endsWith(target) && await page.locator('.solutions-hero').isVisible(), `${old} moves to ${target} (now ${page.url()})`);
+    await page.locator('.page-hero-solutions').waitFor({ timeout: 4000 }).catch(() => {});
+    ok(page.url().endsWith(target) && await page.locator('.page-hero-solutions').isVisible(), `${old} moves to ${target} (now ${page.url()})`);
   }
   ok(await page.evaluate(() => [...document.querySelectorAll('a')].every(link => link.getAttribute('href') !== '#' && !link.getAttribute('href')?.startsWith('javascript:'))), 'No empty or script links');
   for (const [name, width, height] of [['desktop', 1440, 1000], ['tablet', 768, 1024], ['mobile', 390, 844]]) {
