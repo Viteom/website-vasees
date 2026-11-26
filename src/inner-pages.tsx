@@ -9,10 +9,18 @@ import { ChispaPage } from './chispa';
 
 const Arrow = () => <ArrowUpRight size={21} aria-hidden="true" />;
 
-function Hero({ category, title, description, image, alt, cta, href, tone = '', status }: { category: string; title: string; description: string; image: string; alt: string; cta: string; href: string; tone?: string; status?: string }) {
-  return <section className={`inner-hero ${tone}`}>
-    <div className="inner-hero-copy"><div className="inner-breadcrumb"><SiteLink href="/">Inicio</SiteLink><span>/</span><span>{category}</span></div><div className="inner-title-block"><p className="eyebrow">{category}{status && <span className="inner-status">{status}</span>}</p><h1 tabIndex={-1}>{title}</h1><p>{description}</p><SiteLink className="button button-dark" href={href}>{cta}<Arrow /></SiteLink></div></div>
-    <div className="inner-hero-image"><img src={image} alt={alt} fetchPriority="high" /></div>
+/**
+ * Full-screen inner hero, framed like the home hero: photograph behind, copy at the bottom left
+ * and an optional card on the right. No breadcrumb, eyebrow or numbering above the title.
+ */
+function PageHero({ className, title, description, image, alt, imagePosition, actions, card }: { className: string; title: ReactNode; description: string; image: string; alt: string; imagePosition?: string; actions?: ReactNode; card?: ReactNode }) {
+  return <section className={`page-hero ${className}`}>
+    <img className="page-hero-image" src={image} alt={alt} fetchPriority="high" style={imagePosition ? { objectPosition: imagePosition } : undefined} />
+    <div className="page-hero-shade" aria-hidden="true" />
+    <div className="page-hero-content">
+      <div className="page-hero-copy"><h1 tabIndex={-1}>{title}</h1><p className="page-hero-description">{description}</p>{actions && <div className="page-hero-actions">{actions}</div>}</div>
+      {card}
+    </div>
   </section>;
 }
 
@@ -23,13 +31,10 @@ function Closing({ title, text, cta = 'Hablemos de tu proyecto', href = '/?inter
 
 function Solutions() {
   return <>
-    <section className="solutions-hero section-wrap">
-      <div className="inner-breadcrumb"><SiteLink href="/">Inicio</SiteLink><span>/</span><span>Soluciones</span></div>
-      <h1 tabIndex={-1}>Tres soluciones. Un mismo propósito: preparar a tu organización para lo que viene.</h1>
-      <p className="solutions-lead">Hacemos marcas y campañas, construimos cultura organizacional y desarrollamos software para los retos de una sociedad más longeva.</p>
-      <p className="solutions-prompt">No todas las organizaciones necesitan lo mismo. Encuentra la solución que se conecta con tu reto.</p>
-      <nav className="anchor-nav" aria-label="Soluciones en esta página">{solutions.map(item => <SiteLink key={item.id} href={`#${item.anchor}`}>{item.area}<ArrowDown size={18} aria-hidden="true" /></SiteLink>)}</nav>
-    </section>
+    <PageHero className="page-hero-solutions" title="Tres soluciones. Un mismo propósito: preparar a tu organización para lo que viene."
+      description="Hacemos marcas y campañas, construimos cultura organizacional y desarrollamos software para los retos de una sociedad más longeva."
+      image="/images/hero.webp" alt="Tres personas de distintas generaciones revisan planos alrededor de una mesa, en un invernadero"
+      actions={<nav className="anchor-nav" aria-label="Soluciones en esta página">{solutions.map(item => <SiteLink key={item.id} href={`#${item.anchor}`}>{item.area}<ArrowDown size={18} aria-hidden="true" /></SiteLink>)}</nav>} />
     {solutions.map(item => <section className={`solution-detail solution-detail-${item.id} section-wrap`} id={item.anchor} key={item.id} aria-labelledby={`${item.anchor}-heading`}>
       <div className="solution-detail-intro">
         <p className="solution-name">{item.name} · {item.area}</p>
@@ -53,13 +58,12 @@ function Solutions() {
 function Ecosystem() {
   const platforms = initiativeConfig.filter(item => item.publicEnabled && item.kind === 'plataforma');
   return <>
-    <section className="ecosystem-hero section-wrap">
-      <div className="inner-breadcrumb"><SiteLink href="/">Inicio</SiteLink><span>/</span><span>Ecosistema</span></div>
-      <h1 tabIndex={-1}>El futuro se construye en red.</h1>
-      <p>Vasees integra servicios, conocimiento, educación y proyectos que comparten una mirada: diseñar mejores posibilidades en una sociedad más longeva.</p>
-    </section>
+    <PageHero className="page-hero-ecosystem" title="El futuro se construye en red."
+      description="Vasees integra servicios, conocimiento, educación y proyectos que comparten una mirada: diseñar mejores posibilidades en una sociedad más longeva."
+      image="/images/studio.webp" alt="Piezas de papel coral, un libro abierto con ilustraciones lilas y una rama florecida, en un estudio iluminado por el sol" imagePosition="center 60%"
+      actions={<SiteLink className="button button-lime" href="#mapa">Cómo se organiza Vasees<ArrowDown size={20} aria-hidden="true" /></SiteLink>} />
 
-    <section className="ecosystem-map section-wrap" aria-labelledby="map-heading">
+    <section className="ecosystem-map section-wrap" id="mapa" aria-labelledby="map-heading">
       <h2 id="map-heading">Cómo se organiza Vasees</h2>
       <p className="map-question">Distintas capacidades. Una misma pregunta: ¿cómo diseñamos mejores formas de vivir, trabajar y conectar en una sociedad más longeva?</p>
       <div className="map-diagram">
@@ -114,8 +118,12 @@ function Ecosystem() {
 
 function Observatory() {
   return <>
-    <section className="observatory-cover section-wrap"><div className="inner-breadcrumb"><SiteLink href="/">Inicio</SiteLink><span>/</span><span>Observatorio</span></div><div className="observatory-cover-heading"><div><p className="eyebrow">{observatory.name} <span className="inner-status">En preparación</span></p><h1 tabIndex={-1}>Comprender para<br />abrir posibilidades.</h1></div><p>Vivir más transforma el trabajo, el cuidado y las relaciones entre generaciones. Reunimos preguntas, fuentes y experiencias para explorar qué significan esos cambios.</p></div><SiteLink className="observatory-cover-image" href="/observatorio/vivir-mas"><img src="/images/editorial.webp" alt="Retrato conceptual de una mujer de cabello plateado bajo luz natural" fetchPriority="high" /><span className="tag">Exploración editorial de muestra</span><div><span>Lectura destacada</span><h2>Vivir más.<br />¿Estamos listos?</h2><span className="button button-lime">Leer la exploración<Arrow /></span></div></SiteLink></section>
-    <section className="research-lines section-wrap" id="lineas"><div className="section-heading"><h2>Una vida más larga.<br />Nuevas preguntas.</h2></div><div>{research.map(item => <SiteLink href="/observatorio/vivir-mas" key={item.number}><span className="eyebrow">{item.number} /</span><h3>{item.short}</h3><p>{item.text.split('?')[0]}{item.text.includes('?') ? '?' : ''}</p><Arrow /></SiteLink>)}</div></section>
+    <PageHero className="page-hero-observatory" title={'Comprender para\nabrir posibilidades.'}
+      description={`Vivir más transforma el trabajo, el cuidado y las relaciones entre generaciones. Reunimos preguntas, fuentes y experiencias para explorar qué significan esos cambios. El ${observatory.name} está en preparación.`}
+      image="/images/editorial.webp" alt="Retrato conceptual de una mujer de cabello plateado bajo luz natural" imagePosition="62% center"
+      actions={<SiteLink className="button button-lime" href="#lineas">Ver las preguntas<ArrowDown size={20} aria-hidden="true" /></SiteLink>}
+      card={<SiteLink className="page-hero-card" href="/observatorio/vivir-mas"><span className="page-hero-card-tag">Exploración editorial de muestra</span><strong>Vivir más. ¿Estamos listos?</strong><span className="page-hero-card-text">Tres puntos de partida sobre trabajo, cuidado y diseño de servicios.</span><span className="page-hero-card-link">Leer la exploración<Arrow /></span></SiteLink>} />
+    <section className="research-lines section-wrap" id="lineas"><div className="section-heading"><h2>Una vida más larga.<br />Nuevas preguntas.</h2></div><div>{research.map(item => <SiteLink href="/observatorio/vivir-mas" key={item.number}><h3>{item.short}</h3><p>{item.text.split('?')[0]}{item.text.includes('?') ? '?' : ''}</p><Arrow /></SiteLink>)}</div></section>
     <section className="observatory-library section-wrap" id="lecturas"><div className="library-row"><div><span className="tag">Exploración editorial</span><h2>Vivir más.<br />¿Estamos listos?</h2><p>Tres puntos de partida sobre trayectorias laborales, redes de cuidado y diseño de servicios.</p></div><div><span className="eyebrow">Una lectura para abrir la conversación</span><p>Una muestra del enfoque editorial del Observatorio. No es una investigación propia concluida.</p><SiteLink className="text-link" href="/observatorio/vivir-mas">Leer la exploración<Arrow /></SiteLink></div></div><a className="external-reading" href={site.source} target="_blank" rel="noreferrer"><span className="tag">Fuente externa · OMS</span><span>Envejecimiento y salud</span><span>Octubre de 2025</span><Arrow /></a><p className="source-note">Las investigaciones de Vasees y sus archivos se incorporarán cuando estén publicados. No hay descargas de informes disponibles en esta versión.</p></section>
     <section className="reading-context"><p className="eyebrow">Leer con contexto</p><h2>Una cifra necesita un año.<br />Una proyección,<br /><em>un horizonte.</em></h2><p>En cada lectura indicamos de dónde viene el dato y qué pregunta ayuda a explorar.</p></section>
     <Closing title={'¿Qué pregunta falta\nen esta conversación?'} text="Compártenos una pregunta, una experiencia o una fuente que pueda ampliar esta mirada." />
@@ -123,13 +131,19 @@ function Observatory() {
 }
 
 function ResearchArticle() {
-  return <article className="research-article"><header className="article-heading section-wrap"><div className="inner-breadcrumb"><SiteLink href="/">Inicio</SiteLink><span>/</span><SiteLink href="/observatorio">Observatorio</SiteLink><span>/</span><span>Lectura destacada</span></div><p className="eyebrow">Exploración editorial de muestra · Tres miradas</p><h1 tabIndex={-1}>Vivir más.<br /><em>¿Estamos listos?</em></h1><p>Más años de vida cambian las preguntas que hacemos sobre el trabajo, el cuidado y el diseño. Tres puntos de partida para conversar sobre esas decisiones.</p><div className="article-cover"><img src="/images/editorial.webp" alt="Retrato conceptual de una mujer mirando hacia la luz" fetchPriority="high" /></div></header><div className="article-reading section-wrap"><aside><p className="eyebrow">En esta lectura</p>{research.map(item => <SiteLink href={`#lectura-${item.number}`} key={item.number}><span>{item.number}</span>{item.short}</SiteLink>)}<SiteLink href="#fuentes"><Arrow />Fuentes y contexto</SiteLink></aside><div className="article-body"><p className="article-lead">Vivir más no es solo añadir años. También nos invita a revisar qué hacemos con ellos y qué posibilidades ayudan a construir nuestras organizaciones.</p><p>El trabajo, las redes de cuidado y los servicios reúnen decisiones que tomamos hoy. Mirarlas desde la longevidad abre preguntas sobre las distintas trayectorias de las personas y los entornos que las acompañan.</p>{research.map(item => <section id={`lectura-${item.number}`} key={item.number}><span className="eyebrow">{item.number} / {item.short}</span><h2>{item.title}</h2><p>{item.text}</p><blockquote>{item.number === '01' ? 'La experiencia no sigue una sola línea.' : item.number === '02' ? 'Una responsabilidad compartida necesita conversaciones compartidas.' : 'Diseñar empieza por observar, no por suponer.'}</blockquote></section>)}<section id="fuentes" className="article-sources"><span className="eyebrow">Fuentes y contexto</span><h2>Los datos también<br />necesitan una mirada.</h2><p>Según las proyecciones mundiales recogidas por la OMS, en 2030 una de cada seis personas tendrá 60 años o más. Para 2050, la población mundial de 60 años o más se proyecta en 2.100 millones.</p><a className="text-link" href={site.source} target="_blank" rel="noreferrer">OMS · Envejecimiento y salud (2025)<Arrow /></a><p className="source-note">Las cifras son proyecciones mundiales para población de 60 años o más. Los tres territorios anteriores son una reflexión editorial de muestra de Vasees, no resultados de investigación propia. No se ofrece un PDF de estudio.</p></section><SiteLink className="button button-dark" href="/observatorio"><ArrowLeft size={18} />Volver al Observatorio</SiteLink></div></div><Closing title={'El futuro se entiende\ncon más de una mirada.'} text="¿Qué cambia en tu organización cuando las personas viven más? Abramos esa pregunta." /></article>;
+  return <article className="research-article"><PageHero className="page-hero-article" title={<>Vivir más.<br /><em>¿Estamos listos?</em></>}
+      description="Más años de vida cambian las preguntas que hacemos sobre el trabajo, el cuidado y el diseño. Una exploración editorial de muestra con tres puntos de partida para conversar sobre esas decisiones."
+      image="/images/editorial.webp" alt="Retrato conceptual de una mujer mirando hacia la luz" imagePosition="62% center"
+      actions={<SiteLink className="button button-lime" href={`#lectura-${research[0].number}`}>Empezar a leer<ArrowDown size={20} aria-hidden="true" /></SiteLink>} /><div className="article-reading section-wrap"><aside><p className="eyebrow">En esta lectura</p>{research.map(item => <SiteLink href={`#lectura-${item.number}`} key={item.number}>{item.short}</SiteLink>)}<SiteLink href="#fuentes"><Arrow />Fuentes y contexto</SiteLink></aside><div className="article-body"><p className="article-lead">Vivir más no es solo añadir años. También nos invita a revisar qué hacemos con ellos y qué posibilidades ayudan a construir nuestras organizaciones.</p><p>El trabajo, las redes de cuidado y los servicios reúnen decisiones que tomamos hoy. Mirarlas desde la longevidad abre preguntas sobre las distintas trayectorias de las personas y los entornos que las acompañan.</p>{research.map(item => <section id={`lectura-${item.number}`} key={item.number}><h2>{item.title}</h2><p>{item.text}</p><blockquote>{item.number === '01' ? 'La experiencia no sigue una sola línea.' : item.number === '02' ? 'Una responsabilidad compartida necesita conversaciones compartidas.' : 'Diseñar empieza por observar, no por suponer.'}</blockquote></section>)}<section id="fuentes" className="article-sources"><span className="eyebrow">Fuentes y contexto</span><h2>Los datos también<br />necesitan una mirada.</h2><p>Según las proyecciones mundiales recogidas por la OMS, en 2030 una de cada seis personas tendrá 60 años o más. Para 2050, la población mundial de 60 años o más se proyecta en 2.100 millones.</p><a className="text-link" href={site.source} target="_blank" rel="noreferrer">OMS · Envejecimiento y salud (2025)<Arrow /></a><p className="source-note">Las cifras son proyecciones mundiales para población de 60 años o más. Los tres territorios anteriores son una reflexión editorial de muestra de Vasees, no resultados de investigación propia. No se ofrece un PDF de estudio.</p></section><SiteLink className="button button-dark" href="/observatorio"><ArrowLeft size={18} />Volver al Observatorio</SiteLink></div></div><Closing title={'El futuro se entiende\ncon más de una mirada.'} text="¿Qué cambia en tu organización cuando las personas viven más? Abramos esa pregunta." /></article>;
 }
 
 
 function Kanna() {
   return <>
-    <Hero category="Ecosistema · Kánna" title={'Experiencia que abre\nposibilidades.'} description="Las trayectorias guardan conocimiento, capacidad y nuevas preguntas. Kánna explora cómo reconocer el talento senior y conectarlo con oportunidades." image="/images/editorial.webp" alt="Retrato conceptual de una mujer de cabello plateado" cta="Hablemos" href="/?interes=tech#contacto" tone="kanna-hero" status="Producto propio en desarrollo" />
+    <PageHero className="page-hero-kanna" title={'Experiencia que abre\nposibilidades.'}
+      description="Las trayectorias guardan conocimiento, capacidad y nuevas preguntas. Kánna, un producto propio en desarrollo, explora cómo reconocer el talento senior y conectarlo con oportunidades."
+      image="/images/editorial.webp" alt="Retrato conceptual de una mujer de cabello plateado" imagePosition="62% center"
+      actions={<SiteLink className="button button-lime" href="/?interes=tech#contacto">Hablemos<Arrow /></SiteLink>} />
     <section className="inner-intro section-wrap"><div><h2>El talento no tiene<br />una sola<br /><em>etapa de vida.</em></h2><div><p className="lead">Queremos explorar lo que sigue siendo posible.</p><p>Kánna es una plataforma propia en desarrollo para talento senior. Partimos de la escucha y de las trayectorias de las personas para pensar cómo conectar experiencia y nuevas oportunidades.</p><p>Esta página presenta la iniciativa. No hay registro de perfiles, vacantes ni procesos de selección habilitados.</p><SiteLink href="/soluciones#tech" className="text-link">Conoce el enfoque de Vasees Tech<Arrow /></SiteLink></div></div></section>
     <Closing title={'¿Qué puede aportar\nuna nueva mirada?'} text="Si te interesa explorar talento senior desde tu organización o compartir una experiencia, conversemos." />
   </>;
@@ -174,5 +188,6 @@ export function InnerPage({ path, onNewsletter }: { path: string; onNewsletter: 
   };
   const Page = pages[path];
   const content = legal ? <Legal page={legal} /> : movedRoutes[path] ? <Moved to={movedRoutes[path]} /> : Page ? <Page /> : <section className="not-found section-wrap"><p className="eyebrow">404 · Una nueva dirección</p><h1 tabIndex={-1}>Este camino<br />todavía no existe.</h1><p>Podemos volver al inicio y encontrar otra forma de seguir explorando.</p><SiteLink className="button button-dark" href="/">Volver a Vasees<ArrowRight size={18} /></SiteLink></section>;
-  return <main id="contenido" className={`inner-page page-${legal ? 'legal' : path.split('/').filter(Boolean).join('-')}`} key={path}>{content}</main>;
+  const withHero = !legal && !movedRoutes[path] && Boolean(Page);
+  return <main id="contenido" className={`inner-page page-${legal ? 'legal' : path.split('/').filter(Boolean).join('-')}${withHero ? ' with-hero' : ''}`} key={path}>{content}</main>;
 }

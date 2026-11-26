@@ -78,7 +78,6 @@ export function ChispaPodcastHero({ onListen }: { onListen: () => void }) {
   }
 
   return <section className="chispa-podcast-hero" aria-labelledby="chispa-podcast-title">
-    <div className="chispa-podcast-topline"><div className="inner-breadcrumb"><SiteLink href="/">Inicio</SiteLink><span>/</span><SiteLink href="/ecosistema">Ecosistema</SiteLink><span>/</span><span>La Chispa</span></div><span>El medio editorial de Vasees</span></div>
     <header className="chispa-podcast-intro">
       <div className="chispa-podcast-brand"><img src="/images/brands/chispa-mark.svg" alt="" width="35" height="35" /><img src="/images/brands/chispa-wordmark.svg" alt="La Chispa" width="188" height="29" /><span>Podcast</span></div>
       <h1 id="chispa-podcast-title" tabIndex={-1}>Conversaciones<br /><em>que encienden.</em></h1>

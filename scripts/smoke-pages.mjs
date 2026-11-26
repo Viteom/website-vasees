@@ -9,6 +9,7 @@ let logs = '', count = 0, browser, offlineServer;
 server.stdout.on('data', data => logs += data.toString());
 server.stderr.on('data', data => logs += data.toString());
 const ok = (condition, message) => { assert.ok(condition, message); count++; };
+const legalRoutes = ['/privacidad', '/terminos', '/cookies', '/terminos-escuela'];
 const routes = ['/soluciones', '/ecosistema', '/observatorio', '/observatorio/vivir-mas', '/escuela', '/ecosistema/kanna', '/la-chispa', '/privacidad', '/terminos', '/cookies', '/terminos-escuela'];
 try {
   for (let i = 0; i < 100 && !/Local/.test(logs); i++) {
@@ -33,6 +34,17 @@ try {
       await page.addStyleTag({ content: 'html{scroll-behavior:auto!important}' });
       ok(await page.locator('h1').count() === 1, `${route} at ${width}: one heading after hydration`);
       ok(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), `${route} at ${width}: no horizontal overflow`);
+      if (!legalRoutes.includes(route)) {
+        // Every inner page opens with a full-screen hero that holds the page title, with no breadcrumb, eyebrow or numbering.
+        const hero = await page.evaluate(() => {
+          const element = document.querySelector('.page-hero, .school-landing-hero, .chispa-podcast-hero');
+          if (!element) return null;
+          const rect = element.getBoundingClientRect();
+          return { top: rect.top, height: rect.height, holdsTitle: element.contains(document.querySelector('h1')), smallText: element.querySelectorAll('.inner-breadcrumb, .school-breadcrumb, .eyebrow, .chispa-podcast-topline').length, numbered: /(^|\s)0\d\s*\//.test(element.innerText) };
+        });
+        ok(hero && hero.top <= 16 && hero.holdsTitle && hero.smallText === 0 && !hero.numbered, `${route} at ${width}: hero holds the title without breadcrumb, eyebrow or numbering`);
+        if (width !== 390 || !route.startsWith('/escuela') && route !== '/la-chispa') ok(hero.height >= page.viewportSize().height - 40, `${route} at ${width}: hero fills the screen (${Math.round(hero.height)} px)`);
+      }
       for (const image of await page.locator('main img').all()) {
         if (!await image.evaluate(el => Boolean(el.closest('.chispa-guest')))) await image.scrollIntoViewIfNeeded();
         await image.evaluate(img => img.decode());
@@ -64,7 +76,7 @@ try {
   await page.locator('#contacto').waitFor();
   ok(await page.locator('input[name=interest][value=tech]').isChecked(), 'Tech CTA preselects its interest');
   await page.goBack();
-  await page.locator('.solutions-hero').waitFor();
+  await page.locator('.page-hero-solutions').waitFor();
   ok(page.url().includes('/soluciones'), 'Browser back restores the previous page');
   await page.getByRole('link', { name: 'Hablemos' }).first().click();
   await page.locator('#contacto').waitFor();
@@ -81,8 +93,8 @@ try {
   offlinePage.on('request', req => { if (!req.isNavigationRequest() && req.url().startsWith('http')) extraRequests.push(req.url()); });
   await offlinePage.goto(offlineUrl, { waitUntil: 'networkidle' });
   await offlinePage.getByRole('link', { name: 'Explora el Observatorio' }).click();
-  await offlinePage.locator('.observatory-cover').waitFor();
-  await offlinePage.locator('.observatory-cover-image').click();
+  await offlinePage.locator('.page-hero-observatory').waitFor();
+  await offlinePage.locator('.page-hero-card').click();
   await offlinePage.locator('.research-article').waitFor();
   await offlinePage.locator('.article-reading aside').getByRole('link', { name: 'Fuentes y contexto' }).click();
   ok(await offlinePage.locator('.research-article').isVisible() && offlinePage.url().includes('section=fuentes'), 'Offline article anchors preserve the page');
